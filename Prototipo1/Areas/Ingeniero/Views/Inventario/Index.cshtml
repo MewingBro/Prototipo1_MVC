@@ -1,0 +1,52 @@
+﻿@model List<Inventario>
+<partial name="_Notification" />
+    <div class="container">
+
+    <div class="row pt-4 pb-3">
+        <div class="col-6">
+            <h2 class="text-primary">Inventario del Proyecto actual</h2>
+        </div>
+    </div>
+
+
+<table class="table table-bordered table-stripped">
+    <thead>
+    <tr>
+        <th>
+            Id de Inventario
+        </th>
+        <th>
+            Id de Producto
+        </th>
+        <th>
+            Nombre de Producto
+        </th>
+        <th>
+             Existencias
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+        @foreach (var obj in Model.OrderBy(u=>u.IdInventario))
+        {
+            <tr>
+            <td>
+                @obj.IdInventario
+            </td>
+            <td>
+                @obj.IdProducto
+            </td>
+            <td>
+                @obj.Producto.NombreProducto
+            </td>
+            <td>
+                @obj.Existencias
+            </td>
+            
+        
+        </tr>
+        }
+    </tbody>
+</table>
+
+</div>

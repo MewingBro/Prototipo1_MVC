@@ -1,0 +1,87 @@
+﻿@model List<Producto>
+<partial name="_Notification" />
+    <div class="container">
+
+    <div class="row pt-4 pb-3">
+        <div class="col-6">
+            <h2 class="text-primary">Lista de Productos</h2>
+        </div>
+        <div class="col-6 text-end">
+            <a asp-controller="Producto" asp-action="Upsert" asp-route-IdFactura="@ViewBag.IdFactura" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Agregar Producto
+            </a>
+        </div>
+    </div>
+
+
+<table class="table table-bordered table-stripped">
+    <thead>
+    <tr>
+        <th>
+            Id de Producto
+        </th>
+        <th>
+            Codigo de la Producto
+        </th>
+        <th>
+            Nombre de la Producto
+        </th>
+        <th>
+            Descripcion
+        </th>
+        <th>
+            Media Aritmetica
+        </th>
+
+                <th>
+                    Familia
+                </th>
+                <th>
+                    Unidad
+                </th>
+    </tr>
+    </thead>
+    <tbody>
+        @foreach (var obj in Model.OrderBy(u=>u.IdProducto))
+        {
+            <tr>
+            <td>
+                @obj.IdProducto
+            </td>
+            <td>
+                @obj.CodigoProducto
+            </td>
+            <td>
+                @obj.NombreProducto
+            </td>
+            <td>
+                @obj.Descripcion
+            </td>
+            <td>
+                @obj.MediaArtimetica
+            </td>
+
+                    <td>
+                        @obj.Familia.NombreFamilia
+                    </td>
+                    <td>
+                        @obj.Unidad.NombreUnidad
+                    </td>
+            <td>
+                <div class="w-75 btn-group" role="group">
+                    <a asp-controller="Producto" asp-action="Upsert" asp-route-IdProducto="@obj.IdProducto" class="btn btn-primary mx-2">
+                                <i class="bi bi-pencil">Editar Producto</i>
+                    </a>
+                            <a asp-controller="Producto" asp-action="Borrar" asp-route-IdProducto="@obj.IdProducto" class="btn btn-danger mx-2">
+                                <i class="bi bi-trash3"></i>Borrar Producto
+                            </a>
+                            
+                </div>
+            </td>
+        
+        </tr>
+        }
+    </tbody>
+</table>
+
+</div>

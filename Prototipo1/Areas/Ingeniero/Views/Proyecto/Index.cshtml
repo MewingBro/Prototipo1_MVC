@@ -1,0 +1,58 @@
+﻿@model List<Proyecto>
+<partial name="_Notification" />
+    <div class="container">
+
+    <div class="row pt-4 pb-3">
+        <div class="col-6">
+            <h2 class="text-primary">Lista de Proyectos</h2>
+        </div>
+        <div class="col-6 text-end">
+            <a asp-controller="Proyecto" asp-action="Upsert" asp-route-IdProyecto="@ViewBag.IdProyecto" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Agregar Proyecto
+            </a>
+        </div>
+    </div>
+
+
+<table class="table table-bordered table-stripped">
+    <thead>
+    <tr>
+        <th>
+            Id de Proyecto
+        </th>
+        <th>
+            Nombre del Proyecto
+        </th>
+        <th>
+
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+        @foreach (var obj in Model.OrderBy(u=>u.IdProyecto))
+        {
+            <tr>
+            <td>
+                @obj.IdProyecto
+            </td>
+            <td>
+                @obj.NombreProyecto
+            </td>
+            <td>
+                <div class="w-75 btn-group" role="group">
+                    <a asp-controller="Proyecto" asp-action="Upsert" asp-route-IdProyecto="@obj.IdProyecto" class="btn btn-primary mx-2">
+                                <i class="bi bi-pencil">Editar Proyecto</i>
+                    </a>
+                            <a asp-controller="Proyecto" asp-action="Borrar" asp-route-IdProyecto="@obj.IdProyecto" class="btn btn-danger mx-2">
+                                <i class="bi bi-trash3"></i>Borrar Proyecto
+                            </a>
+                            
+                </div>
+            </td>
+        
+        </tr>
+        }
+    </tbody>
+</table>
+
+</div>

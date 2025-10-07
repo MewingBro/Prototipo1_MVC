@@ -1,0 +1,65 @@
+﻿@model List<Nivel>
+<partial name="_Notification" />
+    <div class="container">
+
+    <div class="row pt-4 pb-3">
+        <div class="col-6">
+            <h2 class="text-primary">Lista de Niveles</h2>
+        </div>
+        <div class="col-6 text-end">
+            <a asp-controller="Nivel" asp-action="Upsert" asp-route-IdProyecto="@ViewBag.IdProyecto" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Agregar Nivel
+            </a>
+        </div>
+    </div>
+
+
+<table class="table table-bordered table-stripped">
+    <thead>
+    <tr>
+        <th>
+            Id de Nivel
+        </th>
+        <th>
+            Nombre del Nivel
+        </th>
+                <th>
+                    Nombre del Proyecto
+                </th>
+                <th>
+
+                </th>
+    </tr>
+    </thead>
+    <tbody>
+        @foreach (var obj in Model.OrderBy(u=>u.IdNivel))
+        {
+            <tr>
+            <td>
+                @obj.IdNivel
+            </td>
+            <td>
+                @obj.NombreNivel
+            </td>
+                    <td>
+                        @obj.Proyecto.NombreProyecto
+                    </td>
+
+            <td>
+                <div class="w-75 btn-group" role="group">
+                    <a asp-controller="Nivel" asp-action="Upsert" asp-route-IdNivel="@obj.IdNivel" class="btn btn-primary mx-2">
+                                <i class="bi bi-pencil">Editar Nivel</i>
+                    </a>
+                            <a asp-controller="Nivel" asp-action="Borrar" asp-route-IdNivel="@obj.IdNivel" class="btn btn-danger mx-2">
+                                <i class="bi bi-trash3"></i>Borrar Nivel
+                            </a>
+                            
+                </div>
+            </td>
+        
+        </tr>
+        }
+    </tbody>
+</table>
+
+</div>

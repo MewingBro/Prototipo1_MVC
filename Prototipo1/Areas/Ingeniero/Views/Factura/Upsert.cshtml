@@ -1,0 +1,74 @@
+﻿@model Prototipo1.Models.ViewModels.FacturaVM
+
+<form method="post" class="row" enctype="multipart/form-data">
+    <input asp-for="Factura.IdFactura" hidden/>
+    <div class="row">
+        <div class="col-10">
+    <div class="border p-3 mt-4">
+        <div class="row pb-2">
+            <h2 class="text-primary">
+                        @(Model.Factura.IdFactura != 0 ? "Actualizar" : "Crear") Factura
+            </h2>
+        </div>
+        <div class="mb-3 row p-1">
+            <label asp-for="Factura.Fecha" class="p-0"></label>
+            <input asp-for="Factura.Fecha" class="form-control"/>
+            <span asp-validation-for="Factura.Fecha" class="text-danger"></span>
+        </div>
+
+
+                <input asp-for="Factura.IdTipoFactura" value="1" hidden />
+
+                <div class="mb-3 row p-1">
+                    <label asp-for="Factura.Comentario" class="p-0"></label>
+                    <input asp-for="Factura.Comentario" class="form-control" />
+                    <span asp-validation-for="Factura.Comentario" class="text-danger"></span>
+                </div>
+
+        
+        <div class="row">
+            <div class="col-6 col-md-3">
+
+                @if (Model.Factura.IdFactura != 0)
+                        {
+                            <a asp-controller="FacturaProducto" asp-action="Index" asp-route-IdFactura="@Model.Factura.IdFactura" class="btn btn-outline-secondary form-control">
+                        Agregar Productos a la Factura
+                    </a>
+                        }
+                        else
+                        {
+                    <button type="submit" name="accion" value="AgregarProductosAhora" class="btn btn-outline-secondary form-control">
+                        Guardar y Agregar Productos a la Factura
+                        </button>
+                        }
+                
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-6 col-md-3">
+                        @if (Model.Factura.IdFactura != 0)
+                        {
+                            <button type="submit" name="accion" value="AgregarProductosDespues" class="btn btn-primary form-control">
+                                Actualizar Factura
+                                </button>
+                        }
+                        else
+                        {
+                            
+                    <button type="submit" name="accion" value="AgregarProductosDespues" class="btn btn-primary form-control">
+                        Agregar Factura y volver al menú
+                        </button>
+                        }
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-controller="Factura" asp-action="Index" class="btn btn-outline-secondary form-control">
+                    Volver a la lista
+                </a>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+    
+</form>

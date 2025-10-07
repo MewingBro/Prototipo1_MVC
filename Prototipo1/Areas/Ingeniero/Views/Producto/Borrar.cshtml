@@ -1,0 +1,43 @@
+﻿@model Producto
+
+<form method="post">
+    <input asp-for="IdProducto" hidden/>
+    <div class="border p-3 mt-4">
+        <div class="row pb-2">
+            <h2 class="text-primary">
+                Borrar Producto
+            </h2>
+        </div>
+        <div class="mb-3 row p-1">
+            <label asp-for="CodigoProducto" class="p-0"></label>
+            <input asp-for="CodigoProducto" disabled class="form-control" />
+        </div>
+
+        <div class="mb-3 row p-1">
+            <label asp-for="NombreProducto" class="p-0"></label>
+            <input asp-for="NombreProducto" disabled class="form-control" />
+        </div>
+
+        <div class="mb-3 row p-1">
+            <label asp-for="Descripcion" class="p-0"></label>
+            <input asp-for="Descripcion" disabled class="form-control" />
+        </div>
+
+        <div class="mb-3 row p-1">
+            <label asp-for="MediaArtimetica" class="p-0"></label>
+            <input asp-for="MediaArtimetica" disabled class="form-control" />
+        </div>
+
+
+        <div class="row">
+            <div class="col-6 col-md-3">
+                <button type="submit" class="btn btn-danger form-control">Borrar</button>
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-controller="Producto" asp-action="Index" class="btn btn-outline-secondary form-control">
+                    Volver a la lista
+                </a>
+            </div>
+        </div>
+    </div>
+</form>

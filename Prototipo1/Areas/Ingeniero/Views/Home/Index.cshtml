@@ -1,0 +1,47 @@
+﻿@model IEnumerable<Proyecto>
+
+<div class="row pb-2">
+    @if (@Context.Session.GetInt32("IdProyecto") == 0 || @Context.Session.GetInt32("IdProyecto") == null)
+    {
+        <h2 class="text-primary">
+            Seleccionar Proyecto
+        </h2>
+    } else
+    {
+        <h2 class="text-primary">
+            Proyecto Seleccionado : @Context.Session.GetString("NombreProyecto")
+        </h2>
+    }
+    
+</div>
+
+
+<div class="row pb-3">
+    @foreach (var proyecto in Model)
+    {
+        <div class="col-lg-3 col-sm-3">
+            <div class="row p-2">
+                <div class="col-12 p-1">
+                    <div class="card border-0 p-3 shadow border-top border-5 rounded">
+                        <img src="@proyecto.ImageURL" class="card-img-top rounded" />
+                        <div class="card-body pb-0">
+                            <div class="pl-1">
+                                <p class="card-title h5 text-dark opacity-75 text-uppercase text-center">@proyecto.NombreProyecto </p>
+                            </div>
+                        </div>
+                        <div>
+                            <form asp-controller="Home" asp-action="SeleccionarProyecto" asp-route-IdProyecto="@proyecto.IdProyecto"
+                                  asp-route-NombreProyecto="@proyecto.NombreProyecto" method="post">
+                                <button type="submit" class="btn btn-primary bg-gradient border-0 form-control">
+                                    Seleccionar Proyecto
+                                </button>
+                            </form>
+                        </div>
+
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    }
+</div>

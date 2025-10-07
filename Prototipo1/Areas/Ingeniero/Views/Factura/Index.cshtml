@@ -1,0 +1,72 @@
+﻿@model List<Factura>
+<partial name="_Notification" />
+    <div class="container">
+
+    <div class="row pt-4 pb-3">
+        <div class="col-6">
+            <h2 class="text-primary">Lista de Facturas</h2>
+        </div>
+        <div class="col-6 text-end">
+            <a asp-controller="Factura" asp-action="Upsert" asp-route-Tipo="@ViewBag.Tipo" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Agregar factura
+            </a>
+        </div>
+    </div>
+
+
+<table class="table table-bordered table-stripped">
+    <thead>
+    <tr>
+        <th>
+            Id de factura
+        </th>
+        <th>
+            Fecha
+        </th>
+        <th>
+            Tipo de Factura
+        </th>
+        <th>
+            Comentario
+        </th>
+        <th>
+
+        </th>
+    
+    </tr>
+    </thead>
+    <tbody>
+        @foreach (var obj in Model.OrderBy(u=>u.IdFactura))
+        {
+            <tr>
+            <td>
+                @obj.IdFactura
+            </td>
+            <td>
+                @obj.Fecha
+            </td>
+            <td>
+                @obj.TipoFactura.NombreTipoFactura
+            </td>
+            <td>
+                @obj.Comentario
+            </td>
+
+            <td>
+                <div class="w-75 btn-group" role="group">
+                    <a asp-controller="factura" asp-action="Upsert" asp-route-IdFactura="@obj.IdFactura" class="btn btn-primary mx-2">
+                                <i class="bi bi-pencil">Editar factura</i>
+                    </a>
+                            <a asp-controller="factura" asp-action="Borrar" asp-route-IdFactura="@obj.IdFactura" class="btn btn-danger mx-2">
+                                <i class="bi bi-trash3">Borrar Factura</i>
+                            </a>
+                            
+                </div>
+            </td>
+        
+        </tr>
+        }
+    </tbody>
+</table>
+
+</div>

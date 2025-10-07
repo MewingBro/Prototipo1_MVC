@@ -1,0 +1,86 @@
+﻿@model Prototipo1.Models.ViewModels.ProductoVM
+
+<form method="post" class="row" enctype="multipart/form-data">
+    <input asp-for="Producto.IdProducto" hidden/>
+    <input asp-for="Producto.ImageURL" hidden/>
+    <div class="row">
+        <div class="col-10">
+    <div class="border p-3 mt-4">
+        <div class="row pb-2">
+            <h2 class="text-primary">
+                        @(Model.Producto.IdProducto != 0 ? "Actualizar" : "Crear") Producto
+            </h2>
+        </div>
+        <div class="mb-3 row p-1">
+            <label asp-for="Producto.CodigoProducto" class="p-0"></label>
+            <input asp-for="Producto.CodigoProducto" class="form-control" />
+            <span asp-validation-for="Producto.CodigoProducto" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3 row p-1">
+            <label asp-for="Producto.NombreProducto" class="p-0"></label>
+            <input asp-for="Producto.NombreProducto" class="form-control" />
+            <span asp-validation-for="Producto.NombreProducto" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3 row p-1">
+            <label asp-for="Producto.Descripcion" class="p-0"></label>
+            <input asp-for="Producto.Descripcion" class="form-control" />
+            <span asp-validation-for="Producto.Descripcion" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3 row p-1">
+            <label asp-for="Producto.MediaArtimetica" class="p-0"></label>
+            <input asp-for="Producto.MediaArtimetica" class="form-control" />
+            <span asp-validation-for="Producto.MediaArtimetica" class="text-danger"></span>
+        </div>
+
+
+        <div class="mb-3 row p-1">
+            <label class="p-0">Familia</label>
+            <select asp-for="@Model.Producto.IdFamilia" asp-items="@Model.FamiliaList" class="form-select">
+                <option disabled selected>---Seleccionar Familia---</option>
+            </select>
+            <span asp-validation-for="Producto.IdFamilia" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3 row p-1">
+            <label class="p-0">Unidad</label>
+            <select asp-for="@Model.Producto.IdUnidad" asp-items="@Model.UnidadList" class="form-select">
+                <option disabled selected>---Seleccionar Unidad---</option>
+            </select>
+            <span asp-validation-for="Producto.IdUnidad" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3 row p-1">
+            <label asp-for="Producto.ImageURL" class="p-0"></label>
+            <input type="file" name="file" class="form-control" />
+            <span asp-validation-for="Producto.ImageURL" class="text-danger"></span>
+        </div>
+
+        <div class="row">
+            <div class="col-6 col-md-3">
+                        @if (Model.Producto.IdProducto != 0)
+                        {
+                        <button type="submit" class="btn btn-primary form-control">Actualizar</button>
+                        }
+                        else
+                        {
+                    <button type="submit" class="btn btn-primary form-control">Agregar</button>
+                        }
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-controller="Producto" asp-action="Index" class="btn btn-outline-secondary form-control">
+                    Volver a la lista
+                </a>
+            </div>
+        </div>
+    </div>
+    </div>
+    <div class="col-2">
+        <img src="@Model.Producto.ImageURL" width="100%"
+         style="border-radius:5px; border:1px solid #bbb9b9"/>
+    </div>
+    </div>
+    
+</form>
