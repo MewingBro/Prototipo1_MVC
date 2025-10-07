@@ -23,7 +23,13 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
 
         public IActionResult Index(string Tipo)
         {
-            List<Factura> objFacturaLista = _unitOfWork.Factura.GetAll(includeProperties:"TipoFactura").ToList();
+
+            int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
+
+            List<Factura> objFacturaLista = _unitOfWork.Factura
+                .GetAllBYID(f => f.IdProyecto == idProyecto, includeProperties: "TipoFactura,Proyecto")
+                .ToList();
+
 
             ViewBag.Tipo = Tipo;
 

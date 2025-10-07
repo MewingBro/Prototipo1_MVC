@@ -13,6 +13,6 @@ namespace Prototipo1.Repository.IRepository
     public interface IFacturaProductoRepository : IRepository<FacturaProducto>
     {
         void Update(FacturaProducto FacturaProducto);
-        void AddWithInventario(FacturaProducto facturaProducto);
+        void AddWithInventario(FacturaProducto facturaProducto, int? idProyecto);
     }
 }

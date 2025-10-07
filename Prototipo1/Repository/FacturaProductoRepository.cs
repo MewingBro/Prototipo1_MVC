@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Prototipo1.Data;
+using Prototipo1.Migrations;
 using Prototipo1.Models;
 using Prototipo1.Models.ViewModels;
 using Prototipo1.Repository.IRepository;
@@ -21,30 +22,36 @@ namespace Prototipo1.Repository
             _db = db;
         }
 
-        public void AddWithInventario(FacturaProducto facturaProducto)
+        public void AddWithInventario(FacturaProducto facturaProducto, int? idProyecto)
         {
+            if (!idProyecto.HasValue)
+                throw new ArgumentNullException(nameof(idProyecto), "El IdProyecto no puede ser nulo.");
 
-            var inventario = _db.Inventario.FirstOrDefault(i => i.IdProducto == facturaProducto.IdProducto);
+            int idProyecto1 = idProyecto.Value;
+
+            // 🔹 Busca combinando ambos campos
+            var inventario = _db.Inventario
+                .FirstOrDefault(i => i.IdProducto == facturaProducto.IdProducto && i.IdProyecto == idProyecto1);
 
             if (inventario != null)
             {
-                // Ya existe → sumamos existencias
+                //Si ya existe esa combinación → actualiza existencias
                 inventario.Existencias += facturaProducto.CantidadAumentada;
                 _db.Inventario.Update(inventario);
             }
             else
             {
-                // No existe → creamos un nuevo registro de inventario
+                //Si no existe → crea un nuevo registro
                 inventario = new Inventario
                 {
                     IdProducto = facturaProducto.IdProducto,
-                    Existencias = facturaProducto.CantidadAumentada
+                    Existencias = facturaProducto.CantidadAumentada,
+                    IdProyecto = idProyecto1
                 };
                 _db.Inventario.Add(inventario);
             }
-
         }
-        
+
 
         public void Update(FacturaProducto facturaProducto)
         {
@@ -56,15 +63,17 @@ namespace Prototipo1.Repository
                 facturaProductoFromDB.IdProducto = facturaProducto.IdProducto;
                 facturaProductoFromDB.CantidadAumentada = facturaProducto.CantidadAumentada;
                 facturaProductoFromDB.EntregadoA = facturaProducto.EntregadoA;
-
+                /*
                 var inventarioFromDB = _db.Inventario
                 .FirstOrDefault(i => i.IdProducto == facturaProducto.IdProducto);
+
 
                 if (inventarioFromDB != null)
                 {
                     // Actualizar existencias
                     inventarioFromDB.Existencias += facturaProducto.CantidadAumentada;
                 }
+                */
 
             }
         }

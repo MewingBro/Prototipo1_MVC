@@ -8,7 +8,7 @@ namespace Prototipo1.Models.ViewModels
         public Factura Factura { get; set; }
         [ValidateNever]
         public IEnumerable<SelectListItem> TipoFacturaList { get; set; }
-
+        [ValidateNever]
         public IEnumerable<SelectListItem> ProyectoList { get; set; }
 
     }

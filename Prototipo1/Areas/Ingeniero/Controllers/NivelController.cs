@@ -6,6 +6,7 @@ using Prototipo1.Repository;
 using Prototipo1.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Prototipo1.Models.ViewModels;
+using Prototipo1.Migrations;
 
 namespace Prototipo1.Areas.Ingeniero.Controllers
 {
@@ -23,7 +24,12 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
 
         public IActionResult Index()
         {
-            List<Nivel> objNivelLista = _unitOfWork.Nivel.GetAll(includeProperties:"Proyecto").ToList();
+
+            int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
+
+            List<Nivel> objNivelLista = _unitOfWork.Nivel
+                .GetAllBYID(f => f.IdProyecto == idProyecto, includeProperties: "Proyecto")
+                .ToList();
 
 
             return View(objNivelLista);

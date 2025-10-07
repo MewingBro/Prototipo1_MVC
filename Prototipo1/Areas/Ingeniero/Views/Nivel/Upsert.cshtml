@@ -18,14 +18,7 @@
             <span asp-validation-for="Nivel.NombreNivel" class="text-danger"></span>
         </div>
 
-        <div class="mb-3 row p-1">
-            <label class="p-0">Proyecto</label>
-            <select asp-for="@Model.Nivel.IdProyecto" asp-items="@Model.ProyectoList" class="form-select">
-                <option disabled selected>---Seleccionar Proyecto---</option>
-            </select>
-            <span asp-validation-for="Nivel.IdProyecto" class="text-danger"></span>
-        </div>
-
+                <input asp-for="Nivel.IdProyecto" value="@Context.Session.GetInt32("IdProyecto")" hidden />
 
         <div class="row">
             <div class="col-6 col-md-3">

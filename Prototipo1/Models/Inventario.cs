@@ -25,7 +25,10 @@ namespace Prototipo1.Models
         [Required]
         public double Existencias { get; set; }
 
-
+        public int IdProyecto { get; set; }
+        [ForeignKey("IdProyecto")]
+        [ValidateNever]
+        public Proyecto Proyecto { get; set; }
 
 
     }

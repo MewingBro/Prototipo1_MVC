@@ -38,9 +38,11 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
         .GetAllBYID(f => f.IdFactura == IdFactura, includeProperties: "Factura,Producto")
         .ToList();
 
+            int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
+
             foreach (var x in objFacturaProductoLista)
             {
-                _unitOfWork.FacturaProducto.AddWithInventario(x);
+                _unitOfWork.FacturaProducto.AddWithInventario(x,idProyecto);
                 _unitOfWork.Save();
             }
 

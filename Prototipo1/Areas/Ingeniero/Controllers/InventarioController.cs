@@ -23,7 +23,9 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
 
         public IActionResult Index()
         {
-            List<Inventario> objInventarioLista = _unitOfWork.Inventario.GetAll(includeProperties:"Producto").ToList();
+            int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
+            List<Inventario> objInventarioLista = 
+                _unitOfWork.Inventario.GetAllBYID(f => f.IdProyecto == idProyecto,includeProperties:"Producto,Proyecto").ToList();
 
 
             return View(objInventarioLista);

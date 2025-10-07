@@ -2,6 +2,7 @@
 
 <form method="post" class="row" enctype="multipart/form-data">
     <input asp-for="Factura.IdFactura" hidden/>
+    <input asp-for="Factura.IdProyecto" value="@Context.Session.GetInt32("IdProyecto")" hidden />
     <div class="row">
         <div class="col-10">
     <div class="border p-3 mt-4">
