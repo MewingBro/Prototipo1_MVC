@@ -28,6 +28,10 @@ namespace Prototipo1.Repository
 
         public INivelRepository Nivel { get; private set; }
 
+        public IAposentoRepository Aposento { get; private set; }
+
+        public IRecintoRepository Recinto { get; private set; }
+
         public UnitOfWork(AppDBContext db)
         {
             _db = db;
@@ -40,6 +44,8 @@ namespace Prototipo1.Repository
             Inventario = new InventarioRepository(db);
             Proyecto = new ProyectoRepository(db);
             Nivel = new NivelRepository(db);
+            Aposento = new AposentoRepository(db);
+            Recinto = new RecintoRepository(db);
         }
 
         

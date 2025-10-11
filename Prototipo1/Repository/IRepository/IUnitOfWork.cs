@@ -30,6 +30,10 @@ namespace Prototipo1.Repository.IRepository
 
         INivelRepository Nivel { get; }
 
+        IAposentoRepository Aposento { get; }
+
+        IRecintoRepository Recinto { get; }
+
         void Save();
     }
 }

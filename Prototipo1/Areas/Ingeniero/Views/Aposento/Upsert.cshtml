@@ -1,0 +1,50 @@
+﻿@model Prototipo1.Models.ViewModels.AposentoVM
+
+<form method="post" class="row" enctype="multipart/form-data">
+    <input asp-for="Aposento.IdAposento" hidden/>
+    <div class="row">
+        <div class="col-10">
+    <div class="border p-3 mt-4">
+        <div class="row pb-2">
+            <h2 class="text-primary">
+                        @(Model.Aposento.IdAposento != 0 ? "Actualizar" : "Crear") Aposento
+            </h2>
+        </div>
+
+
+        <div class="mb-3 row p-1">
+            <label asp-for="Aposento.NombreAposento" class="p-0"></label>
+            <input asp-for="Aposento.NombreAposento" class="form-control" />
+            <span asp-validation-for="Aposento.NombreAposento" class="text-danger"></span>
+        </div>
+
+                <div class="mb-3 row p-1">
+                    <label class="p-0">Nivel</label>
+                    <select asp-for="@Model.Aposento.IdNivel" asp-items="@Model.NivelList" class="form-select">
+                        <option disabled selected>---Seleccionar Nivel---</option>
+                    </select>
+                    <span asp-validation-for="Aposento.IdNivel" class="text-danger"></span>
+                </div>
+
+        <div class="row">
+            <div class="col-6 col-md-3">
+                        @if (Model.Aposento.IdAposento != 0)
+                        {
+                        <button type="submit" class="btn btn-primary form-control">Actualizar</button>
+                        }
+                        else
+                        {
+                    <button type="submit" class="btn btn-primary form-control">Agregar</button>
+                        }
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-controller="Aposento" asp-action="Index" class="btn btn-outline-secondary form-control">
+                    Volver a la lista
+                </a>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+    
+</form>

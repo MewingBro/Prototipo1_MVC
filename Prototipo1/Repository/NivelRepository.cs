@@ -12,23 +12,23 @@ using Prototipo1.Repository.IRepository;
 
 namespace Prototipo1.Repository
 {
-    public class NivelRepository : Repository<Nivel>,INivelRepository
+    public class RecintoRepository : Repository<Recinto>,IRecintoRepository
     {
         private AppDBContext _db;
-        public NivelRepository(AppDBContext db) : base(db)
+        public RecintoRepository(AppDBContext db) : base(db)
         {
             _db = db;
         }
 
 
-        public void Update(Nivel Nivel)
+        public void Update(Recinto Recinto)
         {
-            var NivelFromDB = _db.Nivel.FirstOrDefault(u => u.IdNivel == Nivel.IdNivel);
-            if (NivelFromDB != null)
+            var RecintoFromDB = _db.Recinto.FirstOrDefault(u => u.IdRecinto == Recinto.IdRecinto);
+            if (RecintoFromDB != null)
             {
-                NivelFromDB.IdNivel = Nivel.IdNivel;
-                NivelFromDB.NombreNivel = Nivel.NombreNivel;
-                NivelFromDB.IdProyecto= Nivel.IdProyecto;
+                RecintoFromDB.IdRecinto = Recinto.IdRecinto;
+                RecintoFromDB.NombreRecinto = Recinto.NombreRecinto;
+                RecintoFromDB.IdAposento= Recinto.IdAposento;
            
             
             }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Prototipo1.Data;
 
@@ -11,9 +12,11 @@ using Prototipo1.Data;
 namespace Prototipo1.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20251008055617_addAposento")]
+    partial class addAposento
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -299,28 +302,6 @@ namespace Prototipo1.Migrations
                     b.ToTable("Proyecto");
                 });
 
-            modelBuilder.Entity("Prototipo1.Models.Recinto", b =>
-                {
-                    b.Property<int>("IdRecinto")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdRecinto"));
-
-                    b.Property<int>("IdAposento")
-                        .HasColumnType("int");
-
-                    b.Property<string>("NombreRecinto")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("IdRecinto");
-
-                    b.HasIndex("IdAposento");
-
-                    b.ToTable("Recinto");
-                });
-
             modelBuilder.Entity("Prototipo1.Models.TipoFactura", b =>
                 {
                     b.Property<int>("IdTipoFactura")
@@ -491,17 +472,6 @@ namespace Prototipo1.Migrations
                     b.Navigation("Familia");
 
                     b.Navigation("Unidad");
-                });
-
-            modelBuilder.Entity("Prototipo1.Models.Recinto", b =>
-                {
-                    b.HasOne("Prototipo1.Models.Aposento", "Aposento")
-                        .WithMany()
-                        .HasForeignKey("IdAposento")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Aposento");
                 });
 #pragma warning restore 612, 618
         }

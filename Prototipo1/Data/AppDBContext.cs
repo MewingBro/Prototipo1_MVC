@@ -27,6 +27,10 @@ namespace Prototipo1.Data
 
         public DbSet<Nivel> Nivel { get; set; }
 
+        public DbSet<Aposento> Aposento { get; set; }
+
+        public DbSet<Recinto> Recinto { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Familia>().HasData(
