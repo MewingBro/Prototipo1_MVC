@@ -32,6 +32,8 @@ namespace Prototipo1.Repository
 
         public IRecintoRepository Recinto { get; private set; }
 
+        public IRecintoProductoRepository RecintoProducto { get; private set; }
+
         public UnitOfWork(AppDBContext db)
         {
             _db = db;
@@ -46,6 +48,7 @@ namespace Prototipo1.Repository
             Nivel = new NivelRepository(db);
             Aposento = new AposentoRepository(db);
             Recinto = new RecintoRepository(db);
+            RecintoProducto =  new RecintoProductoRepository(db);
         }
 
         

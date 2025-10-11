@@ -31,6 +31,8 @@ namespace Prototipo1.Data
 
         public DbSet<Recinto> Recinto { get; set; }
 
+        public DbSet<RecintoProducto> RecintoProducto { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Familia>().HasData(

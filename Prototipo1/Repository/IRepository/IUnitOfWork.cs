@@ -34,6 +34,8 @@ namespace Prototipo1.Repository.IRepository
 
         IRecintoRepository Recinto { get; }
 
+        IRecintoProductoRepository RecintoProducto { get; }
+
         void Save();
     }
 }
