@@ -52,7 +52,31 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
         public IActionResult Upsert(int? IdRecinto, int? IdRecintoProducto)
         {
 
-            IEnumerable<SelectListItem> ProductoList = _unitOfWork.Producto.GetAll().Select(u => new SelectListItem
+            int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
+
+            if (idProyecto == null)
+            {
+                return RedirectToAction("SeleccionarProyecto", "Proyecto");
+            }
+
+            // 1️⃣ Obtener los productos del inventario del proyecto
+            var inventarios = _unitOfWork.Inventario
+                .GetAllBYID(i => i.IdProyecto == idProyecto)
+                .ToList();
+
+            // 2️⃣ Extraer sus IdProducto
+            var idsProductosInventario = inventarios
+                .Select(i => i.IdProducto)
+                .ToList();
+
+            // 3️⃣ Obtener todos los productos y luego filtrar en memoria
+            var productos = _unitOfWork.Producto
+                .GetAll()
+                .Where(p => idsProductosInventario.Contains(p.IdProducto))
+                .ToList();
+
+            // 4️⃣ Armar la lista para el dropdown
+            IEnumerable<SelectListItem> ProductoList = productos.Select(u => new SelectListItem
             {
                 Text = u.NombreProducto,
                 Value = u.IdProducto.ToString()
@@ -62,19 +86,16 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             {
                 ProductoList = ProductoList,
                 RecintoProducto = new RecintoProducto()
-
             };
 
             ViewBag.IdRecinto = IdRecinto;
 
             if (IdRecintoProducto == null || IdRecintoProducto == 0)
             {
-                //crear
                 return View(RecintoProductoVM);
             }
             else
             {
-                //update
                 RecintoProductoVM.RecintoProducto = _unitOfWork.RecintoProducto.GetID(u => u.IdRecintoProducto == IdRecintoProducto);
                 return View(RecintoProductoVM);
             }

@@ -29,6 +29,7 @@ namespace Prototipo1.Models
 
         public double Presupuesto { get; set; }
         public double Desperdicio { get; set; }
+        [ValidateNever]
         public double ExistenciasActuales { get; set; }
 
 

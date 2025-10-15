@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Prototipo1.Models;
 
 namespace Prototipo1.Data
 {
-    public class AppDBContext : DbContext
+    public class AppDBContext : IdentityDbContext
     {
         public AppDBContext(DbContextOptions<AppDBContext> options) : base(options) 
         {
@@ -35,6 +36,9 @@ namespace Prototipo1.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // necesario cuando se instala Identity
+            base.OnModelCreating(modelBuilder); 
+
             modelBuilder.Entity<Familia>().HasData(
                 new Familia { IdFamilia = 1, NombreFamilia = "BAÑOS" },
                 new Familia { IdFamilia = 2, NombreFamilia = "BASES" },
