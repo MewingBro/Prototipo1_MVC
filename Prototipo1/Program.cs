@@ -2,6 +2,9 @@ using Microsoft.EntityFrameworkCore;
 using Prototipo1.Data;
 using Prototipo1.Repository.IRepository;
 using Prototipo1.Repository;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Prototipo1.Utility;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +13,18 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<AppDBContext>(options=> 
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+
+builder.Services.AddIdentity<IdentityUser,IdentityRole>().AddEntityFrameworkStores<AppDBContext>().AddDefaultTokenProviders();
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = $"/Identity/Account/Login";
+    options.LogoutPath = $"/Identity/Account/Logout";
+    options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
+});
+builder.Services.AddRazorPages();
+
 builder.Services.AddScoped<IUnitOfWork,UnitOfWork>();
+builder.Services.AddScoped<IEmailSender, EmailSender>();
 builder.Services.AddSession();
 builder.Services.AddHttpContextAccessor();
 
@@ -29,10 +43,12 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
+app.MapRazorPages();
+
 app.UseSession();
 app.MapControllerRoute(
     name: "default",
     pattern: "{area=Ingeniero}/{controller=Home}/{action=Index}/{id?}");
-
 app.Run();

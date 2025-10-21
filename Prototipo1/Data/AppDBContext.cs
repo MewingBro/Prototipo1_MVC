@@ -34,6 +34,7 @@ namespace Prototipo1.Data
 
         public DbSet<RecintoProducto> RecintoProducto { get; set; }
 
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // necesario cuando se instala Identity

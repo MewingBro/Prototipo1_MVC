@@ -6,10 +6,13 @@ using Prototipo1.Repository;
 using Prototipo1.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Prototipo1.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Prototipo1.Utility;
 
 namespace Prototipo1.Areas.Ingeniero.Controllers
 {
     [Area("Ingeniero")]
+    [Authorize(Roles = SD.Role_Admin)]
     public class ProyectoController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

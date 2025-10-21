@@ -1,13 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Prototipo1.Data;
 using Prototipo1.Models;
-using System.ComponentModel;
 using Prototipo1.Repository;
 using Prototipo1.Repository.IRepository;
+using System.ComponentModel;
 
 namespace Prototipo1.Areas.Ingeniero.Controllers
 {
     [Area("Ingeniero")]
+    [Authorize]
     public class FamiliaController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

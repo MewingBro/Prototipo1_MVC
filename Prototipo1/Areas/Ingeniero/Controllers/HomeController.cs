@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Prototipo1.Models;
 using Prototipo1.Repository.IRepository;
@@ -6,6 +7,7 @@ using System.Diagnostics;
 namespace Prototipo1.Areas.Ingeniero.Controllers
 {
     [Area("Ingeniero")]
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -19,6 +21,10 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
 
         public IActionResult Index()
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Login", "Account", new { area = "Identity" });
+            }
             IEnumerable<Proyecto> proyectoList = _unitOfWork.Proyecto.GetAll();
             return View(proyectoList);
         }

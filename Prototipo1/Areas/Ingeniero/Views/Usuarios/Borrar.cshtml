@@ -1,0 +1,39 @@
+﻿@model Microsoft.AspNetCore.Identity.IdentityUser
+
+<form method="post">
+    <input asp-for="Id" hidden />
+    <div class="border p-3 mt-4">
+        <div class="row pb-2">
+            <h2 class="text-danger">
+                Borrar Usuario
+            </h2>
+            <hr />
+        </div>
+
+        <div class="mb-3 row p-1">
+            <label asp-for="Email" class="p-0 fw-bold">Correo electrónico</label>
+            <input asp-for="Email" disabled class="form-control" />
+        </div>
+
+        <div class="mb-3 row p-1">
+            <label class="p-0 fw-bold">Nombre de usuario</label>
+            <input value="@Model.UserName" disabled class="form-control" />
+        </div>
+
+        <div class="alert alert-warning mt-3">
+            ¿Está seguro de que desea eliminar este usuario? Esta acción no se puede deshacer.
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-6 col-md-3">
+                <button type="submit" class="btn btn-danger form-control">Borrar</button>
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-area="Ingeniero" asp-controller="Usuarios" asp-action="Index"
+                   class="btn btn-outline-secondary form-control">
+                    Volver a la lista
+                </a>
+            </div>
+        </div>
+    </div>
+</form>

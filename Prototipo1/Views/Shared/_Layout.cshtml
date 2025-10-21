@@ -12,9 +12,12 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Prototipo1</a>
+                <a class="navbar-brand p-0 m-0" asp-area="" asp-controller="Home" asp-action="Index">
+                    <img src="~/Images/logo.png" class="d-block" alt="Logo" style="height: 50px;" />
+
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -42,9 +45,12 @@
                                 Manejo de Habitaciones
                             </a>
                             <ul class="dropdown-menu">
-                                <li class="nav-item">
-                                    <a class="dropdown-item" asp-area="Ingeniero" asp-controller="Proyecto" asp-action="Index">Proyectos</a>
-                                </li>
+                                @if (User.IsInRole(SD.Role_Admin))
+                                {
+                                    <li class="nav-item">
+                                        <a class="dropdown-item" asp-area="Ingeniero" asp-controller="Proyecto" asp-action="Index">Proyectos</a>
+                                    </li>
+                                }
                                 <li class="nav-item">
                                     <a class="dropdown-item" asp-area="Ingeniero" asp-controller="Nivel" asp-action="Index">Niveles</a>
                                 </li>
@@ -78,10 +84,16 @@
                             </ul>
                         </li>
 
-                        
+                        @if (User.IsInRole(SD.Role_Admin))
+                                {
 
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Ingeniero" asp-controller="Usuarios" asp-action="Index">Manejo de Usuarios</a>
+                        </li>
+                                }
 
                     </ul>
+                    <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>

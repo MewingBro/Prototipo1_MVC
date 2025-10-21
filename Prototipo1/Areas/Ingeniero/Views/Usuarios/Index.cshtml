@@ -1,0 +1,66 @@
+﻿@model IEnumerable<Prototipo1.Areas.Ingeniero.Controllers.UsuarioConRolesVM>
+
+<partial name="_Notification" />
+<div class="container">
+
+    <div class="row pt-4 pb-3">
+        <div class="col-6">
+            <h2 class="text-primary">Lista de Usuarios registrados</h2>
+        </div>
+        <div class="col-6 text-end">
+            <a asp-area="Ingeniero" asp-controller="Usuarios" asp-action="Upsert" class="btn btn-primary mx-2">
+                Crear Usuario
+            </a>
+        </div>
+    </div>
+
+
+    <table class="table table-bordered table-stripped">
+        <thead>
+            <tr>
+                <th>
+                    Nombre de Usuario
+                </th>
+                <th>
+                    Tipo de Usuario
+                </th>
+                <th>
+
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>
+                        @user.Email
+                    </td>
+                    <td>
+                        @if (user.Roles.Any())
+                        {
+                            @string.Join(", ", user.Roles)
+                        }
+                        else
+                        {
+                            <em>Sin rol asignado</em>
+                        }
+                    </td>
+                    <td>
+                        <div class="w-75 btn-group" role="group">
+                            <a asp-area="Ingeniero" asp-controller="Usuarios" asp-action="Upsert" asp-route-id="@user.Id" class="btn btn-primary mx-2">
+                                Editar Usuario
+                            </a>
+                            <a asp-area="Ingeniero" asp-controller="Usuarios" asp-action="Borrar" asp-route-id="@user.Id" class="btn btn-danger mx-2">
+                                <i class="bi bi-trash3"></i>Borrar Usuario
+                            </a>
+
+                        </div>
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>

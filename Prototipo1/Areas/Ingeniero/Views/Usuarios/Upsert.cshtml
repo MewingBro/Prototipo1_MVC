@@ -1,0 +1,62 @@
+﻿@model Prototipo1.Areas.Ingeniero.Controllers.UsuarioUpsertVM
+
+<div class="card border mt-4">
+
+    <div class="p-3 mt-4">
+        <h2 class="text-primary"">
+                    @(Model.Id == null ? "Registrar Usuario" : "Editar Usuario")
+                </h2>
+            </div>
+
+
+    <div class="card-body p-4">
+        <div class="row pt-3">
+            <div class="col-md-12">
+                <form method="post" class="row">
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Email" class="form-control" placeholder="Correo electrónico" />
+                        <label asp-for="Email">Correo</label>
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    @if (Model != null)
+                    {
+                        <div class="form-floating mb-3 col-md-6">
+                            <input asp-for="@Model.Password" class="form-control" placeholder="password" />
+                            <label asp-for="@Model.Password" class="text-muted">Contraseña</label>
+                            <span asp-validation-for="@Model.Password" class="text-danger"></span>
+                        </div>
+                        <div class="form-floating mb-3 col-md-6">
+                            <input asp-for="@Model.ConfirmPassword" class="form-control" placeholder="password" />
+                            <label asp-for="@Model.ConfirmPassword" class="text-muted">Confirmar Contraseña</label>
+                            <span asp-validation-for="@Model.ConfirmPassword" class="text-danger"></span>
+                        </div>
+                    }
+
+
+                    <div class="form-floating mb-3">
+                        <select asp-for="Role" asp-items="@Model.RoleList" class="form-select">
+                            <option disabled selected>--Seleccionar Rol--</option>
+                        </select>
+                        <label asp-for="Role">Rol</label>
+                    </div>
+
+                    <div class="row">
+                        <button type="submit" class="btn btn-primary col-6 pb-1">
+                            @(Model.Id == null ? "Registrar Usuario" : "Guardar Cambios")
+                        </button>
+                        <a asp-area="Ingeniero" asp-controller="Usuarios" asp-action="Index" class="btn btn-secondary col-6 pt-1">
+                            Volver
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

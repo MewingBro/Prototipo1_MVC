@@ -10,10 +10,10 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace Prototipo1.Models
 {
-    public class FacturaProducto
+    public class UsuariosProyectos
     {
         [Key]
-        public int IdFacturaProducto { get; set; }
+        public int IdUsuariosProyectos { get; set; }
 
         public int IdFactura { get; set; }
         [ForeignKey("IdFactura")]
@@ -24,11 +24,5 @@ namespace Prototipo1.Models
         [ForeignKey("IdProducto")]
         [ValidateNever]
         public Producto Producto { get; set; }
-
-        [Required]
-        public int CantidadAumentada { get; set; }
-
-        [Required]
-        public string EntregadoA {  get; set; }
     }
 }
