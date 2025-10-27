@@ -17,8 +17,14 @@
             <span asp-validation-for="Factura.Fecha" class="text-danger"></span>
         </div>
 
-
-                <input asp-for="Factura.IdTipoFactura" value="1" hidden />
+                @if (ViewBag.Tipo == "Entrada")
+                {
+                    <input asp-for="Factura.IdTipoFactura" value="1" hidden />
+                } else if (ViewBag.Tipo == "Salida")
+                {
+                    <input asp-for="Factura.IdTipoFactura" value="2" hidden />
+                }
+                
 
                 <div class="mb-3 row p-1">
                     <label asp-for="Factura.Comentario" class="p-0"></label>

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Prototipo1.Data;
 
@@ -11,9 +12,11 @@ using Prototipo1.Data;
 namespace Prototipo1.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20251021011847_UsuariosProyectos")]
+    partial class UsuariosProyectos
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -254,9 +257,6 @@ namespace Prototipo1.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("EstadoFactura")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("datetime2");
 
@@ -303,41 +303,6 @@ namespace Prototipo1.Migrations
                     b.HasIndex("IdProducto");
 
                     b.ToTable("FacturaProducto");
-                });
-
-            modelBuilder.Entity("Prototipo1.Models.FacturaSalidaProducto", b =>
-                {
-                    b.Property<int>("IdFacturaSalidaProducto")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdFacturaSalidaProducto"));
-
-                    b.Property<int>("CantidadDisminuida")
-                        .HasColumnType("int");
-
-                    b.Property<string>("EntregadoA")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("IdFactura")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IdProducto")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IdRecinto")
-                        .HasColumnType("int");
-
-                    b.HasKey("IdFacturaSalidaProducto");
-
-                    b.HasIndex("IdFactura");
-
-                    b.HasIndex("IdProducto");
-
-                    b.HasIndex("IdRecinto");
-
-                    b.ToTable("FacturaSalidaProducto");
                 });
 
             modelBuilder.Entity("Prototipo1.Models.Familia", b =>
@@ -785,33 +750,6 @@ namespace Prototipo1.Migrations
                     b.Navigation("Factura");
 
                     b.Navigation("Producto");
-                });
-
-            modelBuilder.Entity("Prototipo1.Models.FacturaSalidaProducto", b =>
-                {
-                    b.HasOne("Prototipo1.Models.Factura", "Factura")
-                        .WithMany()
-                        .HasForeignKey("IdFactura")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Prototipo1.Models.Producto", "Producto")
-                        .WithMany()
-                        .HasForeignKey("IdProducto")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Prototipo1.Models.Recinto", "Recinto")
-                        .WithMany()
-                        .HasForeignKey("IdRecinto")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Factura");
-
-                    b.Navigation("Producto");
-
-                    b.Navigation("Recinto");
                 });
 
             modelBuilder.Entity("Prototipo1.Models.Inventario", b =>

@@ -47,6 +47,13 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 _unitOfWork.FacturaProducto.AddWithInventario(x,idProyecto);
                 _unitOfWork.Save();
             }
+            var factura = _unitOfWork.Factura.GetID(f => f.IdFactura == IdFactura);
+            if (factura != null)
+            {
+                factura.EstadoFactura = 1; // ← cambia el estado
+                _unitOfWork.Factura.Update(factura);
+            }
+            _unitOfWork.Save();
 
             return RedirectToAction("Index", "Factura");
         }

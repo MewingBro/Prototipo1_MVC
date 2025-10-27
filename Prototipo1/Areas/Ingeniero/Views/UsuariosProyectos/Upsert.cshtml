@@ -1,0 +1,44 @@
+﻿@model Prototipo1.Models.ViewModels.UsuariosProyectosVM
+
+<form asp-action="Upsert" asp-controller="UsuariosProyectos" method="post" class="row" enctype="multipart/form-data">
+
+    <input asp-for="UsuariosProyectos.IdUsuario" value="@ViewBag.IdUsuario" hidden />
+    <input asp-for="UsuariosProyectos.IdUsuariosProyectos" hidden />
+    <div class="row">
+        <div class="col-10">
+            <div class="border p-3 mt-4">
+                <div class="row pb-2">
+                    <h2 class="text-primary">
+                        Agregar Proyecto
+                    </h2>
+                </div>
+
+                <div class="mb-3 row p-1">
+                    <label class="p-0">Proyecto</label>
+                    <select asp-for="@Model.UsuariosProyectos.IdProyecto" asp-items="@Model.ProyectoList" class="form-select">
+                        <option disabled selected>---Seleccionar Proyecto---</option>
+                    </select>
+                    <span asp-validation-for="UsuariosProyectos.IdProyecto" class="text-danger"></span>
+                </div>
+
+
+
+                <div class="row">
+                    <div class="col-6 col-md-3">
+
+                            <button type="submit" class="btn btn-primary form-control">Agregar acceso</button>
+
+
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a asp-controller="UsuariosProyectos" asp-action="Index" asp-route-IdUsuario="@ViewBag.IdUsuario" class="btn btn-outline-secondary form-control">
+                            Volver a la lista de accesos
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</form>

@@ -25,13 +25,31 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
 
         public IActionResult Index(string Tipo)
         {
-
             int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
 
-            List<Factura> objFacturaLista = _unitOfWork.Factura
-                .GetAllBYID(f => f.IdProyecto == idProyecto, includeProperties: "TipoFactura,Proyecto")
-                .ToList();
+            // Determinar el IdTipoFactura según el tipo recibido
+            int? idTipoFactura = null;
+            if (!string.IsNullOrEmpty(Tipo))
+            {
+                if (Tipo.Equals("Entrada", StringComparison.OrdinalIgnoreCase))
+                    idTipoFactura = 1;
+                else if (Tipo.Equals("Salida", StringComparison.OrdinalIgnoreCase))
+                    idTipoFactura = 2;
+            }
 
+            // Consulta base filtrando por proyecto
+            var query = _unitOfWork.Factura.GetAllBYID(
+                f => f.IdProyecto == idProyecto,
+                includeProperties: "TipoFactura,Proyecto"
+            );
+
+            // Si se definió un tipo, aplicar filtro adicional
+            if (idTipoFactura.HasValue)
+            {
+                query = query.Where(f => f.IdTipoFactura == idTipoFactura.Value);
+            }
+
+            var objFacturaLista = query.ToList();
 
             ViewBag.Tipo = Tipo;
 
@@ -184,5 +202,30 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             return RedirectToAction("Index");
 
         }
+
+        public IActionResult DetalleFactura(int idFactura)
+        {
+            var factura = _unitOfWork.Factura.GetID(
+                f => f.IdFactura == idFactura,
+                includeProperties: "Proyecto,TipoFactura"
+            );
+
+            var detalles = _unitOfWork.FacturaProducto.GetAllBYID(
+                d => d.IdFactura == idFactura,
+                includeProperties: "Producto,Producto.Unidad"
+            );
+
+            if (factura == null)
+                return NotFound();
+
+            FacturaCompletaVM vm = new()
+            {
+                Factura = factura,
+                Detalles = detalles
+            };
+
+            return View(vm);
+        }
+
     }
 }

@@ -34,6 +34,9 @@ namespace Prototipo1.Data
 
         public DbSet<RecintoProducto> RecintoProducto { get; set; }
 
+        public DbSet<UsuariosProyectos> UsuariosProyectos { get; set; }
+        public DbSet<FacturaSalidaProducto> FacturaSalidaProducto { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -69,6 +72,8 @@ namespace Prototipo1.Data
                 new TipoFactura { IdTipoFactura = 1, NombreTipoFactura = "Entrada" },
                 new TipoFactura { IdTipoFactura = 2, NombreTipoFactura = "Salida" }
                 );
+
+  
 
         }
 

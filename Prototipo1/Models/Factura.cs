@@ -25,5 +25,8 @@ namespace Prototipo1.Models
         [ValidateNever]
         public Proyecto Proyecto { get; set; }
 
+        [ValidateNever]
+        public int EstadoFactura { get; set; }
+
     }
 }

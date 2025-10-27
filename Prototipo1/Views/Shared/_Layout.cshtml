@@ -27,43 +27,30 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-area="Ingeniero" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="Ingeniero" asp-controller="Factura" asp-action="Index" asp-route-Tipo="Entrada">Facturas</a>
-                        </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="Ingeniero" asp-controller="Inventario" asp-action="Index">Inventario</a>
-                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Inventario
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="nav-item">
+                                    <a class="dropdown-item" asp-area="Ingeniero" asp-controller="Factura" asp-action="Index" asp-route-Tipo="Entrada">Facturas de entrada</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="dropdown-item" asp-area="Ingeniero" asp-controller="Factura" asp-action="Index" asp-route-Tipo="Salida">Facturas de salida</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="dropdown-item" asp-area="Ingeniero" asp-controller="Inventario" asp-action="Index">Inventario</a>
+                                </li>
+
+                            </ul>
+
 
                         <li class="nav-item">
                             <a class="nav-link" asp-area="Ingeniero" asp-controller="Recinto" asp-action="Index">Presupuestos</a>
                         </li>
                         
-                        
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Manejo de Habitaciones
-                            </a>
-                            <ul class="dropdown-menu">
-                                @if (User.IsInRole(SD.Role_Admin))
-                                {
-                                    <li class="nav-item">
-                                        <a class="dropdown-item" asp-area="Ingeniero" asp-controller="Proyecto" asp-action="Index">Proyectos</a>
-                                    </li>
-                                }
-                                <li class="nav-item">
-                                    <a class="dropdown-item" asp-area="Ingeniero" asp-controller="Nivel" asp-action="Index">Niveles</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="dropdown-item" asp-area="Ingeniero" asp-controller="Aposento" asp-action="Index">Aposentos</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="dropdown-item" asp-area="Ingeniero" asp-controller="Recinto" asp-action="Index">Recintos</a>
-                                </li>
-                            </ul>
-
-                        </li>
-                        
+                                   
                         
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -80,17 +67,20 @@
                                     <a class="dropdown-item" asp-area="Ingeniero" asp-controller="Unidad" asp-action="Index">Unidades para productos</a>
                                 </li>     
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#">Something else here</a></li>
+                                
+                                    
+                                    <li class="nav-item">
+                                        <a class="dropdown-item" asp-area="Ingeniero" asp-controller="Nivel" asp-action="Index">Niveles</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="dropdown-item" asp-area="Ingeniero" asp-controller="Aposento" asp-action="Index">Aposentos</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="dropdown-item" asp-area="Ingeniero" asp-controller="Recinto" asp-action="Index">Recintos</a>
+                                    </li>
+                                
                             </ul>
                         </li>
-
-                        @if (User.IsInRole(SD.Role_Admin))
-                                {
-
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="Ingeniero" asp-controller="Usuarios" asp-action="Index">Manejo de Usuarios</a>
-                        </li>
-                                }
 
                     </ul>
                     <partial name="_LoginPartial" />

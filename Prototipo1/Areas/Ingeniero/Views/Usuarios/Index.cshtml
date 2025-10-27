@@ -27,6 +27,9 @@
                 <th>
 
                 </th>
+                <th>
+
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -46,6 +49,15 @@
                             <em>Sin rol asignado</em>
                         }
                     </td>
+                    <td>
+                        @if (user.Roles[0] == "Ingeniero" || user.Roles[0] == "Bodeguero")
+                        {
+                            <a asp-controller="UsuariosProyectos" asp-action="Index" asp-route-IdUsuario="@user.Id" class="btn btn-outline-secondary form-control">
+                                Modificar accesos a proyectos
+                            </a>
+                        }
+                    </td>
+   
                     <td>
                         <div class="w-75 btn-group" role="group">
                             <a asp-area="Ingeniero" asp-controller="Usuarios" asp-action="Upsert" asp-route-id="@user.Id" class="btn btn-primary mx-2">

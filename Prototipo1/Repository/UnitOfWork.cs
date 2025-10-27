@@ -33,6 +33,8 @@ namespace Prototipo1.Repository
         public IRecintoRepository Recinto { get; private set; }
 
         public IRecintoProductoRepository RecintoProducto { get; private set; }
+        
+        public IUsuariosProyectosRepository UsuariosProyectos { get; private set; }
 
         public UnitOfWork(AppDBContext db)
         {
@@ -49,6 +51,7 @@ namespace Prototipo1.Repository
             Aposento = new AposentoRepository(db);
             Recinto = new RecintoRepository(db);
             RecintoProducto =  new RecintoProductoRepository(db);
+            UsuariosProyectos = new UsuariosProyectosRepository(db);
         }
 
         

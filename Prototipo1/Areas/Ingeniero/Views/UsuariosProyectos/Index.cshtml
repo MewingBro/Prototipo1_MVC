@@ -1,0 +1,59 @@
+﻿@model List<UsuariosProyectos>
+<partial name="_Notification" />
+<div class="container">
+
+    <div class="row pt-4 pb-3">
+        <div class="col-6">
+            <h2 class="text-primary">Proyectos Asignados</h2>
+        </div>
+        <div class="col-6 text-end">
+            <a asp-controller="UsuariosProyectos" asp-action="Upsert" asp-route-IdUsuario="@ViewBag.IdUsuario" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Agregar acceso a proyecto
+            </a>
+        </div>
+    </div>
+
+
+    <table class="table table-bordered table-stripped">
+        <thead>
+            <tr>
+                <th>
+                    Nombre de usuario
+                </th>
+                <th>
+                    Proyecto asignado
+                </th>
+                <th>
+
+                </th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var obj in Model.OrderBy(u => u.IdUsuario))
+            {
+                <tr>
+                    <td>
+                        @obj.Usuario.UserName
+                    </td>
+                    <td>
+                        @obj.Proyecto.NombreProyecto
+                    </td>
+
+                    <td>
+                        <div class="w-75 btn-group" role="group">
+
+                            <a asp-controller="UsuariosProyectos" asp-action="Borrar" asp-route-IdUsuario="@ViewBag.IdUsuario" asp-route-IdUsuariosProyectos="@obj.IdUsuariosProyectos" class="btn btn-danger mx-2">
+                                <i class="bi bi-trash3">Quitar acceso a proyecto</i>
+                            </a>
+
+                        </div>
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+
+
+</div>

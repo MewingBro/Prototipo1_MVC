@@ -1,0 +1,166 @@
+﻿@model Prototipo1.Models.ViewModels.FacturaCompletaVM
+@{
+    Layout = null; // sin layout, ideal para imprimir
+    var factura = Model.Factura;
+    var detalles = Model.Detalles;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <title>Factura N° @factura.IdFactura</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 40px;
+            color: #333;
+        }
+
+        .factura-header {
+            text-align: center;
+            border-bottom: 2px solid #444;
+            margin-bottom: 20px;
+        }
+
+            .factura-header h1 {
+                margin: 0;
+                font-size: 26px;
+                color: #222;
+            }
+
+        .factura-info {
+            margin-bottom: 20px;
+        }
+
+            .factura-info table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            .factura-info th {
+                text-align: left;
+                padding-right: 10px;
+            }
+
+        .detalle-factura table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .detalle-factura th, .detalle-factura td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        .detalle-factura th {
+            background-color: #f3f3f3;
+            text-align: center;
+        }
+
+        .detalle-factura td {
+            text-align: center;
+        }
+
+        .footer {
+            margin-top: 40px;
+            border-top: 1px solid #ccc;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .btn-imprimir {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 25px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .media print {
+            .btn-imprimir
+
+        {
+            display: none;
+        }
+
+        }
+    </style>
+</head>
+<body>
+
+    <div class="factura-header">
+        <h1>Factura N° @factura.IdFactura</h1>
+        <p><strong>Proyecto:</strong> @factura.Proyecto?.NombreProyecto</p>
+        <p><strong>Tipo:</strong> @factura.TipoFactura?.NombreTipoFactura</p>
+    </div>
+
+    <div class="factura-info">
+        <table>
+            <tr>
+                <th>Fecha:</th>
+                <td>@factura.Fecha.ToString("dd-MM-yyyy")</td>
+                <th>Estado:</th>
+                <td>
+                    @(factura.EstadoFactura == 1 ? "Finalizada" : "Pendiente")
+                </td>
+            </tr>
+            <tr>
+                <th>Comentario:</th>
+                <td colspan="3">@factura.Comentario</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="detalle-factura">
+        <h3>Detalles de Productos</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Código</th>
+                    <th>Nombre del Producto</th>
+                    <th>Descripción</th>
+                    <th>Unidad</th>
+                    <th>Cantidad</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (detalles != null && detalles.Any())
+                {
+                    var index = 1;
+                    foreach (var item in detalles)
+                    {
+                        <tr>
+                            <td>@index</td>
+                            <td>@item.Producto?.CodigoProducto</td>
+                            <td>@item.Producto?.NombreProducto</td>
+                            <td>@item.Producto?.Descripcion</td>
+                            <td>@item.Producto?.Unidad?.NombreUnidad</td>
+                            <td>@item.CantidadAumentada</td>
+                        </tr>
+                        index++;
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6">No hay productos en esta factura.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir Factura</button>
+
+    <div class="footer">
+        <p>Factura generada automáticamente por el sistema — @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</p>
+    </div>
+
+</body>
+</html>

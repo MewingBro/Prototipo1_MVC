@@ -36,6 +36,8 @@ namespace Prototipo1.Repository.IRepository
 
         IRecintoProductoRepository RecintoProducto { get; }
 
+        IUsuariosProyectosRepository UsuariosProyectos { get; }
+
         void Save();
     }
 }

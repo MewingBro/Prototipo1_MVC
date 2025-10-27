@@ -1,34 +1,31 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Prototipo1.Data;
 using Prototipo1.Models;
-using System.ComponentModel;
 using Prototipo1.Repository;
 using Prototipo1.Repository.IRepository;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace Prototipo1.Models
 {
-    public class FacturaProducto
+    public class UsuariosProyectos
     {
         [Key]
-        public int IdFacturaProducto { get; set; }
+        public int IdUsuariosProyectos { get; set; }
 
-        public int IdFactura { get; set; }
-        [ForeignKey("IdFactura")]
+
+        public string IdUsuario { get; set; }
+        [ForeignKey("IdUsuario")]
         [ValidateNever]
-        public Factura Factura { get; set; }
+        public IdentityUser Usuario { get; set; }
 
-        public int IdProducto { get; set; }
-        [ForeignKey("IdProducto")]
+
+        public int IdProyecto { get; set; }
+        [ForeignKey("IdProyecto")]
         [ValidateNever]
-        public Producto Producto { get; set; }
-
-        [Required]
-        public int CantidadAumentada { get; set; }
-
-        [Required]
-        public string EntregadoA {  get; set; }
+        public Proyecto Proyecto { get; set; }
     }
 }

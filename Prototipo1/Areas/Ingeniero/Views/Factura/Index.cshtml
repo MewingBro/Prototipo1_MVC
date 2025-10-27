@@ -4,7 +4,14 @@
 
     <div class="row pt-4 pb-3">
         <div class="col-6">
-            <h2 class="text-primary">Lista de Facturas</h2>
+            @if (ViewBag.Tipo == "Entrada")
+            {
+                <h2 class="text-primary">Lista de Facturas de Entrada</h2>
+            } else if (ViewBag.Tipo == "Salida")
+            {
+                <h2 class="text-primary">Lista de Facturas de Salidas</h2>
+            }
+            
         </div>
         <div class="col-6 text-end">
             <a asp-controller="Factura" asp-action="Upsert" asp-route-Tipo="@ViewBag.Tipo" class="btn btn-primary">
@@ -35,6 +42,9 @@
         <th>
 
         </th>
+        <th>
+
+        </th>
     
     </tr>
     </thead>
@@ -57,10 +67,17 @@
             <td>
                 @obj.Comentario
             </td>
+            <td>
+                        <a asp-controller="Factura" asp-action="DetalleFactura" asp-route-idFactura="@obj.IdFactura" class="btn btn-outline-secondary form-control">
+                            Imprimir Factura
+                        </a>
+            </td>
 
             <td>
-                <div class="w-75 btn-group" role="group">
-                    <a asp-controller="factura" asp-action="Upsert" asp-route-IdFactura="@obj.IdFactura" class="btn btn-primary mx-2">
+                        @if (User.IsInRole(SD.Role_Admin) || obj.EstadoFactura==0)
+                        {
+                            <div class="w-75 btn-group" role="group">
+                                <a asp-controller="factura" asp-action="Upsert" asp-route-IdFactura="@obj.IdFactura" class="btn btn-primary mx-2">
                                 <i class="bi bi-pencil">Editar factura</i>
                     </a>
                             <a asp-controller="factura" asp-action="Borrar" asp-route-IdFactura="@obj.IdFactura" class="btn btn-danger mx-2">
@@ -68,6 +85,7 @@
                             </a>
                             
                 </div>
+                }
             </td>
         
         </tr>

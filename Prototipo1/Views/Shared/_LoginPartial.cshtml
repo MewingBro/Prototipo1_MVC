@@ -4,22 +4,46 @@
 @inject UserManager<IdentityUser> UserManager
 
 <ul class="navbar-nav">
-@if (SignInManager.IsSignedIn(User))
-{
-    <li class="nav-item">
-        <a id="manage" class="nav-link" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Bienvenido @UserManager.GetUserName(User)!</a>
-    </li>
-    <li class="nav-item">
-        <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button id="logout" type="submit" class="nav-link btn btn-link border-0">Cerrar sesión</button>
-        </form>
-    </li>
-}
-else
-{
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Bienvenido @UserManager.GetUserName(User)!
+            </a>
+            <ul class="dropdown-menu">
+                <li class="nav-item">
+                    <a id="manage" class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
+                    Mi cuenta    
+                    </a>
+                </li>
+                @if (User.IsInRole(SD.Role_Admin))
+                {
+                    <li class="nav-item">
+                        <a class="dropdown-item" asp-area="Ingeniero" asp-controller="Proyecto" asp-action="Index">
+                            Proyectos
+                            </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="dropdown-item" asp-area="Ingeniero" asp-controller="Usuarios" asp-action="Index">
+                            Manejo de Usuarios
+                            </a>
+                    </li>
+                }
+            </ul>
 
-    <li class="nav-item">
-        <a class="nav-link" id="login" asp-area="Identity" asp-page="/Account/Login">Login</a>
-    </li>
-}
+        </li>
+
+        <li class="nav-item">
+            <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                <button id="logout" type="submit" class="nav-link btn btn-link border-0">Cerrar sesión</button>
+            </form>
+        </li>
+    }
+    else
+    {
+
+        <li class="nav-item">
+            <a class="nav-link" id="login" asp-area="Identity" asp-page="/Account/Login">Login</a>
+        </li>
+    }
 </ul>
