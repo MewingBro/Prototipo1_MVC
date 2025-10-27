@@ -12,8 +12,6 @@ namespace Prototipo1.Models.ViewModels
         [ValidateNever]
         public IEnumerable<SelectListItem> FacturaList { get; set; }
 
-        [ValidateNever]
-        public IEnumerable<SelectListItem> RecintoList { get; set; }
 
     }
 }

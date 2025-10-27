@@ -10,6 +10,8 @@ namespace Prototipo1.Models.ViewModels
         public IEnumerable<SelectListItem> TipoFacturaList { get; set; }
         [ValidateNever]
         public IEnumerable<SelectListItem> ProyectoList { get; set; }
+        [ValidateNever]
+        public IEnumerable<SelectListItem> RecintoList { get; set; }
 
     }
 }

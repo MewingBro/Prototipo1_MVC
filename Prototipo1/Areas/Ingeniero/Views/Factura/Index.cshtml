@@ -30,6 +30,20 @@
                 <th>
                     Proyecto
                 </th>
+                @if (ViewBag.Tipo == "Salida")
+                {
+                    <th>
+                        Mivel
+                    </th>
+                    <th>
+                        Aposento
+                    </th>
+                    <th>
+                        Recinto
+                    </th>
+
+                }
+
         <th>
             Fecha
         </th>
@@ -58,6 +72,19 @@
                     <td>
                         @obj.Proyecto.NombreProyecto
                     </td>
+                    @if (ViewBag.Tipo == "Salida")
+                    {
+                        <td>
+                            @obj.Recinto.Aposento.Nivel.NombreNivel
+                        </td>
+                        <td>
+                            @obj.Recinto.Aposento.NombreAposento
+                        </td>
+                        <td>
+                            @obj.Recinto.NombreRecinto
+                        </td>
+
+                    }
             <td>
                 @obj.Fecha
             </td>
@@ -76,10 +103,24 @@
             <td>
                         @if (User.IsInRole(SD.Role_Admin) || obj.EstadoFactura==0)
                         {
+
+
                             <div class="w-75 btn-group" role="group">
-                                <a asp-controller="factura" asp-action="Upsert" asp-route-IdFactura="@obj.IdFactura" class="btn btn-primary mx-2">
-                                <i class="bi bi-pencil">Editar factura</i>
-                    </a>
+
+                                @if (ViewBag.Tipo == "Entrada")
+                                {
+                                    <a asp-controller="factura" asp-action="Upsert" asp-route-IdFactura="@obj.IdFactura" asp-route-Tipo="Entrada" class="btn btn-primary mx-2">
+                                        <i class="bi bi-pencil">Editar factura</i>
+                                    </a>
+                                }
+                                else if (ViewBag.Tipo == "Salida")
+                                {
+                                    <a asp-controller="factura" asp-action="Upsert" asp-route-IdFactura="@obj.IdFactura" asp-route-Tipo="Salida" class=" btn btn-primary mx-2">
+                                        <i class="bi bi-pencil">Editar factura</i>
+                                    </a>
+                                }
+
+                                
                             <a asp-controller="factura" asp-action="Borrar" asp-route-IdFactura="@obj.IdFactura" class="btn btn-danger mx-2">
                                 <i class="bi bi-trash3">Borrar Factura</i>
                             </a>

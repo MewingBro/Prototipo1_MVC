@@ -1,0 +1,92 @@
+﻿@model List<FacturaSalidaProducto>
+<partial name="_Notification" />
+
+<div class="container">
+    <div class="row pt-4 pb-3">
+        <div class="col-6">
+            <h2 class="text-primary">Despacho de Productos</h2>
+        </div>
+        <div class="col-6 text-end">
+            <a asp-controller="FacturaSalidaProducto"
+               asp-action="Upsert"
+               asp-route-IdFactura="@ViewBag.IdFactura"
+               class="btn btn-primary @(ViewBag.SinPresupuesto == true ? "disabled" : "")">
+                <i class="bi bi-plus-circle"></i> Agregar Producto
+            </a>
+        </div>
+    </div>
+
+    <table class="table table-bordered table-stripped">
+        <thead>
+            <tr>
+                <th>Id de factura</th>
+                <th>Producto</th>
+                <th>Cantidad Disminuida</th>
+                <th>Entregado A</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var obj in Model.OrderBy(u => u.IdFactura))
+            {
+                <tr>
+                    <td>@obj.IdFactura</td>
+                    <td>@obj.Producto.NombreProducto</td>
+                    <td>@obj.CantidadDisminuida</td>
+                    <td>@obj.EntregadoA</td>
+                    <td>
+                        <div class="w-75 btn-group" role="group">
+                            <a asp-controller="FacturaSalidaProducto"
+                               asp-action="Upsert"
+                               asp-route-IdFactura="@ViewBag.IdFactura"
+                               asp-route-IdFacturaSalidaProducto="@obj.IdFacturaSalidaProducto"
+                               class="btn btn-primary mx-2">
+                                <i class="bi bi-pencil"></i> Editar detalle
+                            </a>
+                            <a asp-controller="FacturaSalidaProducto"
+                               asp-action="Borrar"
+                               asp-route-IdFactura="@ViewBag.IdFactura"
+                               asp-route-IdFacturaSalidaProducto="@obj.IdFacturaSalidaProducto"
+                               class="btn btn-danger mx-2">
+                                <i class="bi bi-trash3"></i> Borrar detalle
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="col-6 text-end">
+        <form asp-controller="FacturaSalidaProducto"
+              asp-action="TerminarFactura"
+              asp-route-IdFactura="@ViewBag.IdFactura"
+              method="post"
+              style="display:inline;">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check-circle"></i> Terminar despacho y disminuir productos al inventario
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    @if (ViewBag.SinPresupuesto == true)
+    {
+        <script>
+            Swal.fire({
+                icon: 'warning',
+                title: 'Sin productos presupuestados',
+                text: 'No existen productos presupuestados todavía para este recinto.',
+                confirmButtonText: 'Volver al listado de facturas',
+                confirmButtonColor: '#0dcaf0' // 💙 Celeste (Bootstrap info)
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '@Url.Action("Index", "Factura", new { Tipo = "Salida" })';
+                }
+            });
+        </script>
+    }
+}

@@ -25,10 +25,6 @@ namespace Prototipo1.Models
         [ValidateNever]
         public Producto Producto { get; set; }
 
-        public int IdRecinto { get; set; }
-        [ForeignKey("IdRecinto")]
-        [ValidateNever]
-        public Recinto Recinto { get; set; }
 
         [Required]
         public int CantidadDisminuida { get; set; }

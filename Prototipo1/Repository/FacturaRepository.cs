@@ -31,7 +31,7 @@ namespace Prototipo1.Repository
                 facturaFromDB.IdTipoFactura = factura.IdTipoFactura;
                 facturaFromDB.Comentario = factura.Comentario;
                 facturaFromDB.IdProyecto = factura.IdProyecto;
-
+                facturaFromDB.IdRecinto = factura.IdRecinto;
 
 
             }

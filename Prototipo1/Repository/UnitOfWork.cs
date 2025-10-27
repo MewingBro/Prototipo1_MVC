@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Prototipo1.Repository.IRepository;
 using Prototipo1.Data;
 using Microsoft.EntityFrameworkCore;
+using Prototipo1.Models;
 
 namespace Prototipo1.Repository
 {
@@ -36,6 +37,8 @@ namespace Prototipo1.Repository
         
         public IUsuariosProyectosRepository UsuariosProyectos { get; private set; }
 
+        public IFacturaSalidaProductoRepository FacturaSalidaProducto { get; private set; }
+
         public UnitOfWork(AppDBContext db)
         {
             _db = db;
@@ -52,6 +55,7 @@ namespace Prototipo1.Repository
             Recinto = new RecintoRepository(db);
             RecintoProducto =  new RecintoProductoRepository(db);
             UsuariosProyectos = new UsuariosProyectosRepository(db);
+            FacturaSalidaProducto = new FacturaSalidaProductoRepository(db);
         }
 
         

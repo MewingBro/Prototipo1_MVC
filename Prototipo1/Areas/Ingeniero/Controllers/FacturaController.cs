@@ -40,7 +40,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             // Consulta base filtrando por proyecto
             var query = _unitOfWork.Factura.GetAllBYID(
                 f => f.IdProyecto == idProyecto,
-                includeProperties: "TipoFactura,Proyecto"
+                includeProperties: "TipoFactura,Proyecto,Recinto,Recinto.Aposento.Nivel"
             );
 
             // Si se definió un tipo, aplicar filtro adicional
@@ -58,36 +58,63 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
 
         public IActionResult Upsert(int? IdFactura, string? Tipo)
         {
-
             ViewBag.Tipo = Tipo;
-            IEnumerable<SelectListItem> TipoFacturaList = _unitOfWork.TipoFactura.GetAll().Select(u => new SelectListItem
+            ViewBag.IdFactura = IdFactura;
+
+            // Lista de tipos de factura
+            IEnumerable<SelectListItem> TipoFacturaList = _unitOfWork.TipoFactura.GetAll()
+                .Select(u => new SelectListItem
+                {
+                    Text = u.NombreTipoFactura,
+                    Value = u.IdTipoFactura.ToString()
+                });
+
+            // ✅ Lista de recintos filtrados por proyecto (si hay proyecto seleccionado)
+            IEnumerable<SelectListItem> RecintoList = new List<SelectListItem>();
+            int? IdProyecto = HttpContext.Session.GetInt32("IdProyecto");
+            if (IdProyecto != null && IdProyecto != 0)
             {
-                Text = u.NombreTipoFactura,
-                Value = u.IdTipoFactura.ToString()
+                RecintoList = _unitOfWork.Recinto.GetAllBYID(
+                    filter: r => r.Aposento.Nivel.Proyecto.IdProyecto == IdProyecto,
+                    includeProperties: "Aposento" // necesario si usas navegación
+                )
+                .Select(r => new SelectListItem
+                {
+                    Text = r.NombreRecinto,    // ajusta al nombre real del campo
+                    Value = r.IdRecinto.ToString()
+                });
             }
-            );
 
-
-            //ViewBag.FamiliaList = FamiliaList;
-            //ViewBag.UnidadList = UnidadList;
             FacturaVM FacturaVM = new()
             {
                 TipoFacturaList = TipoFacturaList,
+                RecintoList = RecintoList, // ✅ Se agrega al ViewModel
                 Factura = new Factura()
-
             };
-            if (IdFactura == null || IdFactura ==0)
+
+            if (IdFactura == null || IdFactura == 0)
             {
-                //crear
+                // Crear
                 return View(FacturaVM);
             }
             else
             {
-                //update
-                FacturaVM.Factura = _unitOfWork.Factura.GetID(u=>u.IdFactura == IdFactura);
+                // Editar
+                FacturaVM.Factura = _unitOfWork.Factura.GetID(u => u.IdFactura == IdFactura);
+                // Opcional: volver a cargar recintos del proyecto asociado a la factura
+                if (FacturaVM.Factura.IdProyecto != 0)
+                {
+                    FacturaVM.RecintoList = _unitOfWork.Recinto.GetAllBYID(
+                        filter: r => r.Aposento.Nivel.Proyecto.IdProyecto == IdProyecto,
+                        includeProperties: "Aposento"
+                    ).Select(r => new SelectListItem
+                    {
+                        Text = r.NombreRecinto,
+                        Value = r.IdRecinto.ToString()
+                    });
+                }
                 return View(FacturaVM);
             }
-            
         }
 
         [HttpPost]
@@ -95,7 +122,16 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
         {
             if (ModelState.IsValid)
             {
-
+                string Tipo;
+                int TipoNum = FacturaVM.Factura.IdTipoFactura;
+                if (TipoNum == 1)
+                {
+                    Tipo = "Entrada";
+                }
+                else
+                {
+                    Tipo = "Salida";
+                }
                 if (FacturaVM.Factura.IdFactura == 0)
                 {
                     if (accion == "AgregarProductosAhora")
@@ -103,27 +139,41 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                         _unitOfWork.Factura.Add(FacturaVM.Factura);
                         _unitOfWork.Save();
                         int IdFactura = FacturaVM.Factura.IdFactura;
-                        return RedirectToAction(
+                        if (TipoNum == 1)
+                        {
+                            return RedirectToAction(
                 "Index",                 // acción del otro controlador
                 "FacturaProducto",       // nombre del otro controller
                 new { IdFactura = IdFactura } // parámetro
             );
-                    } 
-                        _unitOfWork.Factura.Add(FacturaVM.Factura);
-                        _unitOfWork.Save();
-                        TempData["success"] = "Factura agregada exitosamente";
-                        return RedirectToAction("Index");
-                    
-                    
-                } else
+                        }
+                        else
+                        {
+                            return RedirectToAction(
+                                            "Index",                 // acción del otro controlador
+                                            "FacturaSalidaProducto",       // nombre del otro controller
+                                            new { IdFactura = IdFactura } // parámetro
+                                        );
+
+                        }
+
+                    }
+                    _unitOfWork.Factura.Add(FacturaVM.Factura);
+                    _unitOfWork.Save();
+                    TempData["success"] = "Factura agregada exitosamente";
+                    return RedirectToAction("Index", new { Tipo = Tipo });
+
+
+                }
+                else
                 {
                     _unitOfWork.Factura.Update(FacturaVM.Factura);
                     _unitOfWork.Save();
                     TempData["success"] = "Factura actualizada exitosamente";
-                    return RedirectToAction("Index");
+                    return RedirectToAction("Index", new { Tipo = Tipo });
                 }
 
-                
+
             }
             else
             {
@@ -135,7 +185,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 return View(FacturaVM);
             }
 
-            
+
 
         }
         /*
@@ -190,8 +240,8 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
         {
             Factura? obj = _unitOfWork.Factura.GetID(u => u.IdFactura == IdFactura);
             if (obj == null)
-            { 
-                return Json( new { success = false, message = "Error al borrar" });
+            {
+                return Json(new { success = false, message = "Error al borrar" });
             }
 
 

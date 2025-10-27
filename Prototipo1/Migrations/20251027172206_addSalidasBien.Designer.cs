@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Prototipo1.Data;
 
@@ -11,9 +12,11 @@ using Prototipo1.Data;
 namespace Prototipo1.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20251027172206_addSalidasBien")]
+    partial class addSalidasBien
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -263,7 +266,7 @@ namespace Prototipo1.Migrations
                     b.Property<int>("IdProyecto")
                         .HasColumnType("int");
 
-                    b.Property<int?>("IdRecinto")
+                    b.Property<int>("IdRecinto")
                         .HasColumnType("int");
 
                     b.Property<int>("IdTipoFactura")
@@ -759,7 +762,9 @@ namespace Prototipo1.Migrations
 
                     b.HasOne("Prototipo1.Models.Recinto", "Recinto")
                         .WithMany()
-                        .HasForeignKey("IdRecinto");
+                        .HasForeignKey("IdRecinto")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Prototipo1.Models.TipoFactura", "TipoFactura")
                         .WithMany()

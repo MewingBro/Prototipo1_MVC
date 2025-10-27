@@ -55,7 +55,9 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             }
             _unitOfWork.Save();
 
-            return RedirectToAction("Index", "Factura");
+            string Tipo = "Entrada";
+
+            return RedirectToAction("Index","Factura", new { Tipo = Tipo });
         }
 
         public IActionResult Upsert(int? IdFactura, int? IdFacturaProducto)
