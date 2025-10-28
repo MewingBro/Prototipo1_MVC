@@ -34,21 +34,19 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
         }
 
         [HttpPost]
-        public IActionResult TerminarFactura(int? IdFactura)
+        public IActionResult ConfirmarPresupuesto(int? IdRecinto)
         {
-            List<FacturaProducto> objFacturaProductoLista = _unitOfWork.FacturaProducto
-        .GetAllBYID(f => f.IdFactura == IdFactura, includeProperties: "Factura,Producto")
-        .ToList();
 
-            int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
-
-            foreach (var x in objFacturaProductoLista)
+            var recinto = _unitOfWork.Recinto.GetID(f => f.IdRecinto == IdRecinto);
+            if (recinto != null)
             {
-                _unitOfWork.FacturaProducto.AddWithInventario(x,idProyecto);
-                _unitOfWork.Save();
+                recinto.EstadoRecinto = 1; // ← cambia el estado
+                _unitOfWork.Recinto.Update(recinto);
             }
 
-            return RedirectToAction("Index", "Factura");
+            _unitOfWork.Save();
+
+            return RedirectToAction("Index", "Recinto");
         }
 
         public IActionResult Upsert(int? IdRecinto, int? IdRecintoProducto)

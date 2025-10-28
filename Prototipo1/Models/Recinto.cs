@@ -23,6 +23,8 @@ namespace Prototipo1.Models
         [ValidateNever]
         public Aposento Aposento { get; set; }
 
+        [ValidateNever]
+        public int EstadoRecinto { get; set; }
 
     }
 }

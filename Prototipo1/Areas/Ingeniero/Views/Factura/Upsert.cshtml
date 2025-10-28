@@ -70,7 +70,9 @@
                         {
                             @if (Model.Factura.IdFactura != 0)
                             {
-                                <a asp-controller="FacturaSalidaProducto" asp-action="Index" asp-route-IdFactura="@Model.Factura.IdFactura" class="btn btn-outline-secondary form-control">
+                                <a asp-controller="FacturaSalidaProducto" asp-action="Index" asp-route-IdFactura="@Model.Factura.IdFactura"
+                                   asp-route-IdRecinto="@Model.Factura.IdRecinto"
+                                   class="btn btn-outline-secondary form-control">
                                     Agregar Productos a la Factura
                                 </a>
                             }

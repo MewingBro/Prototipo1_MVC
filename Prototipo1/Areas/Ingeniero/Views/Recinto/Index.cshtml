@@ -1,6 +1,6 @@
 ﻿@model List<Recinto>
 <partial name="_Notification" />
-    <div class="container">
+<div class="container">
 
     <div class="row pt-4 pb-3">
         <div class="col-6">
@@ -14,15 +14,15 @@
     </div>
 
 
-<table class="table table-bordered table-stripped">
-    <thead>
-    <tr>
-        <th>
-            Id de Recinto
-        </th>
-        <th>
-            Nombre del Recinto
-        </th>
+    <table class="table table-bordered table-stripped">
+        <thead>
+            <tr>
+                <th>
+                    Id de Recinto
+                </th>
+                <th>
+                    Nombre del Recinto
+                </th>
                 <th>
                     Nombre del Aposento
                 </th>
@@ -39,18 +39,18 @@
                 <th>
 
                 </th>
-    </tr>
-    </thead>
-    <tbody>
-        @foreach (var obj in Model.OrderBy(u=>u.IdRecinto))
-        {
-            <tr>
-            <td>
-                @obj.IdRecinto
-            </td>
-            <td>
-                @obj.NombreRecinto
-            </td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var obj in Model.OrderBy(u => u.IdRecinto))
+            {
+                <tr>
+                    <td>
+                        @obj.IdRecinto
+                    </td>
+                    <td>
+                        @obj.NombreRecinto
+                    </td>
                     <td>
                         @obj.Aposento.NombreAposento
                     </td>
@@ -62,27 +62,29 @@
                     </td>
 
                     <td>
-                        <a asp-controller="RecintoProducto" asp-action="Index" asp-route-IdRecinto="@obj.IdRecinto" class="btn btn-outline-secondary form-control">
-                            Modificar Presupuesto del Recinto
-                        </a>
-                        
+                        @if (User.IsInRole(SD.Role_Admin) || obj.EstadoRecinto == 0)
+                        {
+                            <a asp-controller="RecintoProducto" asp-action="Index" asp-route-IdRecinto="@obj.IdRecinto" class="btn btn-outline-secondary form-control">
+                                Modificar Presupuesto del Recinto
+                            </a>
+                        }
                     </td>
 
-            <td>
-                <div class="w-75 btn-group" role="group">
-                    <a asp-controller="Recinto" asp-action="Upsert" asp-route-IdRecinto="@obj.IdRecinto" class="btn btn-primary mx-2">
+                    <td>
+                        <div class="w-75 btn-group" role="group">
+                            <a asp-controller="Recinto" asp-action="Upsert" asp-route-IdRecinto="@obj.IdRecinto" class="btn btn-primary mx-2">
                                 <i class="bi bi-pencil">Editar Recinto</i>
-                    </a>
+                            </a>
                             <a asp-controller="Recinto" asp-action="Borrar" asp-route-IdRecinto="@obj.IdRecinto" class="btn btn-danger mx-2">
                                 <i class="bi bi-trash3"></i>Borrar Recinto
                             </a>
-                            
-                </div>
-            </td>
-        
-        </tr>
-        }
-    </tbody>
-</table>
+
+                        </div>
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
 
 </div>

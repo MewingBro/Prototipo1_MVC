@@ -45,8 +45,9 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             foreach (var x in objFacturaProductoLista)
             {
                 _unitOfWork.FacturaProducto.AddWithInventario(x,idProyecto);
-                _unitOfWork.Save();
+                
             }
+            _unitOfWork.Save();
             var factura = _unitOfWork.Factura.GetID(f => f.IdFactura == IdFactura);
             if (factura != null)
             {

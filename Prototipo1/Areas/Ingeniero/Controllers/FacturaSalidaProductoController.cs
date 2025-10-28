@@ -22,7 +22,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        public IActionResult Index(int? IdFactura)
+        public IActionResult Index(int? IdFactura,int? IdRecinto)
         {
             // Obtener la lista de salidas
             List<FacturaSalidaProducto> objFacturaSalidaProductoLista = _unitOfWork.FacturaSalidaProducto
@@ -31,25 +31,17 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
 
             ViewBag.IdFactura = IdFactura;
 
-            // Obtener la factura con su recinto
-            var factura = _unitOfWork.Factura.GetID(
-                f => f.IdFactura == IdFactura,
-                includeProperties: "Recinto"
+            // 
+            var recinto = _unitOfWork.Recinto.GetID(
+                f => f.IdRecinto == IdRecinto
             );
 
-            if (factura != null)
-            {
-                //  Verificar si el recinto tiene productos presupuestados
-                bool existenPresupuestados = _unitOfWork.RecintoProducto
-                    .GetAll()
-                    .Any(rp => rp.IdRecinto == factura.IdRecinto);
-
-                // Si no existen, enviar una bandera a la vista
-                if (!existenPresupuestados)
+            
+                if (recinto.EstadoRecinto == 0)
                 {
                     ViewBag.SinPresupuesto = true;
                 }
-            }
+            
 
             return View(objFacturaSalidaProductoLista);
         }
