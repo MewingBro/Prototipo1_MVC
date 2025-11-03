@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Prototipo1.Data;
 
@@ -11,9 +12,11 @@ using Prototipo1.Data;
 namespace Prototipo1.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20251029034145_addCambios")]
+    partial class addCambios
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -254,21 +257,12 @@ namespace Prototipo1.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("FechaSolicitud")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("IdFactura")
                         .HasColumnType("int");
-
-                    b.Property<string>("IdUsuario")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("IdCambio");
 
                     b.HasIndex("IdFactura");
-
-                    b.HasIndex("IdUsuario");
 
                     b.ToTable("Cambio");
                 });
@@ -791,15 +785,7 @@ namespace Prototipo1.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Usuario")
-                        .WithMany()
-                        .HasForeignKey("IdUsuario")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Factura");
-
-                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("Prototipo1.Models.Factura", b =>

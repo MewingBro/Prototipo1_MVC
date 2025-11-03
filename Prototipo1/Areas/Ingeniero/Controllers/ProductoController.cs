@@ -23,13 +23,60 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
         }
 
 
-        public IActionResult Index()
+        public IActionResult Index(string searchString, int? idFamilia, int? idUnidad, int page = 1)
         {
-            List<Producto> objProductoLista = _unitOfWork.Producto.GetAll(includeProperties:"Familia,Unidad").ToList();
+            const int pageSize = 10;
 
+            // Incluye relaciones
+            var productos = _unitOfWork.Producto.GetAll(includeProperties: "Familia,Unidad").AsQueryable();
 
-            return View(objProductoLista);
+            // 🔍 Filtro por texto
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                var searchLower = searchString.ToLower();
+                productos = productos.Where(p =>
+                    p.NombreProducto.ToLower().Contains(searchLower) ||
+                    p.CodigoProducto.ToLower().Contains(searchLower));
+            }
+
+            // 🧩 Filtro por familia
+            if (idFamilia.HasValue && idFamilia.Value > 0)
+            {
+                productos = productos.Where(p => p.IdFamilia == idFamilia.Value);
+            }
+
+            // ⚙️ Filtro por unidad
+            if (idUnidad.HasValue && idUnidad.Value > 0)
+            {
+                productos = productos.Where(p => p.IdUnidad == idUnidad.Value);
+            }
+
+            // 📄 Total y paginación
+            var totalProductos = productos.Count();
+            var productosPaginados = productos
+                .OrderBy(p => p.IdProducto)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            // 🔹 Cargar listas para los dropdowns
+            ViewBag.FamiliaList = _unitOfWork.Familia.GetAll()
+                .Select(f => new SelectListItem { Text = f.NombreFamilia, Value = f.IdFamilia.ToString() });
+
+            ViewBag.UnidadList = _unitOfWork.Unidad.GetAll()
+                .Select(u => new SelectListItem { Text = u.NombreUnidad, Value = u.IdUnidad.ToString() });
+
+            // 🔹 Variables para la vista
+            ViewBag.SearchString = searchString;
+            ViewBag.IdFamilia = idFamilia;
+            ViewBag.IdUnidad = idUnidad;
+            ViewBag.Page = page;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalProductos = totalProductos;
+
+            return View(productosPaginados);
         }
+
 
         public IActionResult Upsert(int? IdProducto)
         {
@@ -55,7 +102,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 Producto = new Producto()
 
             };
-            if (IdProducto == null || IdProducto ==0)
+            if (IdProducto == null || IdProducto == 0)
             {
                 //crear
                 return View(ProductoVM);
@@ -63,10 +110,10 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             else
             {
                 //update
-                ProductoVM.Producto = _unitOfWork.Producto.GetID(u=>u.IdProducto == IdProducto);
+                ProductoVM.Producto = _unitOfWork.Producto.GetID(u => u.IdProducto == IdProducto);
                 return View(ProductoVM);
             }
-            
+
         }
 
         [HttpPost]
@@ -75,7 +122,8 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             if (ModelState.IsValid)
             {
                 string wwwRootPath = _webHostEnvironment.WebRootPath;
-                if (file != null) { 
+                if (file != null)
+                {
                     string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
                     string ProductoPATH = Path.Combine(wwwRootPath, @"Images\Producto");
 
@@ -90,9 +138,10 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                         }
                     }
 
-                    
 
-                    using (var fileStream = new FileStream(Path.Combine(ProductoPATH, fileName), FileMode.Create)) { 
+
+                    using (var fileStream = new FileStream(Path.Combine(ProductoPATH, fileName), FileMode.Create))
+                    {
                         file.CopyTo(fileStream);
                     }
                     ProductoVM.Producto.ImageURL = @"\Images\Producto\" + fileName;
@@ -101,7 +150,8 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 if (ProductoVM.Producto.IdProducto == 0)
                 {
                     _unitOfWork.Producto.Add(ProductoVM.Producto);
-                } else
+                }
+                else
                 {
                     _unitOfWork.Producto.Update(ProductoVM.Producto);
                 }
@@ -125,7 +175,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 return View(ProductoVM);
             }
 
-            
+
 
         }
         /*
@@ -180,8 +230,8 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
         {
             Producto? obj = _unitOfWork.Producto.GetID(u => u.IdProducto == IdProducto);
             if (obj == null)
-            { 
-                return Json( new { success = false, message = "Error al borrar" });
+            {
+                return Json(new { success = false, message = "Error al borrar" });
             }
 
             var imagenBorrar = Path.Combine(_webHostEnvironment.WebRootPath, obj.ImageURL.TrimStart('\\'));

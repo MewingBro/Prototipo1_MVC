@@ -1,0 +1,119 @@
+﻿@model List<Cambio>
+<partial name="_Notification" />
+<div class="container">
+
+    <div class="row pt-4 pb-2">
+        <div class="col-12">
+            <h2 class="text-primary">Lista de Peticiones</h2>
+        </div>
+    </div>
+
+    <div class="row pb-3">
+        <div class="col-12">
+            <form method="get" class="row g-2" asp-action="Index">
+                <div class="col-12 col-md">
+                    <input type="number" name="IdFactura" value="@ViewBag.IdFactura" placeholder="Id Factura" class="form-control w-100" />
+                </div>
+                <div class="col-12 col-md">
+                    <input type="text" name="email" value="@ViewBag.Email" placeholder="Email usuario" class="form-control w-100" />
+                </div>
+                <div class="col-12 col-md">
+                    <input type="text" name="comentario" value="@ViewBag.Comentario" placeholder="Comentario" class="form-control w-100" />
+                </div>
+                <div class="col-12 col-md">
+                    <input type="date" name="fecha" value="@ViewBag.Fecha" class="form-control w-100" />
+                </div>
+                <div class="col-12 col-md">
+                    <select name="estado" class="form-select w-100">
+                        <option value="">Todos los estados</option>
+                        <option value="Pendiente" selected="@(ViewBag.Estado == "Pendiente" ? "selected" : null)">Pendiente</option>
+                        <option value="Aprobado" selected="@(ViewBag.Estado == "Aprobado" ? "selected" : null)">Aprobado</option>
+                        <option value="Rechazado" selected="@(ViewBag.Estado == "Rechazado" ? "selected" : null)">Rechazado</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-auto d-flex gap-2">
+                    <button type="submit" class="btn btn-info w-100">Filtrar</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary w-100">Limpiar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-bordered table-hover align-middle text-center">
+            <thead class="table-primary">
+                <tr>
+                    <th>ID Cambio</th>
+                    <th>ID Factura</th>
+                    <th>Comentario de Factura</th>
+                    <th>Fecha de Factura</th>
+                    <th>Usuario</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-3">
+                            No existen solicitudes de cambio registradas para este proyecto.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var obj in Model)
+                    {
+                        <tr>
+                            <td>@obj.IdCambio</td>
+                            <td>@obj.IdFactura</td>
+                            <td>@obj.Factura.Comentario</td>
+                            <td>@obj.Factura.Fecha.ToString("dd/MM/yyyy")</td>
+                            <td>@obj.Usuario.Email</td>
+                            <td>@obj.Estado</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a asp-controller="Cambio" asp-action="Detalle" asp-route-IdCambio="@obj.IdCambio" class="btn btn-primary btn-sm">
+                                        <i class="bi bi-pencil"></i> Ver solicitud
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @* PAGINACIÓN *@
+    @{
+        int page = ViewBag.Page;
+        int pageSize = ViewBag.PageSize;
+        int total = ViewBag.TotalCambios;
+        int totalPages = (int)Math.Ceiling((double)total / pageSize);
+    }
+    @if (totalPages > 1)
+    {
+        <nav class="mt-3">
+            <ul class="pagination justify-content-center pagination-sm">
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == page ? "active" : "")">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-page="@i"
+                           asp-route-IdFactura="@ViewBag.IdFactura"
+                           asp-route-email="@ViewBag.Email"
+                           asp-route-comentario="@ViewBag.Comentario"
+                           asp-route-fecha="@ViewBag.Fecha"
+                           asp-route-estado="@ViewBag.Estado">
+                            @i
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+</div>

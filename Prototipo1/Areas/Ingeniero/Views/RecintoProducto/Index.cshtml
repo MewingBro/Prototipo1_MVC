@@ -1,105 +1,137 @@
 ﻿@model List<RecintoProducto>
 <partial name="_Notification" />
-<div class="container">
 
+<div class="container">
     <div class="row pt-4 pb-3">
-        <div class="col-6">
+        <div class="col-12 col-md-6">
             <h2 class="text-primary">Presupuesto del Recinto</h2>
         </div>
-        <div class="col-6 text-end">
+        <div class="col-12 col-md-6 text-end">
             <a asp-controller="RecintoProducto" asp-action="Upsert" asp-route-IdRecinto="@ViewBag.IdRecinto" class="btn btn-primary">
                 <i class="bi bi-plus-circle"></i> Agregar Producto
             </a>
         </div>
     </div>
 
+    <!-- 🔍 FILTROS -->
+    <form asp-action="Index" asp-controller="RecintoProducto" method="get" class="row mb-3">
+        <input type="hidden" name="IdRecinto" value="@ViewBag.IdRecinto" />
 
-    <table class="table table-bordered table-stripped">
-        <thead>
+        <div class="col-md-3 mb-2">
+            <input type="text" name="nombreProducto" value="@ViewBag.NombreProducto" class="form-control" placeholder="Buscar por producto" />
+        </div>
+
+        <div class="col-md-3 mb-2">
+            <input type="text" name="nombreRecinto" value="@ViewBag.NombreRecinto" class="form-control" placeholder="Buscar por recinto" />
+        </div>
+
+
+        <div class="col-md-3 mb-2">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="SoloCero" id="SoloCero" value="true" @(ViewBag.SoloCero == true ? "checked" : "") />
+                <label class="form-check-label" for="SoloCero">
+                    Mostrar solo existencias en 0
+                </label>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-2 d-flex gap-2">
+            <button type="submit" class="btn btn-info w-50">Filtrar</button>
+            <a asp-action="Index" asp-route-IdRecinto="@ViewBag.IdRecinto" class="btn btn-outline-secondary w-50">Limpiar</a>
+        </div>
+    </form>
+
+    <!-- 🔢 TABLA -->
+    <table class="table table-bordered table-striped align-middle text-center">
+        <thead class="table-primary">
             <tr>
-                <th>
-                    Id Aposento + Recinto
-                </th>
-                <th>
-                    Id de Recinto
-                </th>
-                <th>
-                    Nombre del Recinto
-                </th>
-                <th>
-                    Id de Producto
-                </th>
-                <th>
-                    Nombre del Producto
-                </th>
-                <th>
-                    Presupuesto
-                </th>
-                <th>
-                    Desperdicio
-                </th>
-                <th>
-                    Existencias Actuales
-                </th>
-                <th>
-
-                </th>
-
+                <th>Id Recinto</th>
+                <th>Nombre Recinto</th>
+                <th>Id Producto</th>
+                <th>Producto</th>
+                <th>Presupuesto</th>
+                <th>Desperdicio</th>
+                <th>Existencias Actuales</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var obj in Model.OrderBy(u => u.IdRecintoProducto))
+            @if (!Model.Any())
             {
-
                 <tr>
-                    <td>
-                        @obj.IdRecintoProducto
-                    </td>
-                    <td>
-                        @obj.IdRecinto
-                    </td>
-                    <td>
-                        @obj.Recinto.NombreRecinto
-                    </td>
-                    <td>
-                        @obj.IdProducto
-                    </td>
-                    <td>
-                        @obj.Producto.NombreProducto
-                    </td>
-                    <td>
-                        @obj.Presupuesto
-                    </td>
-                    <td>
-                        @obj.Desperdicio
-                    </td>
-                    <td>
-                        @obj.ExistenciasActuales
-                    </td>
-
-                    <td>
-                        <div class="w-75 btn-group" role="group">
-                            <a asp-controller="RecintoProducto" asp-action="Upsert" asp-route-IdRecinto="@ViewBag.IdRecinto" asp-route-IdRecintoProducto="@obj.IdRecintoProducto" class="btn btn-primary mx-2">
-                                <i class="bi bi-pencil">Editar presupuesto</i>
-                            </a>
-                            <a asp-controller="RecintoProducto" asp-action="Borrar" asp-route-IdRecinto="@ViewBag.IdRecinto" asp-route-IdRecintoProducto="@obj.IdRecintoProducto" class="btn btn-danger mx-2">
-                                <i class="bi bi-trash3">Borrar presupuesto</i>
-                            </a>
-
-                        </div>
-                    </td>
-
+                    <td colspan="11" class="text-muted text-center py-3">No hay registros que coincidan con los filtros.</td>
                 </tr>
+            }
+            else
+            {
+                foreach (var obj in Model)
+                {
+                    <tr>
+                        <td>@obj.IdRecinto</td>
+                        <td>@obj.Recinto.NombreRecinto</td>
+                        <td>@obj.IdProducto</td>
+                        <td>@obj.Producto.NombreProducto</td>
+                        <td>@obj.Presupuesto</td>
+                        <td>@obj.Desperdicio</td>
+                        <td>@obj.ExistenciasActuales</td>
+
+                        <td>
+                            <div class="btn-group w-100" role="group">
+                                <a asp-controller="RecintoProducto" asp-action="Upsert"
+                                   asp-route-IdRecinto="@ViewBag.IdRecinto"
+                                   asp-route-IdRecintoProducto="@obj.IdRecintoProducto"
+                                   class="btn btn-primary btn-sm mx-1">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </a>
+                                <a asp-controller="RecintoProducto" asp-action="Borrar"
+                                   asp-route-IdRecinto="@ViewBag.IdRecinto"
+                                   asp-route-IdRecintoProducto="@obj.IdRecintoProducto"
+                                   class="btn btn-danger btn-sm mx-1">
+                                    <i class="bi bi-trash3"></i> Borrar
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
             }
         </tbody>
     </table>
 
-    <div class="col-6">
-        <form asp-controller="RecintoProducto" asp-action="ConfirmarPresupuesto" asp-route-IdRecinto="@ViewBag.IdRecinto" method="post" style="display:inline;">
+    <!-- 📄 PAGINACIÓN -->
+    @{
+        int page = ViewBag.Page;
+        int totalPages = ViewBag.TotalPages;
+    }
+    @if (totalPages > 1)
+    {
+        <nav class="mt-3">
+            <ul class="pagination justify-content-center">
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == page ? "active" : "")">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-IdRecinto="@ViewBag.IdRecinto"
+                           asp-route-nombreProducto="@ViewBag.NombreProducto"
+                           asp-route-nombreRecinto="@ViewBag.NombreRecinto"
+                           asp-route-nombreNivel="@ViewBag.NombreNivel"
+                           asp-route-nombreAposento="@ViewBag.NombreAposento"
+                           asp-route-SoloCero="@ViewBag.SoloCero"
+                           asp-route-page="@i">
+                            @i
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+
+    <!-- ✅ BOTÓN CONFIRMAR -->
+    <div class="col-12 mt-3">
+        <form asp-controller="RecintoProducto" asp-action="ConfirmarPresupuesto" asp-route-IdRecinto="@ViewBag.IdRecinto" method="post">
             <button type="submit" class="btn btn-primary">
-                <i class="bi bi-plus-circle"></i> Confirmar presupuesto
+                <i class="bi bi-check-circle"></i> Confirmar presupuesto
             </button>
         </form>
     </div>
-
 </div>

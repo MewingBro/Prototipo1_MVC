@@ -1,137 +1,192 @@
 ﻿@model List<Factura>
 <partial name="_Notification" />
-    <div class="container">
 
+<div class="container">
+
+    <!-- Encabezado -->
     <div class="row pt-4 pb-3">
         <div class="col-6">
             @if (ViewBag.Tipo == "Entrada")
             {
-                <h2 class="text-primary">Lista de Facturas de Entrada</h2>
-            } else if (ViewBag.Tipo == "Salida")
-            {
-                <h2 class="text-primary">Lista de Facturas de Salidas</h2>
+                <h2 class="text-primary mb-3">Lista de Facturas de Entrada</h2>
             }
-            
+            else if (ViewBag.Tipo == "Salida")
+            {
+                <h2 class="text-primary mb-3">Lista de Facturas de Salida</h2>
+            }
         </div>
         <div class="col-6 text-end">
-            <a asp-controller="Factura" asp-action="Upsert" asp-route-Tipo="@ViewBag.Tipo" class="btn btn-primary">
-                <i class="bi bi-plus-circle"></i> Agregar factura
+            <a asp-controller="Factura" asp-action="Upsert" asp-route-Tipo="@ViewBag.Tipo"
+               class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i>
+                Agregar factura
             </a>
         </div>
     </div>
 
-
-<table class="table table-bordered table-stripped">
-    <thead>
-    <tr>
-        <th>
-            Id de factura
-        </th>
-                <th>
-                    Proyecto
-                </th>
-                @if (ViewBag.Tipo == "Salida")
-                {
-                    <th>
-                        Mivel
-                    </th>
-                    <th>
-                        Aposento
-                    </th>
-                    <th>
-                        Recinto
-                    </th>
-
-                }
-
-        <th>
-            Fecha
-        </th>
-        <th>
-            Tipo de Factura
-        </th>
-        <th>
-            Comentario
-        </th>
-        <th>
-
-        </th>
-        <th>
-
-        </th>
     
-    </tr>
-    </thead>
-    <tbody>
-        @foreach (var obj in Model.OrderBy(u=>u.IdFactura))
-        {
-            <tr>
-            <td>
-                @obj.IdFactura
-            </td>
-                    <td>
-                        @obj.Proyecto.NombreProyecto
-                    </td>
+
+    <!-- Filtros -->
+    <div class="row mb-4">
+        <form method="get" asp-action="Index" class="row g-2">
+            <input type="hidden" name="Tipo" value="@ViewBag.Tipo" />
+            <div class="col-12 col-md">
+                <input type="number" name="IdFactura" value="@ViewBag.IdFactura" placeholder="Id Factura" class="form-control w-100" />
+            </div>
+            @if (ViewBag.Tipo == "Salida")
+            {
+                <div class="col-12 col-md">
+                    <input type="text" name="Nivel" value="@ViewBag.Nivel" placeholder="Nivel" class="form-control w-100" />
+                </div>
+
+                <div class="col-12 col-md">
+                    <input type="text" name="Aposento" value="@ViewBag.Aposento" placeholder="Aposento" class="form-control w-100" />
+                </div>
+                <div class="col-12 col-md">
+                    <input type="text" name="Recinto" value="@ViewBag.Recinto" placeholder="Recinto" class="form-control w-100" />
+            </div>
+            }
+            <div class="col-12 col-md">
+                <input type="date" name="Fecha" value="@ViewBag.Fecha" class="form-control w-100" />
+            </div>
+            <div class="col-12 col-md">
+                <input type="text" name="Comentario" value="@ViewBag.Comentario" placeholder="Comentario" class="form-control w-100" />
+            </div>
+
+            <!-- Filtro Estado -->
+            <div class="col-12 col-md">
+                <select name="Estado" class="form-select w-100">
+                    <option value="">Todos los estados</option>
+                    <option value="Pendiente" selected="@(ViewBag.Estado == "Pendiente" ? "selected" : null)">Pendiente</option>
+                    <option value="Cerrada" selected="@(ViewBag.Estado == "Cerrada" ? "selected" : null)">Cerrada</option>
                     @if (ViewBag.Tipo == "Salida")
                     {
-                        <td>
-                            @obj.Recinto.Aposento.Nivel.NombreNivel
-                        </td>
-                        <td>
-                            @obj.Recinto.Aposento.NombreAposento
-                        </td>
-                        <td>
-                            @obj.Recinto.NombreRecinto
-                        </td>
-
+                        <option value="Pendiente de aprobación" selected="@(ViewBag.Estado == "Pendiente de aprobación" ? "selected" : null)">Pendiente de aprobación</option>
+                        <option value="Rechazada" selected="@(ViewBag.Estado == "Rechazada" ? "selected" : null)">Rechazada</option>
                     }
-            <td>
-                @obj.Fecha
-            </td>
-            <td>
-                @obj.TipoFactura.NombreTipoFactura
-            </td>
-            <td>
-                @obj.Comentario
-            </td>
-            <td>
-                        <a asp-controller="Factura" asp-action="DetalleFactura" asp-route-idFactura="@obj.IdFactura" class="btn btn-outline-secondary form-control">
-                            Imprimir Factura
-                        </a>
-            </td>
+                    
+                </select>
+            </div>
 
-            <td>
-                        @if (User.IsInRole(SD.Role_Admin) || obj.EstadoFactura==0)
-                        {
+            <div class="col-12 col-md-auto d-flex gap-2">
+                <button type="submit" class="btn btn-info w-100 text-white">Filtrar</button>
+                <a asp-action="Index" asp-route-Tipo="@ViewBag.Tipo" class="btn btn-outline-secondary w-100">Limpiar</a>
+            </div>
+        </form>
+    </div>
 
-
-                            <div class="w-75 btn-group" role="group">
-
-                                @if (ViewBag.Tipo == "Entrada")
-                                {
-                                    <a asp-controller="factura" asp-action="Upsert" asp-route-IdFactura="@obj.IdFactura" asp-route-Tipo="Entrada" class="btn btn-primary mx-2">
-                                        <i class="bi bi-pencil">Editar factura</i>
-                                    </a>
-                                }
-                                else if (ViewBag.Tipo == "Salida")
-                                {
-                                    <a asp-controller="factura" asp-action="Upsert" asp-route-IdFactura="@obj.IdFactura" asp-route-Tipo="Salida" class=" btn btn-primary mx-2">
-                                        <i class="bi bi-pencil">Editar factura</i>
-                                    </a>
-                                }
-
-                                
-                            <a asp-controller="factura" asp-action="Borrar" asp-route-IdFactura="@obj.IdFactura" class="btn btn-danger mx-2">
-                                <i class="bi bi-trash3">Borrar Factura</i>
-                            </a>
-                            
-                </div>
+    <!-- Tabla -->
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-bordered table-hover align-middle text-center">
+            <thead class="table-primary">
+                <tr>
+                    <th>ID Factura</th>
+                    <th>Proyecto</th>
+                    @if (ViewBag.Tipo == "Salida")
+                    {
+                        <th>Nivel</th>
+                        <th>Aposento</th>
+                        <th>Recinto</th>
+                    }
+                    <th>Fecha</th>
+                    <th>Tipo</th>
+                    <th>Comentario</th>
+                    <th>Estado</th>
+                    <th colspan="2">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="10" class="text-center text-muted py-3">No existen facturas para este proyecto.</td>
+                    </tr>
                 }
-            </td>
-        
-        </tr>
-        }
-    </tbody>
-</table>
+                else
+                {
+                    foreach (var obj in Model)
+                    {
+                        <tr>
+                            <td>@obj.IdFactura</td>
+                            <td>@obj.Proyecto.NombreProyecto</td>
+                            @if (ViewBag.Tipo == "Salida")
+                            {
+                                <td>@obj.Recinto.Aposento.Nivel.NombreNivel</td>
+                                <td>@obj.Recinto.Aposento.NombreAposento</td>
+                                <td>@obj.Recinto.NombreRecinto</td>
+                            }
+                            <td>@obj.Fecha.ToString("dd/MM/yyyy")</td>
+                            <td>@obj.TipoFactura.NombreTipoFactura</td>
+                            <td>@obj.Comentario</td>
 
+                            @if (obj.EstadoFactura == 0)
+                            {
+                                <td> Pendiente </td>
+                            }
+         @if (obj.EstadoFactura == 1)
+        {
+                                <td> Cerrada </td>
+                            }
+         @if (obj.EstadoFactura == 2)
+        {
+                                <td> Pendiente de aprobación </td>
+                            }
+         @if (obj.EstadoFactura == 3)
+        {
+                                <td> Rechazada </td>
+                            }
+
+                            <td>
+                                <a asp-controller="Factura" asp-action="DetalleFactura" asp-route-idFactura="@obj.IdFactura"
+                                   class="btn btn-outline-secondary btn-sm w-100">Imprimir</a>
+                            </td>
+                            <td>
+                                @if (User.IsInRole(SD.Role_Admin) || obj.EstadoFactura == 0)
+                                {
+                                    <div class="btn-group w-100" role="group">
+                                        <a asp-controller="Factura" asp-action="Upsert"
+                                           asp-route-IdFactura="@obj.IdFactura"
+                                           asp-route-Tipo="@ViewBag.Tipo"
+                                           class="btn btn-primary btn-sm">Editar</a>
+                                        <a asp-controller="Factura" asp-action="Borrar" asp-route-IdFactura="@obj.IdFactura"
+                                           class="btn btn-danger btn-sm">Borrar</a>
+                                    </div>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginación -->
+    @{
+        int page = ViewBag.Page;
+        int pageSize = ViewBag.PageSize;
+        int total = ViewBag.TotalFacturas;
+        int totalPages = (int)Math.Ceiling((double)total / pageSize);
+    }
+    @if (totalPages > 1)
+    {
+        <nav class="mt-3">
+            <ul class="pagination justify-content-center pagination-sm">
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == page ? "active" : "")">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-page="@i"
+                           asp-route-Tipo="@ViewBag.Tipo"
+                           asp-route-IdFactura="@ViewBag.IdFactura"
+                           asp-route-Nivel="@ViewBag.Nivel"
+                           asp-route-Aposento="@ViewBag.Aposento"
+                           asp-route-Recinto="@ViewBag.Recinto"
+                           asp-route-Fecha="@ViewBag.Fecha"
+                           asp-route-Comentario="@ViewBag.Comentario">@i</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
 </div>

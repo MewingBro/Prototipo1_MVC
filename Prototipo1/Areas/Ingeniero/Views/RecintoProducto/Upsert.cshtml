@@ -23,9 +23,12 @@
 
                 <div class="mb-3 row p-1">
                     <label asp-for="RecintoProducto.Presupuesto" class="p-0"></label>
-                    <input asp-for="RecintoProducto.Presupuesto" class="form-control" />
+                    <input asp-for="RecintoProducto.Presupuesto" class="form-control" id="PresupuestoInput" />
                     <span asp-validation-for="RecintoProducto.Presupuesto" class="text-danger"></span>
                 </div>
+
+                <!-- Campo invisible para ExistenciasActuales -->
+                <input asp-for="RecintoProducto.ExistenciasActuales" type="hidden" id="ExistenciasActualesInput" />
 
                 <div class="mb-3 row p-1">
                     <label asp-for="RecintoProducto.Desperdicio" class="p-0"></label>
@@ -58,3 +61,19 @@
     </div>
 
 </form>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const presupuestoInput = document.getElementById("PresupuestoInput");
+            const existenciasInput = document.getElementById("ExistenciasActualesInput");
+
+            if (presupuestoInput && existenciasInput) {
+                presupuestoInput.addEventListener("input", function () {
+                    // Actualiza el valor oculto dinámicamente
+                    existenciasInput.value = this.value;
+                });
+            }
+        });
+    </script>
+}

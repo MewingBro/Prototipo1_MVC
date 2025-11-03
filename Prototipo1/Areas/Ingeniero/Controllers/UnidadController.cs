@@ -19,11 +19,35 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
         }
 
 
-        public IActionResult Index()
+        public IActionResult Index(string searchString, int page = 1, int pageSize = 10)
         {
-            List<Unidad> objUnidadLista = _unitOfWork.Unidad.GetAll().ToList();
-            return View(objUnidadLista);
+            // 🔹 Obtener todas las unidades
+            var unidades = _unitOfWork.Unidad.GetAll();
+
+            // 🔍 Filtrado sin importar mayúsculas/minúsculas
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                var searchLower = searchString.ToLower();
+                unidades = unidades.Where(u => u.NombreUnidad.ToLower().Contains(searchLower));
+            }
+
+            // 📊 Total de resultados y paginación
+            var totalUnidades = unidades.Count();
+            var unidadesPaginadas = unidades
+                .OrderBy(u => u.IdUnidad)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            // 📦 Pasar datos a la vista
+            ViewBag.Page = page;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalUnidades = totalUnidades;
+            ViewBag.SearchString = searchString;
+
+            return View(unidadesPaginadas);
         }
+
 
         public IActionResult Create()
         {

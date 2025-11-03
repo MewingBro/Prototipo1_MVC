@@ -22,16 +22,53 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        public IActionResult Index(int? IdFactura)
+        public IActionResult Index(
+    int? IdFactura,
+    string Producto,
+    string EntregadoA,
+    string Familia,
+    string Unidad)
         {
-            List<FacturaProducto> objFacturaProductoLista = _unitOfWork.FacturaProducto
-        .GetAllBYID(f => f.IdFactura == IdFactura, includeProperties: "Factura,Producto")
-        .ToList();
+            if (!IdFactura.HasValue)
+            {
+                TempData["Error"] = "Debe seleccionar una factura válida.";
+                return RedirectToAction("Index", "Factura");
+            }
 
+            // Consulta base
+            var query = _unitOfWork.FacturaProducto.GetAllBYID(
+                f => f.IdFactura == IdFactura,
+                includeProperties: "Factura,Producto,Producto.Familia,Producto.Unidad"
+            );
+
+            // Filtros dinámicos
+            if (!string.IsNullOrWhiteSpace(Producto))
+                query = query.Where(f => f.Producto.NombreProducto.ToLower().Contains(Producto.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(EntregadoA))
+                query = query.Where(f => f.EntregadoA != null && f.EntregadoA.ToLower().Contains(EntregadoA.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(Familia))
+                query = query.Where(f => f.Producto.Familia.NombreFamilia.ToLower().Contains(Familia.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(Unidad))
+                query = query.Where(f => f.Producto.Unidad.NombreUnidad.ToLower().Contains(Unidad.ToLower()));
+
+            // Ejecutar consulta
+            var objFacturaProductoLista = query
+                .OrderBy(f => f.Producto.NombreProducto)
+                .ToList();
+
+            // ViewBag para mantener los filtros
             ViewBag.IdFactura = IdFactura;
+            ViewBag.Producto = Producto;
+            ViewBag.EntregadoA = EntregadoA;
+            ViewBag.Familia = Familia;
+            ViewBag.Unidad = Unidad;
 
             return View(objFacturaProductoLista);
         }
+
 
         [HttpPost]
         public IActionResult TerminarFactura(int? IdFactura)

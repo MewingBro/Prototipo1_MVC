@@ -1,58 +1,121 @@
-﻿@model List<Inventario>
+﻿                    @model List<Inventario>
 <partial name="_Notification" />
-    <div class="container">
 
+<div class="container">
     <div class="row pt-4 pb-3">
         <div class="col-6">
             <h2 class="text-primary">Inventario del Proyecto actual</h2>
         </div>
     </div>
 
+    <!-- Filtros -->
+    <div class="row mb-4">
+        <form method="get" asp-action="Index" class="row g-2">
+            <div class="col-12 col-md">
+                <input type="text" name="NombreProducto" value="@ViewBag.NombreProducto" placeholder="Nombre de Producto" class="form-control w-100" />
+            </div>
+            <div class="col-12 col-md">
+                <input type="text" name="CodigoProducto" value="@ViewBag.CodigoProducto" placeholder="Código de Producto" class="form-control w-100" />
+            </div>
+            <div class="col-12 col-md">
+                <input type="text" name="Familia" value="@ViewBag.Familia" placeholder="Familia" class="form-control w-100" />
+            </div>
+            <div class="col-12 col-md">
+                <input type="text" name="Unidad" value="@ViewBag.Unidad" placeholder="Unidad" class="form-control w-100" />
+            </div>
+            <div class="col-12 col-md-auto d-flex align-items-center gap-2">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="SoloCero" id="SoloCero" value="true" @(ViewBag.SoloCero == true ? "checked" : "") />
+                    <label class="form-check-label" for="SoloCero">
+                        Mostrar solo existencias en 0
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-info">Filtrar</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Limpiar</a>
+            </div>
+        </form>
+    </div>
 
-<table class="table table-bordered table-stripped">
-    <thead>
-    <tr>
-        <th>
-            Id de Inventario
-        </th>
-        <th>
-            Id de Producto
-        </th>
-                <th>
-                    Proyecto
-                </th>
-        <th>
-            Nombre de Producto
-        </th>
-        <th>
-             Existencias
-        </th>
-    </tr>
-    </thead>
-    <tbody>
-        @foreach (var obj in Model.OrderBy(u=>u.IdInventario))
-        {
+    <table class="table table-bordered table-striped align-middle text-center shadow-sm">
+        <thead class="table-primary">
             <tr>
-            <td>
-                @obj.IdInventario
-            </td>
-            <td>
-                @obj.IdProducto
-            </td>
-                    <td>
-                        @obj.Proyecto.NombreProyecto
-                    </td>
-            <td>
-                @obj.Producto.NombreProducto
-            </td>
-            <td>
-                @obj.Existencias
-            </td>
-            
-        
-        </tr>
-        }
-    </tbody>
-</table>
-
+                <th>Id Inventario</th>
+                <th>Id Producto</th>
+                <th>Proyecto</th>
+                <th>Nombre Producto</th>
+                <th>Familia</th>
+                <th>Unidad</th>
+                <th>Existencias</th>
+                @if (User.IsInRole(SD.Role_Admin))
+                                {
+                <th>Acciones</th>
+                                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var obj in Model.OrderBy(u => u.IdInventario))
+            {
+                <tr>
+                    <td>@obj.IdInventario</td>
+                    <td>@obj.IdProducto</td>
+                    <td>@obj.Proyecto.NombreProyecto</td>
+                    <td>@obj.Producto.NombreProducto</td>
+                    <td>@obj.Producto.Familia.NombreFamilia</td>
+                    <td>@obj.Producto.Unidad.NombreUnidad</td>
+                    <td>@obj.Existencias</td>
+    @if (User.IsInRole(SD.Role_Admin))
+                    {
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a asp-controller="Inventario" asp-action="Upsert" asp-route-IdInventario="@obj.IdInventario" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </a>
+                                <button type="button" class="btn btn-sm btn-danger" onclick="confirmarBorrado(@obj.IdInventario)">
+                                    <i class="bi bi-trash3"></i> Borrar
+                                </button>
+                            </div>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
+
+<div class="col-6">
+    <a asp-controller="Inventario" asp-action="Reporte" target="_blank" class="btn btn-outline-primary">
+        <i class="bi bi-file-earmark-pdf"></i> Imprimir Reporte
+    </a>
+</div>
+
+
+<!-- Modal flotante -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="confirmDeleteLabel">Confirmar eliminación</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p>¿Estás seguro de que deseas eliminar este registro de inventario?</p>
+                <form id="deleteForm" method="post" asp-action="Borrar">
+                    <input type="hidden" name="id" id="deleteId" />
+                    <button type="submit" class="btn btn-danger px-4">Sí, eliminar</button>
+                    <button type="button" class="btn btn-secondary ms-2" data-bs-dismiss="modal">Cancelar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Función para mostrar el modal de confirmación
+        function confirmarBorrado(id) {
+            document.getElementById("deleteId").value = id;
+            var modal = new bootstrap.Modal(document.getElementById("confirmDeleteModal"));
+            modal.show();
+        }
+    </script>
+}

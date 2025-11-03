@@ -4,26 +4,29 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Prototipo1</title>
+
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Prototipo1.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand p-0 m-0" asp-area="" asp-controller="Home" asp-action="Index">
-                    <img src="~/Images/logo.png" class="d-block" alt="Logo" style="height: 50px;" />
-
+                <a class="navbar-brand d-flex align-items-center p-0 m-0" asp-area="" asp-controller="Home" asp-action="Index">
+                    <img src="~/Images/logo.png" alt="Logo" style="height:50px;" class="me-2" />
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain"
+                        aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+
+                <div class="collapse navbar-collapse" id="navbarMain">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
                             <a class="nav-link" asp-area="Ingeniero" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
@@ -33,72 +36,75 @@
                                 Inventario
                             </a>
                             <ul class="dropdown-menu">
-                                <li class="nav-item">
-                                    <a class="dropdown-item" asp-area="Ingeniero" asp-controller="Factura" asp-action="Index" asp-route-Tipo="Entrada">Facturas de entrada</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="dropdown-item" asp-area="Ingeniero" asp-controller="Factura" asp-action="Index" asp-route-Tipo="Salida">Facturas de salida</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="dropdown-item" asp-area="Ingeniero" asp-controller="Inventario" asp-action="Index">Ver Inventario</a>
-                                </li>
-
+                                <li><a class="dropdown-item" asp-area="Ingeniero" asp-controller="Factura" asp-action="Index" asp-route-Tipo="Entrada">Facturas de entrada</a></li>
+                                <li><a class="dropdown-item" asp-area="Ingeniero" asp-controller="Factura" asp-action="Index" asp-route-Tipo="Salida">Facturas de salida</a></li>
+                                <li><a class="dropdown-item" asp-area="Ingeniero" asp-controller="Inventario" asp-action="Index">Ver Inventario</a></li>
                             </ul>
-
-
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="Ingeniero" asp-controller="Recinto" asp-action="Index">Presupuestos</a>
                         </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Presupuestos
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="nav-item">
+                                    <a class="dropdown-item" asp-area="Ingeniero" asp-controller="Recinto" 
+                                    asp-action="Index">Ver Presupuestos del proyecto</a>
+                                <li class="nav-item">
+                                    <a class="dropdown-item" asp-area="Ingeniero" asp-controller="Cambio" asp-action="Index">Cambios de Presupuesto</a>
+                                </li>
+                                
+                            </ul>
+                        </li>
+
                         
-                                   
-                        
+
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Manejo de contenido
                             </a>
                             <ul class="dropdown-menu">
-                                <li class="nav-item">
-                                    <a class="dropdown-item" asp-area="Ingeniero" asp-controller="Producto" asp-action="Index">Productos</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="dropdown-item" asp-area="Ingeniero" asp-controller="Familia" asp-action="Index">Familias de productos</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="dropdown-item" asp-area="Ingeniero" asp-controller="Unidad" asp-action="Index">Unidades para productos</a>
-                                </li>     
+                                <li><a class="dropdown-item" asp-area="Ingeniero" asp-controller="Producto" asp-action="Index">Productos</a></li>
+                                <li><a class="dropdown-item" asp-area="Ingeniero" asp-controller="Familia" asp-action="Index">Familias de productos</a></li>
+                                <li><a class="dropdown-item" asp-area="Ingeniero" asp-controller="Unidad" asp-action="Index">Unidades para productos</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                
-                                    
-                                    <li class="nav-item">
-                                        <a class="dropdown-item" asp-area="Ingeniero" asp-controller="Nivel" asp-action="Index">Niveles</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="dropdown-item" asp-area="Ingeniero" asp-controller="Aposento" asp-action="Index">Aposentos</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="dropdown-item" asp-area="Ingeniero" asp-controller="Recinto" asp-action="Index">Recintos</a>
-                                    </li>
-                                
+                                <li><a class="dropdown-item" asp-area="Ingeniero" asp-controller="Nivel" asp-action="Index">Niveles</a></li>
+                                <li><a class="dropdown-item" asp-area="Ingeniero" asp-controller="Aposento" asp-action="Index">Aposentos</a></li>
+                                <li><a class="dropdown-item" asp-area="Ingeniero" asp-controller="Recinto" asp-action="Index">Recintos</a></li>
                             </ul>
                         </li>
 
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Reportes
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-area="Ingeniero" asp-controller="Inventario" asp-action="Index">Inventario</a></li>
+                                <li><a class="dropdown-item" asp-area="Ingeniero" asp-controller="RecintoProducto" asp-action="Detalle" asp-route-Tipo="Salida">Presupuesto</a></li>
+                                <li><a class="dropdown-item" asp-area="Ingeniero" asp-controller="RecintoProducto" asp-action="PorcentajeExistencias">% de salidas por recinto</a></li>
+                            </ul>
+                        </li>
+
+                        
                     </ul>
+
                     <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted bg-primary">
-        <div class="container text-light text-center">
+    <main class="container pb-3">
+        @RenderBody()
+    </main>
+
+    <footer class="border-top footer text-muted bg-primary mt-auto">
+        <div class="container text-light text-center py-2">
             By Johery Zamora
         </div>
     </footer>
+
+    <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

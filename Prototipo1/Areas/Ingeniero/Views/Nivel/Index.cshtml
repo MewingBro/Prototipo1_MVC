@@ -1,65 +1,106 @@
 ﻿@model List<Nivel>
 <partial name="_Notification" />
-    <div class="container">
 
-    <div class="row pt-4 pb-3">
-        <div class="col-6">
-            <h2 class="text-primary">Lista de Niveles</h2>
+<div class="container mt-4">
+    <div class="row align-items-center mb-3">
+        <div class="col-md-6">
+            <h2 class="text-primary mb-0">
+                <i class="bi bi-layers me-2"></i>Lista de Niveles
+            </h2>
         </div>
-        <div class="col-6 text-end">
-            <a asp-controller="Nivel" asp-action="Upsert" asp-route-IdProyecto="@ViewBag.IdProyecto" class="btn btn-primary">
+        <div class="col-md-6 text-end">
+            <a asp-controller="Nivel" asp-action="Upsert" asp-route-IdProyecto="@ViewBag.IdProyecto" class="btn btn-primary shadow-sm">
                 <i class="bi bi-plus-circle"></i> Agregar Nivel
             </a>
         </div>
     </div>
 
+    <!-- 🔍 Filtro -->
+    <form method="get" asp-action="Index" class="row g-2 align-items-end mb-4">
+        <div class="col-md-4">
+            <label class="form-label fw-bold">Buscar Nivel</label>
+            <input type="text" name="searchString" value="@ViewBag.SearchString" class="form-control shadow-sm" placeholder="Nombre del nivel..." />
+        </div>
 
-<table class="table table-bordered table-stripped">
-    <thead>
-    <tr>
-        <th>
-            Id de Nivel
-        </th>
-        <th>
-            Nombre del Nivel
-        </th>
-                <th>
-                    Nombre del Proyecto
-                </th>
-                <th>
+        <div class="col-md-3 d-flex justify-content-end gap-2">
+            <button type="submit" class="btn btn-primary shadow-sm w-100">
+                <i class="bi bi-search"></i> Filtrar
+            </button>
+            <a asp-action="Index" class="btn btn-outline-secondary shadow-sm w-100">
+                <i class="bi bi-x-circle"></i> Limpiar
+            </a>
+        </div>
+    </form>
 
-                </th>
-    </tr>
-    </thead>
-    <tbody>
-        @foreach (var obj in Model.OrderBy(u=>u.IdNivel))
-        {
-            <tr>
-            <td>
-                @obj.IdNivel
-            </td>
-            <td>
-                @obj.NombreNivel
-            </td>
-                    <td>
-                        @obj.Proyecto.NombreProyecto
-                    </td>
+    <!-- 📋 Tabla -->
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-bordered table-hover align-middle text-center">
+            <thead class="table-primary">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre del Nivel</th>
+                    <th>Proyecto</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-3">
+                            No se encontraron niveles que coincidan con el filtro.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var obj in Model)
+                    {
+                        <tr>
+                            <td>@obj.IdNivel</td>
+                            <td>@obj.NombreNivel</td>
+                            <td>@obj.Proyecto.NombreProyecto</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a asp-controller="Nivel" asp-action="Upsert" asp-route-IdNivel="@obj.IdNivel" class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a asp-controller="Nivel" asp-action="Borrar" asp-route-IdNivel="@obj.IdNivel" class="btn btn-outline-danger btn-sm">
+                                        <i class="bi bi-trash3"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
 
-            <td>
-                <div class="w-75 btn-group" role="group">
-                    <a asp-controller="Nivel" asp-action="Upsert" asp-route-IdNivel="@obj.IdNivel" class="btn btn-primary mx-2">
-                                <i class="bi bi-pencil">Editar Nivel</i>
-                    </a>
-                            <a asp-controller="Nivel" asp-action="Borrar" asp-route-IdNivel="@obj.IdNivel" class="btn btn-danger mx-2">
-                                <i class="bi bi-trash3"></i>Borrar Nivel
-                            </a>
-                            
-                </div>
-            </td>
-        
-        </tr>
-        }
-    </tbody>
-</table>
+    <!-- 📄 Paginación -->
+    @{
+        int page = ViewBag.Page;
+        int pageSize = ViewBag.PageSize;
+        int total = ViewBag.TotalNiveles;
+        int totalPages = (int)Math.Ceiling((double)total / pageSize);
+    }
 
+    @if (totalPages > 1)
+    {
+        <nav class="mt-3">
+            <ul class="pagination justify-content-center pagination-sm">
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == page ? "active" : "")">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-page="@i"
+                           asp-route-searchString="@ViewBag.SearchString">
+                            @i
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
 </div>

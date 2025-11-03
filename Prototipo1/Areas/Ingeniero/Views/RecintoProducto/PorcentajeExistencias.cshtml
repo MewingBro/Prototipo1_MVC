@@ -1,0 +1,120 @@
+﻿@model IEnumerable<dynamic>
+
+<div class="container">
+    <div class="row pt-4 pb-3">
+        <div class="col-md-8">
+            <h2 class="text-primary">Porcentaje de Existencias vs Presupuesto</h2>
+        </div>
+    </div>
+
+    <!-- 🔍 FILTROS -->
+    <form asp-action="PorcentajeExistencias" method="get" class="row mb-3">
+        <div class="col-md-3 mb-2">
+            <input type="text" name="nombreNivel" value="@ViewBag.NombreNivel" class="form-control" placeholder="Buscar por nivel" />
+        </div>
+
+        <div class="col-md-3 mb-2">
+            <input type="text" name="nombreAposento" value="@ViewBag.NombreAposento" class="form-control" placeholder="Buscar por aposento" />
+        </div>
+
+        <div class="col-md-3 mb-2">
+            <input type="text" name="nombreRecinto" value="@ViewBag.NombreRecinto" class="form-control" placeholder="Buscar por recinto" />
+        </div>
+
+        <div class="col-md-3 mb-2 d-flex gap-2">
+            <button type="submit" class="btn btn-info w-50">Filtrar</button>
+            <a asp-action="PorcentajeExistencias" class="btn btn-outline-secondary w-50">Limpiar</a>
+        </div>
+    </form>
+
+    <!-- 📊 TABLA -->
+    <table class="table table-bordered table-striped align-middle text-center">
+        <thead class="table-primary">
+            <tr>
+                <th>Nivel</th>
+                <th>Aposento</th>
+                <th>Recinto</th>
+                <th>Producto</th>
+                <th>Presupuesto</th>
+                <th>Existencias Actuales</th>
+                <th>Porcentaje</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="7" class="text-muted py-3 text-center">
+                        No hay registros que coincidan con los filtros.
+                    </td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var item in Model)
+                {
+                var color = "";
+                if (item.Porcentaje < 50)
+                {
+                    color = "table-danger";
+                   
+                        
+                    } else if (item.Porcentaje < 80) {
+                        color = "table-warning";
+                } else
+                {
+                    color = "table-success";
+                };
+
+                    <tr class="@color">
+                        <td>@item.Nivel</td>
+                        <td>@item.Aposento</td>
+                        <td>@item.Recinto</td>
+                        <td>@item.Producto</td>
+                        <td>@item.Presupuesto</td>
+                        <td>@item.Existencias</td>
+                        <td>@item.Porcentaje.ToString("0.##") %</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+
+    <div class="text-end mt-3">
+        <a asp-action="ReportePorcentajeExistencias"
+           asp-route-nombreNivel="@ViewBag.NombreNivel"
+           asp-route-nombreAposento="@ViewBag.NombreAposento"
+           asp-route-nombreRecinto="@ViewBag.NombreRecinto"
+           class="btn btn-outline-primary">
+            <i class="bi bi-printer"></i> Imprimir Reporte
+        </a>
+    </div>
+
+</div>
+
+<!-- 📄 PAGINACIÓN -->
+@{
+    int page = ViewBag.Page;
+    int totalPages = ViewBag.TotalPages;
+}
+@if (totalPages > 1)
+{
+    <nav class="mt-3">
+        <ul class="pagination justify-content-center">
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <li class="page-item @(i == page ? "active" : "")">
+                    <a class="page-link"
+                       asp-action="PorcentajeExistencias"
+                       asp-route-nombreNivel="@ViewBag.NombreNivel"
+                       asp-route-nombreAposento="@ViewBag.NombreAposento"
+                       asp-route-nombreRecinto="@ViewBag.NombreRecinto"
+                       asp-route-page="@i">
+                        @i
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+}
+

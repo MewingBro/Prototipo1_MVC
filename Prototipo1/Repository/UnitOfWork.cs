@@ -39,6 +39,8 @@ namespace Prototipo1.Repository
 
         public IFacturaSalidaProductoRepository FacturaSalidaProducto { get; private set; }
 
+        public ICambioRepository Cambio { get; private set; }
+
         public UnitOfWork(AppDBContext db)
         {
             _db = db;
@@ -56,6 +58,7 @@ namespace Prototipo1.Repository
             RecintoProducto =  new RecintoProductoRepository(db);
             UsuariosProyectos = new UsuariosProyectosRepository(db);
             FacturaSalidaProducto = new FacturaSalidaProductoRepository(db);
+            Cambio = new CambioRepository(db);
         }
 
         

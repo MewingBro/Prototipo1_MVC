@@ -24,18 +24,47 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
         }
 
 
-        public IActionResult Index()
+        public IActionResult Index(string searchString, int page = 1, int pageSize = 10)
         {
-
             int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
 
-            List<Nivel> objNivelLista = _unitOfWork.Nivel
-                .GetAllBYID(f => f.IdProyecto == idProyecto, includeProperties: "Proyecto")
+            if (idProyecto == null)
+            {
+                TempData["Error"] = "Debe seleccionar un proyecto antes de ver los niveles.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Obtiene los niveles del proyecto actual
+            var niveles = _unitOfWork.Nivel.GetAllBYID(
+                f => f.IdProyecto == idProyecto,
+                includeProperties: "Proyecto"
+            );
+
+            // Filtro sin importar mayúsculas/minúsculas
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                var searchLower = searchString.ToLower();
+                niveles = niveles.Where(n => n.NombreNivel.ToLower().Contains(searchLower));
+            }
+
+            // Total y paginación
+            var totalNiveles = niveles.Count();
+            var nivelesPaginados = niveles
+                .OrderBy(n => n.IdNivel)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToList();
 
+            // Datos auxiliares para la vista
+            ViewBag.Page = page;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalNiveles = totalNiveles;
+            ViewBag.SearchString = searchString;
+            ViewBag.IdProyecto = idProyecto;
 
-            return View(objNivelLista);
+            return View(nivelesPaginados);
         }
+
 
         public IActionResult Upsert(int? IdNivel)
         {

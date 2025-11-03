@@ -1,0 +1,114 @@
+﻿@model IEnumerable<dynamic>
+@{
+    Layout = null; // 🔸 Sin layout, para impresión limpia
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Reporte de Porcentaje de Existencias</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <style>
+        .media print {
+            .no-print
+
+        {
+            display: none;
+        }
+
+        body {
+            margin: 10mm;
+            background: white;
+        }
+
+        }
+
+        body {
+            overflow-x: hidden;
+            background: white;
+        }
+
+        .header {
+            border-bottom: 2px solid #0d6efd;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+        }
+
+        .logo {
+            height: 60px;
+        }
+
+        .table thead {
+            background-color: #0d6efd;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- 🔹 Encabezado -->
+        <div class="d-flex align-items-center justify-content-between header">
+            <div class="d-flex align-items-center">
+                <img src="~/Images/logo.png" alt="Logo" class="logo me-3" />
+                <div>
+                    <h3 class="text-primary mb-0">Reporte de Porcentaje de Existencias</h3>
+                    <small class="text-muted">Proyecto: @ViewBag.Proyecto</small>
+                </div>
+            </div>
+            <div class="text-end">
+                <small class="text-secondary">Fecha de generación: @ViewBag.FechaGeneracion</small>
+            </div>
+        </div>
+
+        <!-- 🔹 Botón de imprimir -->
+        <div class="mb-3 no-print text-end">
+            <button class="btn btn-primary" onclick="window.print();">
+                <i class="bi bi-printer"></i> Imprimir
+            </button>
+        </div>
+
+        <!-- 🔹 Tabla -->
+        <table class="table table-bordered table-striped text-center">
+            <thead>
+                <tr>
+                    <th>Nivel</th>
+                    <th>Aposento</th>
+                    <th>Recinto</th>
+                    <th>Producto</th>
+                    <th>Presupuesto</th>
+                    <th>Existencias</th>
+                    <th>Porcentaje</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-muted text-center py-3">
+                            No hay registros que coincidan con los filtros.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        var color = item.Porcentaje < 50 ? "table-danger"
+                        : item.Porcentaje < 80 ? "table-warning" : "table-success";
+                        <tr class="@color">
+                            <td>@item.Nivel</td>
+                            <td>@item.Aposento</td>
+                            <td>@item.Recinto</td>
+                            <td>@item.Producto</td>
+                            <td>@item.Presupuesto</td>
+                            <td>@item.Existencias</td>
+                            <td>@item.Porcentaje.ToString("0.##") %</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

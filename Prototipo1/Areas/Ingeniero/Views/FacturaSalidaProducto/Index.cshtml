@@ -79,7 +79,7 @@
             Swal.fire({
                 icon: 'warning',
                 title: 'Sin productos presupuestados',
-                text: 'No existen productos presupuestados todavía para este recinto.',
+                text: 'El presupuesto de este recinto no se encuentra confirmado',
                 confirmButtonText: 'Volver al listado de facturas',
                 confirmButtonColor: '#0dcaf0' // 💙 Celeste (Bootstrap info)
             }).then((result) => {
@@ -88,5 +88,28 @@
                 }
             });
         </script>
+    }
+
+    @if (TempData["AlertaPresupuesto"] != null)
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>@TempData["AlertaPresupuesto"]</strong>
+            <div class="mt-2">
+                <form asp-controller="Cambio" asp-action="Create" method="post">
+                    <input type="hidden" name="IdFactura" value="@ViewBag.IdFactura" />
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        Iniciar Solicitud de Cambio
+                    </button>
+                </form>
+
+                <a asp-controller="Factura"
+                   asp-action="Index"
+                   asp-route-Tipo="Salida"
+                   class="btn btn-secondary btn-sm">
+                    Volver a Facturas
+                </a>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     }
 }

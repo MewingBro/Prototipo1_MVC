@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Prototipo1.Models;
+using Prototipo1.Repository;
 using Prototipo1.Repository.IRepository;
 using Prototipo1.Utility;
 using System.Diagnostics;
@@ -21,43 +22,69 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        public IActionResult Index()
+
+
+public IActionResult Index(string searchString, int page = 1)
+    {
+        if (!User.Identity.IsAuthenticated)
         {
-            if (!User.Identity.IsAuthenticated)
-            {
-                return RedirectToAction("Login", "Account", new { area = "Identity" });
-            }
+            return RedirectToAction("Login", "Account", new { area = "Identity" });
+        }
 
-            IEnumerable<Proyecto> proyectoList = null;
+        List<Proyecto> proyectoList = new List<Proyecto>();
 
-            if (User.IsInRole(SD.Role_Admin))
+        // 🔹 Admin ve todos los proyectos
+        if (User.IsInRole(SD.Role_Admin))
+        {
+            proyectoList = _unitOfWork.Proyecto.GetAll().ToList();
+        }
+        // 🔹 Ingeniero o Bodeguero solo ven sus proyectos
+        else if (User.IsInRole(SD.Role_Ingeniero) || User.IsInRole(SD.Role_Bodeguero))
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!string.IsNullOrEmpty(userId))
             {
-                proyectoList = _unitOfWork.Proyecto.GetAll();
-            } else if (User.IsInRole(SD.Role_Ingeniero) || User.IsInRole(SD.Role_Bodeguero))
-            {
-                // 1️⃣ Obtener el Id del usuario logueado
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-                // 2️⃣ Obtener los Ids de proyectos que le pertenecen
                 var proyectosUsuario = _unitOfWork.UsuariosProyectos
                     .GetAllBYID(up => up.IdUsuario == userId)
                     .Select(up => up.IdProyecto)
                     .ToList();
 
-                // 3️⃣ Obtener solo esos proyectos
                 proyectoList = _unitOfWork.Proyecto
-                    .GetAllBYID(p => proyectosUsuario.Contains(p.IdProyecto));
+                    .GetAllBYID(p => proyectosUsuario.Contains(p.IdProyecto))
+                    .ToList();
             }
-            else
-            {
-                proyectoList = Enumerable.Empty<Proyecto>();
-            }
-
-
-            return View(proyectoList);
         }
 
-        [HttpPost]
+        // 🔹 Filtrado por búsqueda
+        if (!string.IsNullOrEmpty(searchString))
+        {
+            proyectoList = proyectoList
+                .Where(p => p.NombreProyecto.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+
+        // 🔹 Paginación
+        const int pageSize = 8;
+        int total = proyectoList.Count();
+        int totalPages = (int)Math.Ceiling((double)total / pageSize);
+        var proyectosPaginados = proyectoList
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        // 🔹 Pasar valores a la vista
+        ViewBag.Page = page;
+        ViewBag.PageSize = pageSize;
+        ViewBag.TotalProyectos = total;
+        ViewBag.SearchString = searchString;
+        ViewBag.TotalPages = totalPages;
+
+        return View(proyectosPaginados);
+    }
+
+
+
+    [HttpPost]
         public IActionResult SeleccionarProyecto(int IdProyecto, string NombreProyecto)
         {
             // Guardar en la sesión

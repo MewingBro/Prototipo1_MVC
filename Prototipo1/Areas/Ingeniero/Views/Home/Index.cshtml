@@ -1,47 +1,92 @@
 ﻿@model IEnumerable<Proyecto>
 
-<div class="row pb-2">
-    @if (@Context.Session.GetInt32("IdProyecto") == 0 || @Context.Session.GetInt32("IdProyecto") == null)
-    {
-        <h2 class="text-primary">
-            Seleccionar Proyecto
-        </h2>
-    } else
-    {
-        <h2 class="text-primary">
-            Proyecto Seleccionado : @Context.Session.GetString("NombreProyecto")
-        </h2>
-    }
-    
-</div>
+@{
+    int page = ViewBag.Page;
+    int pageSize = ViewBag.PageSize;
+    int total = ViewBag.TotalProyectos;
+    string search = ViewBag.SearchString ?? "";
+    int totalPages = ViewBag.TotalPages;
+}
 
+<div class="container mt-4">
+    <!-- 🔹 Título según sesión -->
+    <div class="row pb-3">
+        @if (Context.Session.GetInt32("IdProyecto") == 0 || Context.Session.GetInt32("IdProyecto") == null)
+        {
+            <h2 class="text-primary">Seleccionar Proyecto</h2>
+        }
+        else
+        {
+            <h2 class="text-primary">
+                Proyecto Seleccionado: <span class="fw-bold">@Context.Session.GetString("NombreProyecto")</span>
+            </h2>
+        }
+    </div>
 
-<div class="row pb-3">
-    @foreach (var proyecto in Model)
-    {
-        <div class="col-lg-3 col-sm-3">
-            <div class="row p-2">
-                <div class="col-12 p-1">
-                    <div class="card border-0 p-3 shadow border-top border-5 rounded">
-                        <img src="@proyecto.ImageURL" class="card-img-top rounded" />
-                        <div class="card-body pb-0">
-                            <div class="pl-1">
-                                <p class="card-title h5 text-dark opacity-75 text-uppercase text-center">@proyecto.NombreProyecto </p>
-                            </div>
-                        </div>
-                        <div>
-                            <form asp-controller="Home" asp-action="SeleccionarProyecto" asp-route-IdProyecto="@proyecto.IdProyecto"
-                                  asp-route-NombreProyecto="@proyecto.NombreProyecto" method="post">
-                                <button type="submit" class="btn btn-primary bg-gradient border-0 form-control">
-                                    Seleccionar Proyecto
-                                </button>
-                            </form>
-                        </div>
+    <!-- 🔍 Barra de búsqueda -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <input id="searchBox" type="text" class="form-control" placeholder="Buscar proyecto por nombre..." value="@search" />
+        </div>
+    </div>
+
+    <!-- 📦 Contenedor de tarjetas -->
+    <div class="row g-3" id="proyectoContainer">
+        @foreach (var proyecto in Model)
+        {
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="card border-0 shadow-sm rounded-3 h-100">
+                    <img src="@proyecto.ImageURL" class="card-img-top rounded-top" style="object-fit: cover; height: 180px;" />
+                    <div class="card-body text-center">
+                        <h5 class="card-title text-dark text-uppercase fw-semibold">@proyecto.NombreProyecto</h5>
 
                     </div>
-                    
+                    <div class="card-footer bg-transparent border-0 pb-3">
+                        <form asp-controller="Home" asp-action="SeleccionarProyecto"
+                              asp-route-IdProyecto="@proyecto.IdProyecto"
+                              asp-route-NombreProyecto="@proyecto.NombreProyecto"
+                              method="post">
+                            <button type="submit" class="btn btn-primary bg-gradient border-0 w-100">
+                                <i class="bi bi-check-circle"></i> Seleccionar Proyecto
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
-    }
+        }
+    </div>
+
+    <!-- 📄 Paginación -->
+    <nav aria-label="Paginación de proyectos" class="mt-4">
+        <ul class="pagination justify-content-center">
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <li class="page-item @(i == page ? "active" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-searchString="@search">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
 </div>
+
+@section Scripts {
+    <script>
+        // 🔎 Filtrado dinámico sin recargar la página
+        document.getElementById("searchBox").addEventListener("keyup", function () {
+            const query = this.value.trim();
+            const url = '@Url.Action("Index", "Home")' + '?searchString=' + encodeURIComponent(query);
+
+            fetch(url)
+                .then(res => res.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newCards = doc.getElementById('proyectoContainer').innerHTML;
+                    const newPagination = doc.querySelector('nav').innerHTML;
+
+                    document.getElementById('proyectoContainer').innerHTML = newCards;
+                    document.querySelector('nav').innerHTML = newPagination;
+                });
+        });
+    </script>
+}

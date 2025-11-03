@@ -19,11 +19,35 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
         }
 
 
-        public IActionResult Index()
+        public IActionResult Index(string searchString, int page = 1, int pageSize = 10)
         {
-            List<Familia> objFamiliaLista = _unitOfWork.Familia.GetAll().ToList();
-            return View(objFamiliaLista);
+            // Obtener todas las familias
+            var familias = _unitOfWork.Familia.GetAll();
+
+            // Filtrado sin importar mayúsculas/minúsculas
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                var searchLower = searchString.ToLower();
+                familias = familias.Where(f => f.NombreFamilia.ToLower().Contains(searchLower));
+            }
+
+            // Total de resultados y paginación
+            var totalFamilias = familias.Count();
+            var familiasPaginadas = familias
+                .OrderBy(f => f.IdFamilia)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            // Pasar datos a la vista
+            ViewBag.Page = page;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalFamilias = totalFamilias;
+            ViewBag.SearchString = searchString;
+
+            return View(familiasPaginadas);
         }
+
 
         public IActionResult Create()
         {

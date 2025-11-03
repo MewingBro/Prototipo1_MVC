@@ -1,90 +1,133 @@
 ﻿@model List<Recinto>
 <partial name="_Notification" />
-<div class="container">
 
-    <div class="row pt-4 pb-3">
-        <div class="col-6">
-            <h2 class="text-primary">Lista de Aposentos</h2>
+<div class="container mt-4">
+    <div class="row align-items-center mb-3">
+        <div class="col-md-6">
+            <h2 class="text-primary">
+                <i class="bi bi-building"></i> Lista de Recintos
+            </h2>
         </div>
-        <div class="col-6 text-end">
+        <div class="col-md-6 text-end">
             <a asp-controller="Recinto" asp-action="Upsert" class="btn btn-primary">
                 <i class="bi bi-plus-circle"></i> Agregar Recinto
             </a>
         </div>
     </div>
 
+    <!-- 🔍 FILTROS -->
+    <form method="get" asp-action="Index" class="row g-3 mb-4">
+        <div class="col-md-4">
+            <label class="form-label fw-bold">Buscar por Recinto</label>
+            <input type="text" name="searchRecinto" value="@ViewBag.SearchRecinto" class="form-control" placeholder="Nombre del recinto..." />
+        </div>
 
-    <table class="table table-bordered table-stripped">
-        <thead>
-            <tr>
-                <th>
-                    Id de Recinto
-                </th>
-                <th>
-                    Nombre del Recinto
-                </th>
-                <th>
-                    Nombre del Aposento
-                </th>
+        <div class="col-md-4">
+            <label class="form-label fw-bold">Buscar por Aposento</label>
+            <input type="text" name="searchAposento" value="@ViewBag.SearchAposento" class="form-control" placeholder="Nombre del aposento..." />
+        </div>
 
-                <th>
-                    Nombre del Nivel
-                </th>
-                <th>
-                    Nombre del Proyecto
-                </th>
-                <th>
+        <div class="col-md-4">
+            <label class="form-label fw-bold">Buscar por Nivel</label>
+            <input type="text" name="searchNivel" value="@ViewBag.SearchNivel" class="form-control" placeholder="Nombre del nivel..." />
+        </div>
 
-                </th>
-                <th>
+        <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-search"></i> Filtrar
+            </button>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-x-circle"></i> Limpiar
+            </a>
+        </div>
+    </form>
 
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var obj in Model.OrderBy(u => u.IdRecinto))
-            {
+    <!-- 📋 TABLA -->
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-bordered table-hover align-middle text-center">
+            <thead class="table-primary">
                 <tr>
-                    <td>
-                        @obj.IdRecinto
-                    </td>
-                    <td>
-                        @obj.NombreRecinto
-                    </td>
-                    <td>
-                        @obj.Aposento.NombreAposento
-                    </td>
-                    <td>
-                        @obj.Aposento.Nivel.NombreNivel
-                    </td>
-                    <td>
-                        @obj.Aposento.Nivel.Proyecto.NombreProyecto
-                    </td>
-
-                    <td>
-                        @if (User.IsInRole(SD.Role_Admin) || obj.EstadoRecinto == 0)
-                        {
-                            <a asp-controller="RecintoProducto" asp-action="Index" asp-route-IdRecinto="@obj.IdRecinto" class="btn btn-outline-secondary form-control">
-                                Modificar Presupuesto del Recinto
-                            </a>
-                        }
-                    </td>
-
-                    <td>
-                        <div class="w-75 btn-group" role="group">
-                            <a asp-controller="Recinto" asp-action="Upsert" asp-route-IdRecinto="@obj.IdRecinto" class="btn btn-primary mx-2">
-                                <i class="bi bi-pencil">Editar Recinto</i>
-                            </a>
-                            <a asp-controller="Recinto" asp-action="Borrar" asp-route-IdRecinto="@obj.IdRecinto" class="btn btn-danger mx-2">
-                                <i class="bi bi-trash3"></i>Borrar Recinto
-                            </a>
-
-                        </div>
-                    </td>
-
+                    <th>ID</th>
+                    <th>Nombre del Recinto</th>
+                    <th>Aposento</th>
+                    <th>Nivel</th>
+                    <th>Proyecto</th>
+                    <th>Presupuesto</th>
+                    <th>Acciones</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-3">
+                            No se encontraron recintos que coincidan con los filtros.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var obj in Model.OrderBy(u => u.IdRecinto))
+                    {
+                        <tr>
+                            <td>@obj.IdRecinto</td>
+                            <td>@obj.NombreRecinto</td>
+                            <td>@obj.Aposento.NombreAposento</td>
+                            <td>@obj.Aposento.Nivel.NombreNivel</td>
+                            <td>@obj.Aposento.Nivel.Proyecto.NombreProyecto</td>
 
+                            <td>
+                                @if (User.IsInRole(SD.Role_Admin) || obj.EstadoRecinto == 0)
+                                {
+                                    <a asp-controller="RecintoProducto" asp-action="Index" asp-route-IdRecinto="@obj.IdRecinto" class="btn btn-outline-secondary btn-sm">
+                                        Modificar Presupuesto
+                                    </a>
+                                }
+                            </td>
+
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a asp-controller="Recinto" asp-action="Upsert" asp-route-IdRecinto="@obj.IdRecinto" class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a asp-controller="Recinto" asp-action="Borrar" asp-route-IdRecinto="@obj.IdRecinto" class="btn btn-outline-danger btn-sm">
+                                        <i class="bi bi-trash3"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 📄 PAGINACIÓN -->
+    @{
+        int page = ViewBag.Page;
+        int pageSize = ViewBag.PageSize;
+        int total = ViewBag.TotalRecintos;
+        int totalPages = (int)Math.Ceiling((double)total / pageSize);
+    }
+
+    @if (totalPages > 1)
+    {
+        <nav class="mt-3">
+            <ul class="pagination justify-content-center pagination-sm">
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == page ? "active" : "")">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-page="@i"
+                           asp-route-searchRecinto="@ViewBag.SearchRecinto"
+                           asp-route-searchAposento="@ViewBag.SearchAposento"
+                           asp-route-searchNivel="@ViewBag.SearchNivel">
+                            @i
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
 </div>

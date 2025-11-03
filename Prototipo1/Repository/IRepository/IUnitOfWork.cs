@@ -40,6 +40,8 @@ namespace Prototipo1.Repository.IRepository
 
         IFacturaSalidaProductoRepository FacturaSalidaProducto { get; }
 
+        ICambioRepository Cambio { get; }
+
         void Save();
     }
 }

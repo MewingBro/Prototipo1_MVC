@@ -32,7 +32,7 @@ namespace Prototipo1.Repository
                 RecintoProductoFromDB.IdRecinto = RecintoProducto.IdRecinto;
                 RecintoProductoFromDB.Presupuesto = RecintoProducto.Presupuesto;
                 RecintoProductoFromDB.Desperdicio = RecintoProducto.Desperdicio;
-                RecintoProductoFromDB.ExistenciasActuales =RecintoProducto.ExistenciasActuales;
+                RecintoProductoFromDB.ExistenciasActuales =RecintoProducto.Presupuesto;
          
             
             }

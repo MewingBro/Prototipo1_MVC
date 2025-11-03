@@ -24,21 +24,58 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
         }
 
 
-        public IActionResult Index()
+        public IActionResult Index(string searchRecinto, string searchAposento, string searchNivel, int page = 1, int pageSize = 10)
         {
-
             int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
 
-            List<Recinto> objRecintoLista = _unitOfWork.Recinto
-        .GetAllBYID(
-            a => a.Aposento.Nivel.IdProyecto == idProyecto,
-            includeProperties: "Aposento,Aposento.Nivel.Proyecto"
-        )
-        .ToList();
+            if (idProyecto == null)
+            {
+                TempData["Error"] = "Debe seleccionar un proyecto antes de ver los recintos.";
+                return RedirectToAction("Index", "Home");
+            }
 
+            var recintos = _unitOfWork.Recinto.GetAllBYID(
+                a => a.Aposento.Nivel.IdProyecto == idProyecto,
+                includeProperties: "Aposento,Aposento.Nivel.Proyecto"
+            ).AsQueryable();
 
-            return View(objRecintoLista);
+            // 🔍 Filtros (case-insensitive)
+            if (!string.IsNullOrEmpty(searchRecinto))
+            {
+                var recintoLower = searchRecinto.ToLower();
+                recintos = recintos.Where(r => r.NombreRecinto.ToLower().Contains(recintoLower));
+            }
+
+            if (!string.IsNullOrEmpty(searchAposento))
+            {
+                var aposentoLower = searchAposento.ToLower();
+                recintos = recintos.Where(r => r.Aposento.NombreAposento.ToLower().Contains(aposentoLower));
+            }
+
+            if (!string.IsNullOrEmpty(searchNivel))
+            {
+                var nivelLower = searchNivel.ToLower();
+                recintos = recintos.Where(r => r.Aposento.Nivel.NombreNivel.ToLower().Contains(nivelLower));
+            }
+
+            // 📄 Paginación
+            var total = recintos.Count();
+            var recintosPaginados = recintos
+                .OrderBy(r => r.IdRecinto)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            ViewBag.Page = page;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalRecintos = total;
+            ViewBag.SearchRecinto = searchRecinto;
+            ViewBag.SearchAposento = searchAposento;
+            ViewBag.SearchNivel = searchNivel;
+
+            return View(recintosPaginados);
         }
+
 
         public IActionResult Upsert(int? IdRecinto)
 

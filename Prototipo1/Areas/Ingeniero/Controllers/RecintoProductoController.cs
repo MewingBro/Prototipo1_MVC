@@ -22,16 +22,63 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        public IActionResult Index(int? IdRecinto)
+        [HttpGet]
+        public IActionResult Index(
+    int? IdRecinto,
+    string nombreProducto,
+    string nombreRecinto,
+    string nombreNivel,
+    string nombreAposento,
+    bool? SoloCero,
+    int page = 1,
+    int pageSize = 10)
         {
-            List<RecintoProducto> objRecintoProductoLista = _unitOfWork.RecintoProducto
-        .GetAllBYID(f => f.IdRecinto == IdRecinto, includeProperties: "Recinto,Producto")
-        .ToList();
+            var query = _unitOfWork.RecintoProducto.GetAllBYID(
+                f => f.IdRecinto == IdRecinto,
+                includeProperties: "Recinto,Recinto.Aposento.Nivel,Producto"
+            );
 
+            // 🔍 Filtros dinámicos
+            if (!string.IsNullOrWhiteSpace(nombreProducto))
+                query = query.Where(rp => rp.Producto.NombreProducto.ToLower().Contains(nombreProducto.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(nombreRecinto))
+                query = query.Where(rp => rp.Recinto.NombreRecinto.ToLower().Contains(nombreRecinto.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(nombreNivel))
+                query = query.Where(rp => rp.Recinto.Aposento.Nivel.NombreNivel.ToLower().Contains(nombreNivel.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(nombreAposento))
+                query = query.Where(rp => rp.Recinto.Aposento.NombreAposento.ToLower().Contains(nombreAposento.ToLower()));
+
+            if (SoloCero.HasValue && SoloCero.Value)
+                query = query.Where(rp => rp.ExistenciasActuales == 0);
+
+            // 📊 Paginación
+            int totalItems = query.Count();
+            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            var objRecintoProductoLista = query
+                .OrderBy(rp => rp.IdRecintoProducto)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            // ViewBag con parámetros
             ViewBag.IdRecinto = IdRecinto;
+            ViewBag.NombreProducto = nombreProducto;
+            ViewBag.NombreRecinto = nombreRecinto;
+            ViewBag.NombreNivel = nombreNivel;
+            ViewBag.NombreAposento = nombreAposento;
+            ViewBag.SoloCero = SoloCero;
+            ViewBag.Page = page;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalPages = totalPages;
 
             return View(objRecintoProductoLista);
         }
+
+
 
         [HttpPost]
         public IActionResult ConfirmarPresupuesto(int? IdRecinto)
@@ -182,5 +229,240 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             return RedirectToAction("Index", new { IdRecinto = IdRecinto });
 
         }
+
+        [HttpGet]
+        public IActionResult Detalle(
+    string nombreNivel,
+    string nombreAposento,
+    string nombreRecinto,
+    string nombreProducto,
+    string Estado,
+    bool? SoloCero,
+    int page = 1,
+    int pageSize = 10)
+        {
+            var query = _unitOfWork.RecintoProducto.GetAll(
+                includeProperties: "Recinto,Recinto.Aposento.Nivel,Producto"
+            );
+
+            int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
+
+            query = query.Where(n => n.Recinto.Aposento.Nivel.IdProyecto == idProyecto);
+
+
+            // 🔍 Filtros dinámicos
+            if (!string.IsNullOrWhiteSpace(nombreNivel))
+                query = query.Where(rp => rp.Recinto.Aposento.Nivel.NombreNivel.ToLower().Contains(nombreNivel.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(nombreAposento))
+                query = query.Where(rp => rp.Recinto.Aposento.NombreAposento.ToLower().Contains(nombreAposento.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(nombreRecinto))
+                query = query.Where(rp => rp.Recinto.NombreRecinto.ToLower().Contains(nombreRecinto.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(nombreProducto))
+                query = query.Where(rp => rp.Producto.NombreProducto.ToLower().Contains(nombreProducto.ToLower()));
+
+            if (SoloCero.HasValue && SoloCero.Value)
+                query = query.Where(rp => rp.ExistenciasActuales == 0);
+
+            if (!string.IsNullOrWhiteSpace(Estado))
+            {
+                query = Estado switch
+                {
+                    "Pendiente" => query.Where(f => f.Recinto.EstadoRecinto == 0),
+                    "Confirmado" => query.Where(f => f.Recinto.EstadoRecinto == 1),
+                   
+                    _ => query
+                };
+            }
+
+            // 📊 Paginación
+            int totalItems = query.Count();
+            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            var lista = query
+                .OrderBy(rp => rp.IdRecintoProducto)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            // ViewBags
+            ViewBag.NombreNivel = nombreNivel;
+            ViewBag.NombreAposento = nombreAposento;
+            ViewBag.NombreRecinto = nombreRecinto;
+            ViewBag.NombreProducto = nombreProducto;
+            ViewBag.SoloCero = SoloCero;
+            ViewBag.Page = page;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.Estado = Estado;
+
+            return View(lista);
+        }
+
+        [HttpGet]
+        public IActionResult Reporte(
+    string nombreNivel,
+    string nombreAposento,
+    string nombreRecinto,
+    string nombreProducto,
+    string Estado,
+    bool? SoloCero)
+        {
+            int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
+            var Proyecto = _unitOfWork.Proyecto.GetID(m => m.IdProyecto == idProyecto);
+            ViewBag.Proyecto = Proyecto.NombreProyecto;
+
+            var query = _unitOfWork.RecintoProducto.GetAll(
+                includeProperties: "Recinto,Recinto.Aposento.Nivel,Producto"
+            );
+
+            // Filtrar solo por proyecto
+            query = query.Where(rp => rp.Recinto.Aposento.Nivel.IdProyecto == idProyecto);
+
+            // 🔍 Aplicar los filtros que vinieron del view Detalle
+            if (!string.IsNullOrWhiteSpace(nombreNivel))
+                query = query.Where(rp => rp.Recinto.Aposento.Nivel.NombreNivel.ToLower().Contains(nombreNivel.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(nombreAposento))
+                query = query.Where(rp => rp.Recinto.Aposento.NombreAposento.ToLower().Contains(nombreAposento.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(nombreRecinto))
+                query = query.Where(rp => rp.Recinto.NombreRecinto.ToLower().Contains(nombreRecinto.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(nombreProducto))
+                query = query.Where(rp => rp.Producto.NombreProducto.ToLower().Contains(nombreProducto.ToLower()));
+
+            if (SoloCero.HasValue && SoloCero.Value)
+                query = query.Where(rp => rp.ExistenciasActuales == 0);
+
+            if (!string.IsNullOrWhiteSpace(Estado))
+            {
+                query = Estado switch
+                {
+                    "Pendiente" => query.Where(rp => rp.Recinto.EstadoRecinto == 0),
+                    "Confirmado" => query.Where(rp => rp.Recinto.EstadoRecinto == 1),
+                    _ => query
+                };
+            }
+
+            var listaFiltrada = query.OrderBy(rp => rp.IdRecintoProducto).ToList();
+
+            return View(listaFiltrada); // Pasamos la lista filtrada al view
+        }
+
+        [HttpGet]
+        public IActionResult PorcentajeExistencias(
+    string nombreNivel,
+    string nombreAposento,
+    string nombreRecinto,
+    int page = 1)
+        {
+            int pageSize = 10; // 🔹 10 registros por página
+
+            int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
+
+            var query = _unitOfWork.RecintoProducto.GetAll(
+                includeProperties: "Recinto,Recinto.Aposento.Nivel,Producto"
+            );
+
+            if (idProyecto.HasValue)
+                query = query.Where(rp => rp.Recinto.Aposento.Nivel.IdProyecto == idProyecto);
+
+            // 🔍 Filtros dinámicos
+            if (!string.IsNullOrWhiteSpace(nombreNivel))
+                query = query.Where(rp => rp.Recinto.Aposento.Nivel.NombreNivel.ToLower().Contains(nombreNivel.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(nombreAposento))
+                query = query.Where(rp => rp.Recinto.Aposento.NombreAposento.ToLower().Contains(nombreAposento.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(nombreRecinto))
+                query = query.Where(rp => rp.Recinto.NombreRecinto.ToLower().Contains(nombreRecinto.ToLower()));
+
+            // Total de registros antes de paginar
+            int totalRegistros = query.Count();
+            int totalPages = (int)Math.Ceiling(totalRegistros / (double)pageSize);
+
+            // Aplicar paginación
+            var lista = query
+                .OrderBy(rp => rp.Recinto.Aposento.Nivel.NombreNivel)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList()
+                .Select(rp => new
+                {
+                    Nivel = rp.Recinto.Aposento.Nivel.NombreNivel,
+                    Aposento = rp.Recinto.Aposento.NombreAposento,
+                    Recinto = rp.Recinto.NombreRecinto,
+                    Producto = rp.Producto.NombreProducto,
+                    Presupuesto = rp.Presupuesto,
+                    Existencias = rp.ExistenciasActuales,
+                    Porcentaje = rp.Presupuesto > 0 ? (rp.ExistenciasActuales / rp.Presupuesto) * 100 : 0
+                })
+                .ToList();
+
+            // Guardar filtros y datos de paginación
+            ViewBag.NombreNivel = nombreNivel;
+            ViewBag.NombreAposento = nombreAposento;
+            ViewBag.NombreRecinto = nombreRecinto;
+            ViewBag.Page = page;
+            ViewBag.TotalPages = totalPages;
+
+            return View(lista);
+        }
+
+        [HttpGet]
+        public IActionResult ReportePorcentajeExistencias(
+    string nombreNivel,
+    string nombreAposento,
+    string nombreRecinto)
+        {
+            int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
+
+            var Proyecto = _unitOfWork.Proyecto.GetID(m => m.IdProyecto == idProyecto);
+
+            string nombreProyecto = Proyecto.NombreProyecto;
+
+            var query = _unitOfWork.RecintoProducto.GetAll(
+                includeProperties: "Recinto,Recinto.Aposento.Nivel,Producto"
+            );
+
+            if (idProyecto.HasValue)
+                query = query.Where(rp => rp.Recinto.Aposento.Nivel.IdProyecto == idProyecto);
+
+            // Filtros
+            if (!string.IsNullOrWhiteSpace(nombreNivel))
+                query = query.Where(rp => rp.Recinto.Aposento.Nivel.NombreNivel.ToLower().Contains(nombreNivel.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(nombreAposento))
+                query = query.Where(rp => rp.Recinto.Aposento.NombreAposento.ToLower().Contains(nombreAposento.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(nombreRecinto))
+                query = query.Where(rp => rp.Recinto.NombreRecinto.ToLower().Contains(nombreRecinto.ToLower()));
+
+            // Generar lista
+            var lista = query
+                .OrderBy(rp => rp.Recinto.Aposento.Nivel.NombreNivel)
+                .ToList()
+                .Select(rp => new
+                {
+                    Nivel = rp.Recinto.Aposento.Nivel.NombreNivel,
+                    Aposento = rp.Recinto.Aposento.NombreAposento,
+                    Recinto = rp.Recinto.NombreRecinto,
+                    Producto = rp.Producto.NombreProducto,
+                    Presupuesto = rp.Presupuesto,
+                    Existencias = rp.ExistenciasActuales,
+                    Porcentaje = rp.Presupuesto > 0 ? (rp.ExistenciasActuales / rp.Presupuesto) * 100 : 0
+                })
+                .ToList();
+
+            ViewBag.FechaGeneracion = DateTime.Now.ToString("dd/MM/yyyy HH:mm");
+            ViewBag.Proyecto = nombreProyecto;
+
+            return View("ReportePorcentajeExistencias", lista);
+        }
+
+
     }
 }

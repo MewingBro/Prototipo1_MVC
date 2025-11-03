@@ -10,5 +10,6 @@ namespace Prototipo1.Models.ViewModels
         public IEnumerable<SelectListItem> FamiliaList { get; set; }
         [ValidateNever]
         public IEnumerable<SelectListItem> UnidadList { get; set; }
+
     }
 }

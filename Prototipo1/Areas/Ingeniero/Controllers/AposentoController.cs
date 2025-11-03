@@ -24,21 +24,53 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
         }
 
 
-        public IActionResult Index()
+        public IActionResult Index(string searchAposento, string searchNivel, int page = 1, int pageSize = 10)
         {
-
             int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
 
-            List<Aposento> objAposentoLista = _unitOfWork.Aposento
-        .GetAllBYID(
-            a => a.Nivel.IdProyecto == idProyecto,
-            includeProperties: "Nivel,Nivel.Proyecto"
-        )
-        .ToList();
+            if (idProyecto == null)
+            {
+                TempData["Error"] = "Debe seleccionar un proyecto antes de ver los aposentos.";
+                return RedirectToAction("Index", "Home");
+            }
 
+            // 🔹 Obtiene los aposentos del proyecto actual
+            var aposentos = _unitOfWork.Aposento.GetAllBYID(
+                a => a.Nivel.IdProyecto == idProyecto,
+                includeProperties: "Nivel,Nivel.Proyecto"
+            );
 
-            return View(objAposentoLista);
+            // 🔍 Filtros (insensibles a mayúsculas/minúsculas)
+            if (!string.IsNullOrEmpty(searchAposento))
+            {
+                var aposentoLower = searchAposento.ToLower();
+                aposentos = aposentos.Where(a => a.NombreAposento.ToLower().Contains(aposentoLower));
+            }
+
+            if (!string.IsNullOrEmpty(searchNivel))
+            {
+                var nivelLower = searchNivel.ToLower();
+                aposentos = aposentos.Where(a => a.Nivel.NombreNivel.ToLower().Contains(nivelLower));
+            }
+
+            // 📊 Total y paginación
+            var totalAposentos = aposentos.Count();
+            var aposentosPaginados = aposentos
+                .OrderBy(a => a.IdAposento)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            // 📦 Datos auxiliares para la vista
+            ViewBag.Page = page;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalAposentos = totalAposentos;
+            ViewBag.SearchAposento = searchAposento;
+            ViewBag.SearchNivel = searchNivel;
+
+            return View(aposentosPaginados);
         }
+
 
         public IActionResult Upsert(int? IdAposento)
 

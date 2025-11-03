@@ -49,29 +49,55 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
         [HttpPost]
         public IActionResult TerminarFactura(int? IdFactura)
         {
-            List<FacturaSalidaProducto> objFacturaSalidaProductoLista = _unitOfWork.FacturaSalidaProducto
-        .GetAllBYID(f => f.IdFactura == IdFactura, includeProperties: "Factura,Producto")
-        .ToList();
+            var listaSalidas = _unitOfWork.FacturaSalidaProducto
+                .GetAllBYID(f => f.IdFactura == IdFactura, includeProperties: "Factura,Producto")
+                .ToList();
 
             int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
 
-            foreach (var x in objFacturaSalidaProductoLista)
+            // Buscar el recinto de la factura
+            var factura = _unitOfWork.Factura.GetID(f => f.IdFactura == IdFactura);
+            if (factura == null)
+                return NotFound();
+
+            int? idRecinto = factura.IdRecinto;
+
+            // Verificar si alguna salida excede su presupuesto
+            bool excedePresupuesto = false;
+            foreach (var salida in listaSalidas)
             {
-                _unitOfWork.FacturaSalidaProducto.RemoveFromInventario(x,idProyecto);
+                var presupuesto = _unitOfWork.RecintoProducto.GetID(
+                    r => r.IdRecinto == idRecinto && r.IdProducto == salida.IdProducto);
+
+                if (presupuesto == null || salida.CantidadDisminuida > presupuesto.ExistenciasActuales)
+                {
+                    excedePresupuesto = true;
+                    break;
+                }
+            }
+
+            // Si hay exceso, mostrar alerta y no ejecutar cambios
+            if (excedePresupuesto)
+            {
+                TempData["AlertaPresupuesto"] = "Uno o más productos exceden el presupuesto asignado. ¿Desea iniciar una solicitud de cambio?";
+                return RedirectToAction("Index", "FacturaSalidaProducto", new { IdFactura = IdFactura, IdRecinto = idRecinto });
+            }
+
+            // Si todo está dentro del presupuesto
+            foreach (var x in listaSalidas)
+            {
+                _unitOfWork.FacturaSalidaProducto.RemoveFromInventario(x, idProyecto);
                 _unitOfWork.Save();
             }
-            var factura = _unitOfWork.Factura.GetID(f => f.IdFactura == IdFactura);
-            if (factura != null)
-            {
-                factura.EstadoFactura = 1; // ← cambia el estado
-                _unitOfWork.Factura.Update(factura);
-            }
+
+            factura.EstadoFactura = 1; // ← Cambia el estado
+            _unitOfWork.Factura.Update(factura);
             _unitOfWork.Save();
 
-            string Tipo = "Entrada";
-
-            return RedirectToAction("Index","Factura", new { Tipo = Tipo });
+            string Tipo = "Salida";
+            return RedirectToAction("Index", "Factura", new { Tipo = Tipo, IdRecinto = idRecinto });
         }
+
 
         public IActionResult Upsert(int? IdFactura, int? IdFacturaSalidaProducto)
         {
@@ -144,9 +170,14 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                     TempData["success"] = "Detalle de Factura actualizado exitosamente";
                 }
                 int IdFactura = FacturaSalidaProductoVM.FacturaSalidaProducto.IdFactura;
+
                 _unitOfWork.Save();
 
-                return RedirectToAction("Index", new { IdFactura = IdFactura });
+                var Recinto = _unitOfWork.Factura.GetID(m => m.IdFactura == IdFactura);
+
+                int? IdRecinto = Recinto.IdRecinto;
+
+                return RedirectToAction("Index", new { IdFactura = IdFactura,  IdRecinto = IdRecinto });
 
             }
             else

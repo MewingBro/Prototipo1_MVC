@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Prototipo1.Data;
+using Prototipo1.Migrations;
 using Prototipo1.Models;
 using Prototipo1.Models.ViewModels;
 using Prototipo1.Repository;
@@ -23,11 +24,25 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
         }
 
 
-        public IActionResult Index(string Tipo)
+        public IActionResult Index(
+    string Tipo,
+    int? IdFactura,
+    string Aposento,
+    string Nivel,
+    string Recinto,
+    DateTime? Fecha,
+    string Comentario,
+    string Estado,
+    int page = 1,
+    int pageSize = 10)
         {
             int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
+            if (!idProyecto.HasValue)
+            {
+                TempData["Error"] = "Debe seleccionar un proyecto antes de continuar.";
+                return RedirectToAction("Index", "Home");
+            }
 
-            // Determinar el IdTipoFactura según el tipo recibido
             int? idTipoFactura = null;
             if (!string.IsNullOrEmpty(Tipo))
             {
@@ -37,24 +52,78 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                     idTipoFactura = 2;
             }
 
-            // Consulta base filtrando por proyecto
+            // Base query
             var query = _unitOfWork.Factura.GetAllBYID(
                 f => f.IdProyecto == idProyecto,
                 includeProperties: "TipoFactura,Proyecto,Recinto,Recinto.Aposento.Nivel"
             );
 
-            // Si se definió un tipo, aplicar filtro adicional
+            // Filtro por tipo
             if (idTipoFactura.HasValue)
-            {
                 query = query.Where(f => f.IdTipoFactura == idTipoFactura.Value);
+
+            // Filtros dinámicos
+            if (IdFactura.HasValue)
+                query = query.Where(f => f.IdFactura == IdFactura.Value);
+
+            if (!string.IsNullOrWhiteSpace(Comentario))
+                query = query.Where(f => f.Comentario != null &&
+                                         f.Comentario.ToLower().Contains(Comentario.ToLower()));
+
+            if (Fecha.HasValue)
+                query = query.Where(f => f.Fecha.Date == Fecha.Value.Date);
+
+            if (!string.IsNullOrWhiteSpace(Aposento))
+                query = query.Where(f => f.Recinto != null &&
+                                         f.Recinto.Aposento.NombreAposento.ToLower().Contains(Aposento.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(Nivel))
+                query = query.Where(f => f.Recinto != null &&
+                                         f.Recinto.Aposento.Nivel.NombreNivel.ToLower().Contains(Nivel.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(Recinto))
+                query = query.Where(f => f.Recinto != null &&
+                                         f.Recinto.NombreRecinto.ToLower().Contains(Recinto.ToLower()));
+
+            // Filtro por estado
+            if (!string.IsNullOrWhiteSpace(Estado))
+            {
+                query = Estado switch
+                {
+                    "Pendiente" => query.Where(f => f.EstadoFactura == 0),
+                    "Cerrada" => query.Where(f => f.EstadoFactura == 1),
+                    "Pendiente de aprobación" => query.Where(f => f.EstadoFactura == 2),
+                    "Rechazada" => query.Where(f => f.EstadoFactura == 3),
+                    _ => query
+                };
             }
 
-            var objFacturaLista = query.ToList();
+            // Paginación
+            int total = query.Count();
+            var objFacturaLista = query
+                .OrderByDescending(f => f.Fecha)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
 
+            // ViewBags
             ViewBag.Tipo = Tipo;
+            ViewBag.Page = page;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalFacturas = total;
+            ViewBag.IdFactura = IdFactura;
+            ViewBag.Aposento = Aposento;
+            ViewBag.Nivel = Nivel;
+            ViewBag.Recinto = Recinto;
+            ViewBag.Fecha = Fecha?.ToString("yyyy-MM-dd");
+            ViewBag.Comentario = Comentario;
+            ViewBag.Estado = Estado;
 
             return View(objFacturaLista);
         }
+
+
+
 
         public IActionResult Upsert(int? IdFactura, string? Tipo)
         {
@@ -139,6 +208,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                         _unitOfWork.Factura.Add(FacturaVM.Factura);
                         _unitOfWork.Save();
                         int IdFactura = FacturaVM.Factura.IdFactura;
+                        int? IdRecinto = FacturaVM.Factura.IdRecinto;
                         if (TipoNum == 1)
                         {
                             return RedirectToAction(
@@ -152,7 +222,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                             return RedirectToAction(
                                             "Index",                 // acción del otro controlador
                                             "FacturaSalidaProducto",       // nombre del otro controller
-                                            new { IdFactura = IdFactura } // parámetro
+                                            new { IdFactura = IdFactura, IdRecinto = IdRecinto } // parámetro
                                         );
 
                         }
@@ -188,22 +258,6 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
 
 
         }
-        /*
-        public IActionResult Editar(int? IdFactura)
-        {
-            if (IdFactura == null || IdFactura == 0)
-            {
-                return NotFound();
-            }
-
-            Factura? Factura = _unitOfWork.Factura.GetID(u => u.IdFactura == IdFactura);
-            if (Factura == null)
-            {
-                return NotFound();
-            }
-            return View(Factura);
-        }
-        */
 
         [HttpPost]
         public IActionResult Editar(Factura obj)

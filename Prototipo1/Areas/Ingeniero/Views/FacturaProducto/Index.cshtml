@@ -1,84 +1,107 @@
 ﻿@model List<FacturaProducto>
 <partial name="_Notification" />
+
 <div class="container">
 
+    <!-- Título -->
     <div class="row pt-4 pb-3">
         <div class="col-6">
             <h2 class="text-primary">Productos de Factura</h2>
         </div>
-        <div class="col-6 text-end">
 
-            <a asp-controller="FacturaProducto" asp-action="Upsert" asp-route-IdFactura="@ViewBag.IdFactura" class="btn btn-primary">
-                <i class="bi bi-plus-circle"></i> Agregar Producto
-            </a>
-        </div>
+        <div class="col-6 text-end"> 
+            <a asp-controller="FacturaProducto" asp-action="Upsert" 
+            asp-route-IdFactura="@ViewBag.IdFactura" class="btn btn-primary"> 
+            <i class="bi bi-plus-circle"></i> 
+            Agregar Producto
+        </a> </div>
     </div>
 
+    <!-- Filtros -->
+    <div class="row mb-4">
+        <form method="get" asp-action="Index" class="row g-2">
+            <input type="hidden" name="IdFactura" value="@ViewBag.IdFactura" />
 
-    <table class="table table-bordered table-stripped">
-        <thead>
-            <tr>
-                <th>
-                    Id de factura
-                </th>
-                <th>
-                    Producto
-                </th>
-                <th>
-                    Cantidad Aumentada
-                </th>
-                <th>
-                    Entregado A
-                </th>
-                <th>
+            <div class="col-12 col-md">
+                <input type="text" name="Producto" value="@ViewBag.Producto" placeholder="Producto" class="form-control w-100" />
+            </div>
+            <div class="col-12 col-md">
+                <input type="text" name="EntregadoA" value="@ViewBag.EntregadoA" placeholder="Entregado a" class="form-control w-100" />
+            </div>
+            <div class="col-12 col-md">
+                <input type="text" name="Familia" value="@ViewBag.Familia" placeholder="Familia" class="form-control w-100" />
+            </div>
+            <div class="col-12 col-md">
+                <input type="text" name="Unidad" value="@ViewBag.Unidad" placeholder="Unidad" class="form-control w-100" />
+            </div>
 
-                </th>
+            <!-- Botones -->
+            <div class="col-12 col-md-auto d-flex gap-2">
+                <button type="submit" class="btn btn-info text-white w-100">Filtrar</button>
+                <a asp-action="Index" asp-route-IdFactura="@ViewBag.IdFactura" class="btn btn-outline-secondary w-100">Limpiar</a>
+            </div>
+        </form>
+    </div>
 
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var obj in Model.OrderBy(u => u.IdFactura))
-            {
+    <!-- Tabla -->
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-bordered table-hover align-middle text-center">
+            <thead class="table-primary">
                 <tr>
-                    <td>
-                        @obj.IdFactura
-                    </td>
-                    <td>
-                        @obj.Producto.NombreProducto
-                    </td>
-                    <td>
-                        @obj.CantidadAumentada
-                    </td>
-                    <td>
-                        @obj.EntregadoA
-                    </td>
-
-                    <td>
-                        <div class="w-75 btn-group" role="group">
-                            <a asp-controller="FacturaProducto" asp-action="Upsert" asp-route-IdFactura="@ViewBag.IdFactura" asp-route-IdFacturaProducto="@obj.IdFacturaProducto" class="btn btn-primary mx-2">
-                                <i class="bi bi-pencil">Editar detalle</i>
-                            </a>
-                            <a asp-controller="FacturaProducto" asp-action="Borrar" asp-route-IdFactura="@ViewBag.IdFactura" asp-route-IdFacturaProducto="@obj.IdFacturaProducto" class="btn btn-danger mx-2">
-                                <i class="bi bi-trash3">Borrar detalle</i>
-                            </a>
-
-                        </div>
-                    </td>
-
+                    <th>ID Factura</th>
+                    <th>Producto</th>
+                    <th>Familia</th>
+                    <th>Unidad</th>
+                    <th>Cantidad Aumentada</th>
+                    <th>Entregado A</th>
+                    <th>Acciones</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-3">No existen productos asociados a esta factura.</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var obj in Model)
+                    {
+                        <tr>
+                            <td>@obj.IdFactura</td>
+                            <td>@obj.Producto.NombreProducto</td>
+                            <td>@obj.Producto.Familia?.NombreFamilia</td>
+                            <td>@obj.Producto.Unidad?.NombreUnidad</td>
+                            <td>@obj.CantidadAumentada</td>
+                            <td>@obj.EntregadoA</td>
+                            <td>
+                                <div class="btn-group w-100" role="group">
+                                    <a asp-controller="FacturaProducto" asp-action="Upsert"
+                                       asp-route-IdFactura="@ViewBag.IdFactura"
+                                       asp-route-IdFacturaProducto="@obj.IdFacturaProducto"
+                                       class="btn btn-primary btn-sm">Editar</a>
 
+                                    <a asp-controller="FacturaProducto" asp-action="Borrar"
+                                       asp-route-IdFactura="@ViewBag.IdFactura"
+                                       asp-route-IdFacturaProducto="@obj.IdFacturaProducto"
+                                       class="btn btn-danger btn-sm">Borrar</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
 
-
-        <div class="col-6">
-            <form asp-controller="FacturaProducto" asp-action="TerminarFactura" asp-route-IdFactura="@ViewBag.IdFactura" method="post" style="display:inline;">
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-plus-circle"></i> Terminar Factura y agregar Productos al inventario
-                </button>
-            </form>
-        </div>
-
-
+    <!-- Botón terminar factura -->
+    <div class="mt-4">
+        <form asp-controller="FacturaProducto" asp-action="TerminarFactura"
+              asp-route-IdFactura="@ViewBag.IdFactura" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Terminar Factura y agregar Productos al inventario
+            </button>
+        </form>
+    </div>
 </div>

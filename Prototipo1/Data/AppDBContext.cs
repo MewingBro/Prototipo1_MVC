@@ -37,6 +37,8 @@ namespace Prototipo1.Data
         public DbSet<UsuariosProyectos> UsuariosProyectos { get; set; }
         public DbSet<FacturaSalidaProducto> FacturaSalidaProducto { get; set; }
 
+        public DbSet<Cambio> Cambio { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

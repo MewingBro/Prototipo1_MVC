@@ -29,28 +29,49 @@ namespace Prototipo1.Repository
 
             int idProyecto1 = idProyecto.Value;
 
-            // 🔹 Busca combinando ambos campos
+            //  Actualizar Inventario del proyecto
             var inventario = _db.Inventario
                 .FirstOrDefault(i => i.IdProducto == facturaSalidaProducto.IdProducto && i.IdProyecto == idProyecto1);
 
-            if (inventario != null)
+            if (inventario == null)
+                throw new InvalidOperationException($"El producto {facturaSalidaProducto.IdProducto} no existe en el inventario del proyecto.");
+
+            if (inventario.Existencias < facturaSalidaProducto.CantidadDisminuida)
+                throw new InvalidOperationException($"No hay suficiente stock de {facturaSalidaProducto.IdProducto} en el proyecto.");
+
+            inventario.Existencias -= facturaSalidaProducto.CantidadDisminuida;
+            _db.Inventario.Update(inventario);
+
+            var factura = _db.Factura.FirstOrDefault(m => m.IdFactura == facturaSalidaProducto.IdFactura);
+            int? idRecinto = factura.IdRecinto;
+
+            // 🔹 2. Actualizar Existencias del producto en el recinto
+            var recintoProducto = _db.RecintoProducto
+                .FirstOrDefault(rp => rp.IdRecinto == idRecinto
+                                   && rp.IdProducto == facturaSalidaProducto.IdProducto);
+
+            if (recintoProducto != null)
             {
-                //Si ya existe esa combinación → actualiza existencias
-                inventario.Existencias += facturaSalidaProducto.CantidadDisminuida;
-                _db.Inventario.Update(inventario);
+                // Verifica que no quede negativo
+                if (recintoProducto.ExistenciasActuales < facturaSalidaProducto.CantidadDisminuida)
+                {
+                    throw new InvalidOperationException($"El recinto no tiene suficiente stock del producto {facturaSalidaProducto.IdProducto}.");
+                }
+
+                recintoProducto.ExistenciasActuales -= facturaSalidaProducto.CantidadDisminuida;
+                _db.RecintoProducto.Update(recintoProducto);
             }
             else
             {
-                //Si no existe → crea un nuevo registro
-                inventario = new Inventario
-                {
-                    IdProducto = facturaSalidaProducto.IdProducto,
-                    Existencias = facturaSalidaProducto.CantidadDisminuida,
-                    IdProyecto = idProyecto1
-                };
-                _db.Inventario.Add(inventario);
+                // Si no existe el registro, lanzamos excepción
+                throw new InvalidOperationException($"El producto {facturaSalidaProducto.IdProducto} no está presupuestado en el recinto.");
             }
+
+            // 🔹 3. Guardar los cambios
+            _db.SaveChanges();
         }
+
+
 
 
         public void Update(FacturaSalidaProducto facturaSalidaProducto)
