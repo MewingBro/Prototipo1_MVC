@@ -1,27 +1,32 @@
 ﻿@model Familia
 
-<form method="post">
-    <div class="border p-3 mt-4">
-        <div class="row pb-2">
-            <h2 class="text-primary">
-                Agregar Familia
+<div class="container py-4">
+    <form method="post" class="shadow-sm border rounded p-4 bg-light">
+        <!-- Encabezado -->
+        <div class="text-center mb-4">
+            <h2 class="text-primary fw-bold">
+                <i class="bi bi-plus-circle"></i> Agregar Nueva Familia
             </h2>
-        </div>
-        <div class="mb-3 row p-1">
-            <label asp-for=NombreFamilia class="p-0"></label>
-            <input asp-for="NombreFamilia" class="form-control"/>
-            <span asp-validation-for="NombreFamilia" class="text-danger"></span>
+            <p class="text-muted mb-0">
+                Complete la información requerida para registrar una nueva familia de productos.
+            </p>
         </div>
 
-        <div class="row">
-            <div class="col-6 col-md-3">
-                <button type="submit" class="btn btn-primary form-control">Agregar</button>
-            </div>
-            <div class="col-6 col-md-3">
-                <a asp-controller="Familia" asp-action="Index" class="btn btn-outline-secondary form-control">
-                    Volver a la lista
-                </a>
-            </div>
-        </div>        
-    </div>
-</form>
+        <!-- Campo: Nombre de la familia -->
+        <div class="mb-4">
+            <label asp-for="NombreFamilia" class="form-label fw-semibold"></label>
+            <input asp-for="NombreFamilia" class="form-control" placeholder="Ingrese el nombre de la familia..." />
+            <span asp-validation-for="NombreFamilia" class="text-danger small"></span>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="d-flex justify-content-center gap-3 mt-3">
+            <button type="submit" class="btn btn-primary px-4">
+                <i class="bi bi-check-circle"></i> Agregar
+            </button>
+            <a asp-controller="Familia" asp-action="Index" class="btn btn-outline-secondary px-4">
+                <i class="bi bi-arrow-left-circle"></i> Cancelar
+            </a>
+        </div>
+    </form>
+</div>

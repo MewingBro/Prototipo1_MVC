@@ -4,41 +4,104 @@
     Layout = "_LayoutLogin";
 }
 
-<div class="card border-0 mt-4">
-    <div class="card-header bg-secondary bg-warning ml-0 py-4">
-        <div class="row">
-            <div class="col-12 text-center">
-                <h2 class="py-2 text-white">Iniciar Sesión</h2>
-            </div>
-        </div>
-    </div>
-    <div class="card-body p-4">
-        <div class="row">
-            <div class="col-md-12">
-                <section>
-                    <form id="account" method="post">
+<style>
+    .login-container {
+        max-width: 420px;
+        margin: 5rem auto;
+        padding: 0;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+        animation: fadeIn 0.6s ease-in-out;
+    }
 
-                        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-                        <div class="form-floating mb-3">
-                            <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                            <label asp-for="Input.Email" class="form-label">Email</label>
-                            <span asp-validation-for="Input.Email" class="text-danger"></span>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
-                            <label asp-for="Input.Password" class="form-label">Password</label>
-                            <span asp-validation-for="Input.Password" class="text-danger"></span>
-                        </div>
-                        <div>
-                            <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Iniciar sesión</button>
-                        </div>
-                    </form>
-                </section>
+    .card-header {
+        background: linear-gradient(90deg, #ffb700, #ff8800);
+        color: #fff;
+        border: none;
+    }
+
+        .card-header h2 {
+            font-weight: 600;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+    .form-floating label {
+        color: #555;
+    }
+
+    .form-control {
+        border-radius: 10px;
+    }
+
+        .form-control:focus {
+            box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.3);
+            border-color: #ffc107;
+        }
+
+    .btn-primary {
+        background-color: #ff9800;
+        border-color: #ff9800;
+        font-weight: 600;
+        border-radius: 10px;
+        transition: all 0.2s ease-in-out;
+    }
+
+        .btn-primary:hover {
+            background-color: #e68900;
+            border-color: #e68900;
+            transform: scale(1.02);
+        }
+
+    .text-danger {
+        font-size: 0.9rem;
+    }
+
+    .keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+</style>
+
+<div class="login-container card border-0 mt-4">
+    <div class="card-header text-center py-4">
+        <h2>Iniciar Sesión</h2>
+    </div>
+
+    <div class="card-body p-4">
+        <form id="account" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                <label asp-for="Input.Email">Correo electrónico</label>
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
             </div>
-        </div>
+
+            <div class="form-floating mb-4">
+                <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" type="password" />
+                <label asp-for="Input.Password">Contraseña</label>
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+
+            <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">
+                <i class="bi bi-box-arrow-in-right me-2"></i> Iniciar sesión
+            </button>
+        </form>
     </div>
 </div>
-
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

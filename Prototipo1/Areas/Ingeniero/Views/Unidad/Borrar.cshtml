@@ -1,27 +1,40 @@
 ﻿@model Unidad
 
-<form method="post">
+<form method="post" class="row justify-content-center">
     <input asp-for="IdUnidad" hidden />
-    <div class="border p-3 mt-4">
-        <div class="row pb-2">
-            <h2 class="text-primary">
-                Borrar Unidad
-            </h2>
-        </div>
-        <div class="mb-3 row p-1">
-            <label asp-for=NombreUnidad class="p-0"></label>
-            <input asp-for="NombreUnidad" disabled class="form-control" />
-        </div>
 
-        <div class="row">
-            <div class="col-6 col-md-3">
-                <button type="submit" class="btn btn-danger form-control">Borrar</button>
+    <div class="col-12 col-md-8 col-lg-6">
+        <div class="border p-4 mt-5 rounded-3 shadow-sm bg-light">
+            <div class="row pb-3 text-center">
+                <h2 class="text-danger fw-bold">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> Borrar Unidad
+                </h2>
+                <p class="text-muted mb-0">Confirme si desea eliminar esta unidad. Esta acción no se puede deshacer.</p>
             </div>
-            <div class="col-6 col-md-3">
-                <a asp-controller="Unidad" asp-action="Index" class="btn btn-outline-secondary form-control">
-                    Volver a la lista
-                </a>
+
+            <hr class="my-3" />
+
+            <div class="mb-3">
+                <label asp-for="NombreUnidad" class="form-label fw-semibold"></label>
+                <input asp-for="NombreUnidad" disabled class="form-control bg-white text-secondary" />
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-12 col-md-6 mb-2 mb-md-0">
+                    <button type="submit" class="btn btn-danger w-100 shadow-sm" id="btnBorrarUnidad">
+                        <i class="bi bi-trash3-fill me-1"></i> Borrar
+                    </button>
+                </div>
+                <div class="col-12 col-md-6">
+                    <a asp-controller="Unidad" asp-action="Index" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-arrow-left-circle me-1"></i> Volver a la lista
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 </form>
+
+
+}
+ 

@@ -1,78 +1,177 @@
 ﻿@model IEnumerable<Prototipo1.Areas.Ingeniero.Controllers.UsuarioConRolesVM>
 
 <partial name="_Notification" />
-<div class="container">
 
-    <div class="row pt-4 pb-3">
-        <div class="col-6">
-            <h2 class="text-primary">Lista de Usuarios registrados</h2>
+<div class="container mt-4">
+    <div class="row align-items-center mb-3">
+        <div class="col-12 col-md-6">
+            <h2 class="text-primary fw-bold">
+                <i class="bi bi-people-fill me-2"></i> Lista de Usuarios Registrados
+            </h2>
         </div>
-        <div class="col-6 text-end">
-            <a asp-area="Ingeniero" asp-controller="Usuarios" asp-action="Upsert" class="btn btn-primary mx-2">
-                Crear Usuario
+        <div class="col-12 col-md-6 text-md-end mt-3 mt-md-0">
+            <a asp-area="Ingeniero" asp-controller="Usuarios" asp-action="Upsert"
+               class="btn btn-primary shadow-sm">
+                <i class="bi bi-person-plus-fill me-1"></i> Crear Usuario
             </a>
         </div>
     </div>
 
+    <!-- 🔍 Filtros -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row g-2">
+                <div class="col-md-8">
+                    <input type="text" id="filtroUsuarios" class="form-control" placeholder="Buscar por correo o rol...">
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <button id="btnFiltrar" class="btn btn-warning me-2">
+                        <i class="bi bi-search"></i> Filtrar
+                    </button>
+                    <button id="btnLimpiar" class="btn btn-outline-secondary">
+                        <i class="bi bi-eraser"></i> Limpiar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <table class="table table-bordered table-stripped">
-        <thead>
-            <tr>
-                <th>
-                    Nombre de Usuario
-                </th>
-                <th>
-                    Tipo de Usuario
-                </th>
-                <th>
-
-                </th>
-                <th>
-
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var user in Model)
-            {
+    <!-- 📋 Tabla -->
+    <div class="table-responsive">
+        <table class="table table-striped align-middle shadow-sm" id="tablaUsuarios">
+            <thead class="table-light">
                 <tr>
-                    <td>
-                        @user.Email
-                    </td>
-                    <td>
-                        @if (user.Roles.Any())
-                        {
-                            @string.Join(", ", user.Roles)
-                        }
-                        else
-                        {
-                            <em>Sin rol asignado</em>
-                        }
-                    </td>
-                    <td>
-                        @if (user.Roles[0] == "Ingeniero" || user.Roles[0] == "Bodeguero")
-                        {
-                            <a asp-controller="UsuariosProyectos" asp-action="Index" asp-route-IdUsuario="@user.Id" class="btn btn-outline-secondary form-control">
-                                Modificar accesos a proyectos
-                            </a>
-                        }
-                    </td>
-   
-                    <td>
-                        <div class="w-75 btn-group" role="group">
-                            <a asp-area="Ingeniero" asp-controller="Usuarios" asp-action="Upsert" asp-route-id="@user.Id" class="btn btn-primary mx-2">
-                                Editar Usuario
-                            </a>
-                            <a asp-area="Ingeniero" asp-controller="Usuarios" asp-action="Borrar" asp-route-id="@user.Id" class="btn btn-danger mx-2">
-                                <i class="bi bi-trash3"></i>Borrar Usuario
-                            </a>
-
-                        </div>
-                    </td>
-
+                    <th>Correo electrónico</th>
+                    <th>Rol</th>
+                    <th class="text-center">Proyectos</th>
+                    <th class="text-center">Acciones</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody id="tablaUsuariosBody">
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td>@user.Email</td>
+                        <td>
+                            @if (user.Roles.Any())
+                            {
+                                @string.Join(", ", user.Roles)
+                            }
+                            else
+                            {
+                                <em class="text-muted">Sin rol asignado</em>
+                            }
+                        </td>
+                        <td class="text-center">
+                            @if (user.Roles.Any() && (user.Roles[0] == "Ingeniero" || user.Roles[0] == "Bodeguero"))
+                            {
+                                <a asp-controller="UsuariosProyectos" asp-action="Index"
+                                   asp-route-IdUsuario="@user.Id"
+                                   class="btn btn-outline-secondary btn-sm">
+                                    <i class="bi bi-diagram-3"></i> Accesos
+                                </a>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group">
+                                <a asp-area="Ingeniero" asp-controller="Usuarios" asp-action="Upsert"
+                                   asp-route-id="@user.Id"
+                                   class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil-square"></i> Editar
+                                </a>
+                                <a asp-area="Ingeniero" asp-controller="Usuarios" asp-action="Borrar"
+                                   asp-route-id="@user.Id"
+                                   class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash3"></i> Borrar
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 
+    <!-- 📄 Paginación -->
+    <nav>
+        <ul class="pagination justify-content-center mt-4" id="paginacion"></ul>
+    </nav>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const filtroInput = document.getElementById("filtroUsuarios");
+            const btnFiltrar = document.getElementById("btnFiltrar");
+            const btnLimpiar = document.getElementById("btnLimpiar");
+            const tabla = document.getElementById("tablaUsuariosBody");
+            const filas = Array.from(tabla.getElementsByTagName("tr"));
+            const paginacion = document.getElementById("paginacion");
+
+            const filasPorPagina = 10;
+            let paginaActual = 1;
+            let filasFiltradas = filas;
+
+            // Filtrar usuarios
+            function filtrarUsuarios() {
+                const filtro = filtroInput.value.toLowerCase();
+                filasFiltradas = filas.filter(fila => fila.innerText.toLowerCase().includes(filtro));
+                paginaActual = 1;
+                renderTabla();
+            }
+
+            // Limpiar filtro
+            function limpiarFiltro() {
+                filtroInput.value = "";
+                filasFiltradas = filas;
+                paginaActual = 1;
+                renderTabla();
+            }
+
+            // Mostrar tabla según la página actual
+            function renderTabla() {
+                tabla.innerHTML = "";
+                const inicio = (paginaActual - 1) * filasPorPagina;
+                const fin = inicio + filasPorPagina;
+                filasFiltradas.slice(inicio, fin).forEach(f => tabla.appendChild(f));
+                renderPaginacion();
+            }
+
+            // Render paginación
+            function renderPaginacion() {
+                paginacion.innerHTML = "";
+                const totalPaginas = Math.ceil(filasFiltradas.length / filasPorPagina);
+
+                for (let i = 1; i <= totalPaginas; i++) {
+                    const li = document.createElement("li");
+                    li.classList.add("page-item");
+                    if (i === paginaActual) li.classList.add("active");
+
+                    const a = document.createElement("a");
+                    a.classList.add("page-link");
+                    a.href = "#";
+                    a.textContent = i;
+
+                    a.addEventListener("click", e => {
+                        e.preventDefault();
+                        paginaActual = i;
+                        renderTabla();
+                    });
+
+                    li.appendChild(a);
+                    paginacion.appendChild(li);
+                }
+            }
+
+            // Eventos
+            btnFiltrar.addEventListener("click", filtrarUsuarios);
+            btnLimpiar.addEventListener("click", limpiarFiltro);
+            filtroInput.addEventListener("keyup", e => {
+                if (e.key === "Enter") filtrarUsuarios();
+            });
+
+            // Render inicial
+            renderTabla();
+        });
+    </script>
+}

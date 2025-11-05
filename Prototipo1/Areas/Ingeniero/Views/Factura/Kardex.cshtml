@@ -1,0 +1,151 @@
+﻿@model Prototipo1.Models.ViewModels.KardexVM
+
+<div class="container py-4">
+    <!-- Título -->
+    <div class="row mb-3">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h2 class="text-primary">
+                <i class="bi bi-clipboard-data"></i> Reporte Kardex
+            </h2>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left-circle"></i> Volver
+            </a>
+        </div>
+    </div>
+
+    <!-- Selección de producto -->
+    <div class="border rounded p-3 shadow-sm mb-4">
+        <h5 class="text-secondary mb-3">Seleccionar Producto</h5>
+
+        <form method="get" asp-action="Kardex" class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label>Producto</label>
+                <div class="input-group">
+                    <input type="text" id="productoNombre" class="form-control" readonly
+                           value="@Model.Producto?.NombreProducto" placeholder="Seleccione un producto..." />
+                    <button type="button" class="btn btn-outline-primary"
+                            data-bs-toggle="modal" data-bs-target="#buscarProductoModal">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                </div>
+                <input type="hidden" id="productoId" name="idProducto" value="@Model.Producto?.IdProducto" />
+            </div>
+
+            <div class="col-md-auto">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-graph-up"></i> Generar Reporte
+                </button>
+            </div>
+            <div class="col-md-auto">
+                <a asp-action="Kardex" class="btn btn-outline-secondary">
+                    <i class="bi bi-x-circle"></i> Limpiar
+                </a>
+            </div>
+        </form>
+    </div>
+    @if (Model.Movimientos != null && Model.Movimientos.Any())
+    {
+        <div class="col-md-auto">
+            <a asp-action="ImprimirKardex"
+               asp-route-idProducto="@Model.Producto?.IdProducto"
+               class="btn btn-warning" target="_blank">
+                <i class="bi bi-printer"></i> Imprimir Reporte
+            </a>
+        </div>
+    }
+
+    <!-- Información del producto -->
+    @if (Model.Producto != null)
+    {
+        <div class="mb-4 p-3 border rounded bg-light shadow-sm">
+            <h5 class="text-secondary mb-2">Información del Producto</h5>
+            <div class="row">
+                <div class="col-md-3"><strong>Código:</strong> @Model.Producto.CodigoProducto</div>
+                <div class="col-md-3"><strong>Familia:</strong> @Model.Producto.Familia?.NombreFamilia</div>
+                <div class="col-md-3"><strong>Unidad:</strong> @Model.Producto.Unidad?.NombreUnidad</div>
+                <div class="col-md-3"><strong>Media:</strong> @Model.Producto.MediaAritmetica</div>
+            </div>
+            <div class="mt-2">
+                <strong>Descripción:</strong> @Model.Producto.Descripcion
+            </div>
+        </div>
+    }
+
+    <!-- Tabla Kardex -->
+    @if (Model.Movimientos != null && Model.Movimientos.Any())
+    {
+        <div class="table-responsive shadow-sm rounded">
+            <table class="table table-bordered table-hover align-middle text-center">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Fecha</th>
+                        <th>ID Factura</th>
+                        <th>Tipo</th>
+                        <th>Entrada</th>
+                        <th>Salida</th>
+                        <th>Saldo</th>
+                        <th>Nivel</th>
+                        <th>Aposento</th>
+                        <th>Recinto</th>
+                        <th>Comentario</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var mov in Model.Movimientos)
+                    {
+                        <tr>
+                            <td>@mov.FechaFactura.ToShortDateString()</td>
+                            <td>@mov.IdFactura</td>
+                            <td>
+                                @if (mov.TipoFactura == "Entrada")
+                                {
+                                    <span class="badge bg-success">Entrada</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Salida</span>
+                                }
+                            </td>
+                            <td>@(mov.CantidadAumentada == 0 ? "-" : mov.CantidadAumentada.ToString())</td>
+                            <td>@(mov.CantidadDisminuida == 0 ? "-" : mov.CantidadDisminuida.ToString())</td>
+                            <td><strong>@mov.Saldo</strong></td>
+                            <td>@mov.Nivel</td>
+                            <td>@mov.Aposento</td>
+                            <td>@mov.Recinto</td>
+                            <td class="text-start">@mov.Comentario</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else if (Model.Producto != null)
+    {
+        <div class="alert alert-info mt-4">
+            <i class="bi bi-info-circle"></i> No se encontraron movimientos para este producto.
+        </div>
+    }
+</div>
+
+<!-- Modal de selección de producto -->
+@await Html.PartialAsync("_BuscarProducto", new List<Prototipo1.Models.Producto>())
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Al seleccionar producto en el modal, actualizar los campos del Kardex
+        document.addEventListener("click", function (e) {
+            if (e.target && e.target.classList.contains("seleccionar-producto")) {
+                const fila = e.target.closest("tr");
+                const id = e.target.dataset.id || fila.children[0].innerText;
+                const nombre = fila.children[1].innerText;
+                const codigo = fila.children[0].innerText;
+
+                document.getElementById("productoId").value = id;
+                document.getElementById("productoNombre").value = nombre;
+
+                const modal = bootstrap.Modal.getInstance(document.getElementById("buscarProductoModal"));
+                modal.hide();
+            }
+        });
+    });
+</script>

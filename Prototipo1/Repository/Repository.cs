@@ -18,7 +18,7 @@ namespace Prototipo1.Repository
         {
             _db = db;
             this.dbSet = _db.Set<T>();
-            _db.Producto.Include(u => u.Familia).Include(u=>u.MediaArtimetica);
+            _db.Producto.Include(u => u.Familia).Include(u=>u.MediaAritmetica);
 
         }
         public void Add(T entity)

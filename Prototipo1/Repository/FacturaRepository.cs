@@ -32,7 +32,7 @@ namespace Prototipo1.Repository
                 facturaFromDB.Comentario = factura.Comentario;
                 facturaFromDB.IdProyecto = factura.IdProyecto;
                 facturaFromDB.IdRecinto = factura.IdRecinto;
-
+                facturaFromDB.RecibidoPor = factura.RecibidoPor;
 
             }
         }

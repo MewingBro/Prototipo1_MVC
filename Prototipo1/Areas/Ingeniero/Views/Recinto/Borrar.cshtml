@@ -1,28 +1,34 @@
 ﻿@model Recinto
 
-<form method="post">
-    <input asp-for="IdRecinto" hidden />
-    <div class="border p-3 mt-4">
-        <div class="row pb-2">
-            <h2 class="text-primary">
-                Borrar Recinto
+<div class="container py-4">
+    <form method="post" class="shadow-sm border rounded p-4 bg-light">
+        <!-- Campo oculto -->
+        <input asp-for="IdRecinto" hidden />
+
+        <!-- Encabezado -->
+        <div class="mb-4">
+            <h2 class="text-primary fw-bold">
+                <i class="bi bi-trash"></i> Borrar Recinto
             </h2>
+            <p class="text-muted mb-0">
+                Esta acción eliminará el recinto seleccionado de forma permanente.
+            </p>
         </div>
 
-        <div class="mb-3 row p-1">
-            <label asp-for="NombreRecinto" class="p-0"></label>
-            <input asp-for="NombreRecinto" disabled class="form-control" />
+        <!-- Campo de información -->
+        <div class="mb-3">
+            <label asp-for="NombreRecinto" class="form-label fw-semibold"></label>
+            <input asp-for="NombreRecinto" disabled class="form-control bg-white" />
         </div>
 
-        <div class="row">
-            <div class="col-6 col-md-3">
-                <button type="submit" class="btn btn-danger form-control">Borrar</button>
-            </div>
-            <div class="col-6 col-md-3">
-                <a asp-controller="Recinto" asp-action="Index" class="btn btn-outline-secondary form-control">
-                    Volver a la lista
-                </a>
-            </div>
+        <!-- Acciones -->
+        <div class="d-flex gap-3 mt-4">
+            <button type="submit" class="btn btn-danger px-4">
+                <i class="bi bi-trash-fill"></i> Borrar
+            </button>
+            <a asp-controller="Recinto" asp-action="Index" class="btn btn-outline-secondary px-4">
+                <i class="bi bi-arrow-left-circle"></i> Volver a la lista
+            </a>
         </div>
-    </div>
-</form>
+    </form>
+</div>

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Prototipo1.Data;
+using Prototipo1.Migrations;
 using Prototipo1.Models;
 using Prototipo1.Models.ViewModels;
 using Prototipo1.Repository;
@@ -22,29 +23,63 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        public IActionResult Index(int? IdFactura,int? IdRecinto)
+        public IActionResult Index(
+    int? IdFactura,
+    int? IdRecinto,
+    string Producto,
+    string EntregadoA,
+    string Familia,
+    string Unidad)
         {
-            // Obtener la lista de salidas
-            List<FacturaSalidaProducto> objFacturaSalidaProductoLista = _unitOfWork.FacturaSalidaProducto
-                .GetAllBYID(f => f.IdFactura == IdFactura, includeProperties: "Factura,Producto")
-                .ToList();
+            if (!IdFactura.HasValue)
+            {
+                TempData["Error"] = "Debe seleccionar una factura válida.";
+                return RedirectToAction("Index", "Factura");
+            }
 
-            ViewBag.IdFactura = IdFactura;
-
-            // 
-            var recinto = _unitOfWork.Recinto.GetID(
-                f => f.IdRecinto == IdRecinto
+            // Consulta base con includes
+            var query = _unitOfWork.FacturaSalidaProducto.GetAllBYID(
+                f => f.IdFactura == IdFactura,
+                includeProperties: "Factura,Producto,Producto.Familia,Producto.Unidad"
             );
 
-            
-                if (recinto.EstadoRecinto == 0)
-                {
-                    ViewBag.SinPresupuesto = true;
-                }
-            
+            // Filtros dinámicos
+            if (!string.IsNullOrWhiteSpace(Producto))
+                query = query.Where(f => f.Producto.NombreProducto.ToLower().Contains(Producto.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(EntregadoA))
+                query = query.Where(f => f.EntregadoA != null && f.EntregadoA.ToLower().Contains(EntregadoA.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(Familia))
+                query = query.Where(f => f.Producto.Familia.NombreFamilia.ToLower().Contains(Familia.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(Unidad))
+                query = query.Where(f => f.Producto.Unidad.NombreUnidad.ToLower().Contains(Unidad.ToLower()));
+
+            // Ejecutar consulta
+            var objFacturaSalidaProductoLista = query
+                .OrderBy(f => f.Producto.NombreProducto)
+                .ToList();
+
+            var recinto = _unitOfWork.Recinto.GetID(f => f.IdRecinto == IdRecinto); 
+            if (recinto != null) 
+            { 
+                if (recinto.EstadoRecinto == 0) 
+                { 
+                    ViewBag.SinPresupuesto = true; 
+                } 
+            }
+
+            // ViewBag para mantener filtros
+            ViewBag.IdFactura = IdFactura;
+            ViewBag.Producto = Producto;
+            ViewBag.EntregadoA = EntregadoA;
+            ViewBag.Familia = Familia;
+            ViewBag.Unidad = Unidad;
 
             return View(objFacturaSalidaProductoLista);
         }
+
 
         [HttpPost]
         public IActionResult TerminarFactura(int? IdFactura)
@@ -157,49 +192,108 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
         {
             if (ModelState.IsValid)
             {
-                
-                if (FacturaSalidaProductoVM.FacturaSalidaProducto.IdFacturaSalidaProducto == 0)
+                var detalle = FacturaSalidaProductoVM.FacturaSalidaProducto;
+
+                // Guardar o actualizar registro normalmente
+                if (detalle.IdFacturaSalidaProducto == 0)
                 {
-                    _unitOfWork.FacturaSalidaProducto.Add(FacturaSalidaProductoVM.FacturaSalidaProducto);
+                    _unitOfWork.FacturaSalidaProducto.Add(detalle);
                     TempData["success"] = "Detalle de Factura agregado exitosamente";
-                    
                 }
                 else
                 {
-                    _unitOfWork.FacturaSalidaProducto.Update(FacturaSalidaProductoVM.FacturaSalidaProducto);
+                    _unitOfWork.FacturaSalidaProducto.Update(detalle);
                     TempData["success"] = "Detalle de Factura actualizado exitosamente";
                 }
-                int IdFactura = FacturaSalidaProductoVM.FacturaSalidaProducto.IdFactura;
 
                 _unitOfWork.Save();
 
-                var Recinto = _unitOfWork.Factura.GetID(m => m.IdFactura == IdFactura);
+                // Lógica de validación extra de la media aritmetica
 
-                int? IdRecinto = Recinto.IdRecinto;
+                try
+                {
+                    // Obtener el producto y su media aritmética (en días)
+                    var producto = _unitOfWork.Producto.GetID(p => p.IdProducto == detalle.IdProducto);
+                    if (producto == null) throw new Exception("Producto no encontrado");
 
-                return RedirectToAction("Index", new { IdFactura = IdFactura,  IdRecinto = IdRecinto });
+                    int N = producto.MediaAritmetica;
 
+                    // Obtener la factura y su recinto
+                    var factura = _unitOfWork.Factura.GetID(
+                        f => f.IdFactura == detalle.IdFactura,
+                        includeProperties: "Recinto"
+                    );
+                    if (factura == null) throw new Exception("Factura no encontrada");
+
+                    int? idRecinto = factura.IdRecinto;
+
+                    // 3️⃣ Obtener todas las facturas de salida confirmadas de los últimos N días
+                    var fechaCorte = DateTime.Now.AddDays(-N);
+                    var facturasRelacionadas = _unitOfWork.Factura.GetAllBYID(
+                        f => f.IdTipoFactura == 2 &&
+                             f.EstadoFactura == 1 &&
+                             f.Fecha >= fechaCorte
+                    ).ToList();
+
+                    // 🔹 Tomamos solo los IDs
+                    var facturasRelacionadasIds = facturasRelacionadas.Select(f => f.IdFactura).ToList();
+
+                    // 4️⃣ Obtener todas las salidas de ese producto en esas facturas
+                    var salidas = _unitOfWork.FacturaSalidaProducto.GetAllBYID(
+                        s => s.IdProducto == detalle.IdProducto &&
+                             facturasRelacionadasIds.Contains(s.IdFactura)
+                    );
+
+                    double totalDisminuido = salidas.Sum(s => s.CantidadDisminuida);
+
+                    // Obtener existencias actuales del recinto-producto
+                    var recintoProducto = _unitOfWork.RecintoProducto.GetID(
+                        rp => rp.IdRecinto == idRecinto && rp.IdProducto == detalle.IdProducto
+                    );
+
+                    if (recintoProducto != null)
+                    {
+                        double existencias = recintoProducto.ExistenciasActuales;
+
+                        if (totalDisminuido > existencias)
+                        {
+                            TempData["AlertaInventario"] =
+                                $"⚠️ En los últimos {N} días, se han utilizado {totalDisminuido} unidades del producto " +
+                                $"{producto.NombreProducto}, superando las existencias actuales ({existencias}). " +
+                                $"Continúe con precaución: el inventario podría no alcanzar para cubrir los próximos {N} días.";
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Evita romper la ejecución si algo falla en la validación
+                    Console.WriteLine($"[Advertencia Inventario] {ex.Message}");
+                }
+
+                // Redirigir nuevamente al listado
+                int idFactura = detalle.IdFactura;
+                var facturaRelacionada = _unitOfWork.Factura.GetID(m => m.IdFactura == idFactura);
+                int? idRecintoRelacionado = facturaRelacionada?.IdRecinto;
+
+                return RedirectToAction("Index", new { IdFactura = idFactura, IdRecinto = idRecintoRelacionado });
             }
-            else
+
+            // Si hay error de validación
+            FacturaSalidaProductoVM.FacturaList = _unitOfWork.Factura.GetAll().Select(u => new SelectListItem
             {
-                
-                FacturaSalidaProductoVM.FacturaList = _unitOfWork.Factura.GetAll().Select(u => new SelectListItem
-                {
-                    Text = u.Comentario.ToString(),
-                    Value = u.IdFactura.ToString()
-                });
-                FacturaSalidaProductoVM.ProductoList = _unitOfWork.Producto.GetAll().Select(u => new SelectListItem
-                {
-                    Text = u.NombreProducto.ToString(),
-                    Value = u.IdProducto.ToString()
-                });
+                Text = u.Comentario.ToString(),
+                Value = u.IdFactura.ToString()
+            });
 
-                return View(FacturaSalidaProductoVM);
-            }
+            FacturaSalidaProductoVM.ProductoList = _unitOfWork.Producto.GetAll().Select(u => new SelectListItem
+            {
+                Text = u.NombreProducto.ToString(),
+                Value = u.IdProducto.ToString()
+            });
 
-            
-
+            return View(FacturaSalidaProductoVM);
         }
+
 
         public IActionResult Borrar(int? IdFacturaSalidaProducto, int? IdFactura)
         {
@@ -224,8 +318,8 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
         {
             FacturaSalidaProducto? obj = _unitOfWork.FacturaSalidaProducto.GetID(u => u.IdFacturaSalidaProducto == IdFacturaSalidaProducto);
             if (obj == null)
-            { 
-                return Json( new { success = false, message = "Error al borrar" });
+            {
+                return Json(new { success = false, message = "Error al borrar" });
             }
 
 

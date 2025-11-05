@@ -1,40 +1,47 @@
 ﻿@model RecintoProducto
 
-<form asp-action="Borrar" method="post">
-    <input asp-for="IdRecinto" hidden />
-    <input asp-for="IdRecintoProducto" hidden />
-    <div class="border p-3 mt-4">
-        <div class="row pb-2">
-            <h2 class="text-primary">
-                Borrar Detalle
+<div class="container py-4">
+    <form asp-action="Borrar" method="post" class="shadow-sm border rounded p-4 bg-light">
+        <!-- Campos ocultos -->
+        <input asp-for="IdRecinto" hidden />
+        <input asp-for="IdRecintoProducto" hidden />
+
+        <!-- Encabezado -->
+        <div class="mb-4">
+            <h2 class="text-danger fw-bold">
+                <i class="bi bi-trash3"></i> Borrar Detalle de Recinto
             </h2>
+            <p class="text-muted mb-0">
+                ¿Está seguro de que desea eliminar este registro? Esta acción no se puede deshacer.
+            </p>
         </div>
 
-        <div class="mb-3 row p-1">
-            <label asp-for="Presupuesto" class="p-0"></label>
-            <input asp-for="Presupuesto" disabled class="form-control" />
+        <!-- Campos del detalle (solo lectura) -->
+        <div class="mb-3">
+            <label asp-for="Presupuesto" class="form-label fw-semibold"></label>
+            <input asp-for="Presupuesto" disabled class="form-control bg-light" />
         </div>
 
-        <div class="mb-3 row p-1">
-            <label asp-for="Desperdicio" class="p-0"></label>
-            <input asp-for="Desperdicio" disabled class=" form-control" />
+        <div class="mb-3">
+            <label asp-for="Desperdicio" class="form-label fw-semibold"></label>
+            <input asp-for="Desperdicio" disabled class="form-control bg-light" />
         </div>
 
-        <div class="mb-3 row p-1">
-            <label asp-for="ExistenciasActuales" class="p-0"></label>
-            <input asp-for="ExistenciasActuales" disabled class=" form-control" />
+        <div class="mb-3">
+            <label asp-for="ExistenciasActuales" class="form-label fw-semibold"></label>
+            <input asp-for="ExistenciasActuales" disabled class="form-control bg-light" />
         </div>
 
+        <!-- Botones de acción -->
+        <div class="d-flex gap-3 mt-4">
+            <button type="submit" class="btn btn-danger px-4">
+                <i class="bi bi-trash"></i> Borrar
+            </button>
 
-        <div class="row">
-            <div class="col-6 col-md-3">
-                <button type="submit" class="btn btn-danger form-control">Borrar</button>
-            </div>
-            <div class="col-6 col-md-3">
-                <a asp-controller="RecintoProducto" asp-action="Index" asp-route-IdRecinto="@ViewBag.IdRecinto" class="btn btn-outline-secondary form-control">
-                    Volver a la lista de presupuestos
-                </a>
-            </div>
+            <a asp-controller="RecintoProducto" asp-action="Index" asp-route-IdRecinto="@ViewBag.IdRecinto"
+               class="btn btn-outline-secondary px-4">
+                <i class="bi bi-arrow-left-circle"></i> Volver a la lista de presupuestos
+            </a>
         </div>
-    </div>
-</form>
+    </form>
+</div>

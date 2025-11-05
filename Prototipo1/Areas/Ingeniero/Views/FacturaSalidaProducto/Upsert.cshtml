@@ -1,60 +1,83 @@
 ﻿@model Prototipo1.Models.ViewModels.FacturaSalidaProductoVM
 
 <form asp-action="Upsert" asp-controller="FacturaSalidaProducto" method="post" class="row" enctype="multipart/form-data">
-
     <input asp-for="FacturaSalidaProducto.IdFactura" value="@ViewBag.IdFactura" hidden />
     <input asp-for="FacturaSalidaProducto.IdFacturaSalidaProducto" hidden />
-    <div class="row">
-        <div class="col-10">
-            <div class="border p-3 mt-4">
-                <div class="row pb-2">
-                    <h2 class="text-primary">
-                        @(Model.FacturaSalidaProducto.IdFacturaSalidaProducto != 0 ? "Actualizar" : "Crear") Detalle
-                    </h2>
+
+    <input type="hidden" id="facturaId" value="@ViewBag.IdFactura" />
+
+    <div class="col-10">
+        <div class="border p-3 mt-4">
+            <h2 class="text-primary">
+                @(Model.FacturaSalidaProducto.IdFacturaSalidaProducto != 0 ? "Actualizar" : "Crear") Detalle
+            </h2>
+
+            <!-- 🔍 Producto (buscador flotante) -->
+            <div class="mb-3 row p-1">
+                <label>Producto</label>
+                <div class="input-group">
+                    <input type="text" id="productoNombre" class="form-control" readonly placeholder="Seleccione un producto..." />
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#buscarProductoModal">
+                        Buscar
+                    </button>
                 </div>
+                <input asp-for="FacturaSalidaProducto.IdProducto" id="productoId" hidden />
+            </div>
 
-                <div class="mb-3 row p-1">
-                    <label class="p-0">Producto</label>
-                    <select asp-for="@Model.FacturaSalidaProducto.IdProducto" asp-items="@Model.ProductoList" class="form-select">
-                        <option disabled selected>---Seleccionar Producto---</option>
-                    </select>
-                    <span asp-validation-for="FacturaSalidaProducto.IdProducto" class="text-danger"></span>
+            <div class="mb-3 row p-1">
+                <label>Código</label>
+                <input type="text" id="productoCodigo" class="form-control" readonly />
+            </div>
+
+            <div class="mb-3 row p-1">
+                <label>Familia</label>
+                <input type="text" id="productoFamilia" class="form-control" readonly />
+            </div>
+
+            <div class="mb-3 row p-1">
+                <label>Unidad</label>
+                <input type="text" id="productoUnidad" class="form-control" readonly />
+            </div>
+
+            <div class="mb-3 row p-1">
+                <label>Media Aritmética</label>
+                <input type="text" id="productoMedia" class="form-control" readonly />
+            </div>
+
+            <div class="mb-3 row p-1">
+                <label>Descripción</label>
+                <textarea id="productoDescripcion" class="form-control" readonly></textarea>
+            </div>
+
+            <!--Cantidad y Entregado A -->
+            <div class="mb-3 row p-1">
+                <label asp-for="FacturaSalidaProducto.CantidadDisminuida"></label>
+                <input asp-for="FacturaSalidaProducto.CantidadDisminuida" class="form-control" />
+                <span asp-validation-for="FacturaSalidaProducto.CantidadDisminuida" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3 row p-1">
+                <label asp-for="FacturaSalidaProducto.EntregadoA"></label>
+                <input asp-for="FacturaSalidaProducto.EntregadoA" class="form-control" />
+                <span asp-validation-for="FacturaSalidaProducto.EntregadoA" class="text-danger"></span>
+            </div>
+
+            <!-- Botones -->
+            <div class="row">
+                <div class="col-6 col-md-3">
+                    <button type="submit" class="btn btn-primary form-control">
+                        @(Model.FacturaSalidaProducto.IdFacturaSalidaProducto != 0 ? "Actualizar" : "Agregar")
+                    </button>
                 </div>
-
-                <div class="mb-3 row p-1">
-                    <label asp-for="FacturaSalidaProducto.CantidadDisminuida" class="p-0"></label>
-                    <input asp-for="FacturaSalidaProducto.CantidadDisminuida" class="form-control" />
-                    <span asp-validation-for="FacturaSalidaProducto.CantidadDisminuida" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3 row p-1">
-                    <label asp-for="FacturaSalidaProducto.EntregadoA" class="p-0"></label>
-                    <input asp-for="FacturaSalidaProducto.EntregadoA" class="form-control" />
-                    <span asp-validation-for="FacturaSalidaProducto.EntregadoA" class="text-danger"></span>
-                </div>
-
-
-                <div class="row">
-                    <div class="col-6 col-md-3">
-                        @if (Model.FacturaSalidaProducto.IdFacturaSalidaProducto != 0)
-                        {
-                            <button type="submit" class="btn btn-primary form-control">Actualizar</button>
-                            
-                        } else
-                        {
-                            <button type="submit" class="btn btn-primary form-control">Agregar</button>
-                        }
-
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <a asp-controller="FacturaSalidaProducto" asp-action="Index" asp-route-IdFactura="@ViewBag.IdFactura" class="btn btn-outline-secondary form-control">
-                            Volver a la lista de Productos
-                        </a>
-                    </div>
+                <div class="col-6 col-md-3">
+                    <a asp-controller="FacturaSalidaProducto" asp-action="Index" asp-route-IdFactura="@ViewBag.IdFactura" class="btn btn-outline-secondary form-control">
+                        Volver a la lista
+                    </a>
                 </div>
             </div>
         </div>
-
     </div>
-
 </form>
+
+<!--Reutilizamos el mismo partial del buscador -->
+@await Html.PartialAsync("_BuscarProducto", new List<Prototipo1.Models.Producto>())

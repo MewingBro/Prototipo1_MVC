@@ -33,7 +33,7 @@ namespace Prototipo1.Repository
                 ProductoFromDB.IdUnidad = Producto.IdUnidad;
                 ProductoFromDB.IdFamilia = Producto.IdFamilia;
                 ProductoFromDB.IdUnidad = Producto.IdUnidad;
-                ProductoFromDB.MediaArtimetica = Producto.MediaArtimetica;
+                ProductoFromDB.MediaAritmetica = Producto.MediaAritmetica;
                 if (Producto.ImageURL != null)
                 {
                     ProductoFromDB.ImageURL = Producto.ImageURL;

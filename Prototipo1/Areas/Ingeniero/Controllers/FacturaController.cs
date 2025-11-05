@@ -27,6 +27,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
         public IActionResult Index(
     string Tipo,
     int? IdFactura,
+    string? Impresion,
     string Aposento,
     string Nivel,
     string Recinto,
@@ -35,7 +36,9 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
     string Estado,
     int page = 1,
     int pageSize = 10)
+    
         {
+            ViewBag.Impresion = Impresion;
             int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
             if (!idProyecto.HasValue)
             {
@@ -129,6 +132,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
         {
             ViewBag.Tipo = Tipo;
             ViewBag.IdFactura = IdFactura;
+            
 
             // Lista de tipos de factura
             IEnumerable<SelectListItem> TipoFacturaList = _unitOfWork.TipoFactura.GetAll()
@@ -330,6 +334,133 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
 
             return View(vm);
         }
+
+        public IActionResult DetalleSalida(int idFactura)
+        {
+            // Obtener la factura junto con sus relaciones
+            var factura = _unitOfWork.Factura.GetID(
+                f => f.IdFactura == idFactura,
+                includeProperties: "Proyecto,TipoFactura,Recinto,Recinto.Aposento,Recinto.Aposento.Nivel"
+            );
+
+            if (factura == null)
+                return NotFound();
+
+            // Obtener los productos asociados a la factura de salida
+            var detalles = _unitOfWork.FacturaSalidaProducto.GetAllBYID(
+                d => d.IdFactura == idFactura,
+                includeProperties: "Producto,Producto.Unidad,Producto.Familia,Factura"
+            );
+
+            // Construir el ViewModel
+            var vm = new FacturaCompletaSalidaVM
+            {
+                Factura = factura,
+                Detalles = detalles
+            };
+
+            return View(vm);
+        }
+
+        public IActionResult Kardex(int? idProducto)
+        {
+            KardexVM vm = new();
+
+            if (idProducto == null)
+                return View(vm);
+
+            // Obtener el producto
+            var producto = _unitOfWork.Producto.GetID(
+                p => p.IdProducto == idProducto,
+                includeProperties: "Familia,Unidad"
+            );
+
+            if (producto == null)
+                return NotFound();
+
+            vm.Producto = producto;
+
+            // Proyecto seleccionado en sesión
+            int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
+            if (idProyecto == null)
+            {
+                TempData["Error"] = "Debe seleccionar un proyecto antes de generar el reporte Kardex.";
+                return RedirectToAction("Index", "Proyecto");
+            }
+
+            // Obtener facturas de entrada (solo del proyecto actual)
+            var entradas = _unitOfWork.FacturaProducto.GetAllBYID(
+                f => f.IdProducto == idProducto && f.Factura.IdProyecto == idProyecto,
+                includeProperties: "Factura,Factura.Recinto,Factura.Recinto.Aposento"
+            ).Select(e => new KardexItemVM
+            {
+                FechaFactura = e.Factura.Fecha,
+                IdFactura = e.IdFactura,
+                TipoFactura = "Entrada",
+                CantidadAumentada = e.CantidadAumentada,
+                CantidadDisminuida = 0,
+                Comentario = e.Factura.Comentario,
+                Recinto = e.Factura.Recinto?.NombreRecinto ?? "-",
+                Nivel = e.Factura.Recinto?.Aposento?.Nivel?.NombreNivel?.ToString() ?? "-",
+                Aposento = e.Factura.Recinto?.Aposento?.NombreAposento?.ToString() ?? "-"
+            });
+
+            // 🔹 Obtener facturas de salida (solo del proyecto actual)
+            var salidas = _unitOfWork.FacturaSalidaProducto.GetAllBYID(
+                f => f.IdProducto == idProducto && f.Factura.IdProyecto == idProyecto,
+                includeProperties: "Factura,Factura.Recinto,Factura.Recinto.Aposento.Nivel"
+            ).Select(s => new KardexItemVM
+            {
+                FechaFactura = s.Factura.Fecha,
+                IdFactura = s.IdFactura,
+                TipoFactura = "Salida",
+                CantidadAumentada = 0,
+                CantidadDisminuida = s.CantidadDisminuida,
+                Comentario = s.Factura.Comentario,
+                Recinto = s.Factura.Recinto?.NombreRecinto ?? "-",
+                Nivel = s.Factura.Recinto?.Aposento?.Nivel?.NombreNivel?.ToString() ?? "-",
+                Aposento = s.Factura.Recinto?.Aposento?.NombreAposento?.ToString() ?? "-"
+            });
+
+            // 🔹 Combinar y ordenar cronológicamente
+            var movimientos = entradas.Concat(salidas)
+                .OrderBy(m => m.FechaFactura)
+                .ToList();
+
+            // 🔹 Calcular saldo acumulado
+            int saldo = 0;
+            foreach (var m in movimientos)
+            {
+                saldo += m.CantidadAumentada;
+                saldo -= m.CantidadDisminuida;
+                m.Saldo = saldo;
+            }
+
+            vm.Movimientos = movimientos;
+
+            return View(vm);
+        }
+
+
+        public IActionResult ImprimirKardex(int idProducto)
+        {
+            // Reutilizamos la lógica del Kardex original
+            var kardexData = Kardex(idProducto) as ViewResult;
+            int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
+            var Proyecto = _unitOfWork.Proyecto.GetID(m => m.IdProyecto == idProyecto);
+
+            ViewBag.Proyecto = Proyecto.NombreProyecto;
+
+            if (kardexData?.Model is KardexVM vm && vm.Producto != null)
+            {
+                // Pasamos el mismo ViewModel pero usamos un View distinto sin layout
+                return View("KardexImprimir", vm);
+            }
+
+            return RedirectToAction("Kardex");
+        }
+
+
 
     }
 }

@@ -1,35 +1,42 @@
 ﻿@model FacturaProducto
 
-<form asp-action="Borrar" method="post">
-    <input asp-for="IdFactura" hidden />
-    <input asp-for="IdFacturaProducto" hidden />
-    <div class="border p-3 mt-4">
-        <div class="row pb-2">
-            <h2 class="text-primary">
-                Borrar Detalle
+<div class="container py-4">
+    <form asp-action="Borrar" method="post" class="shadow-sm border rounded p-4 bg-light">
+        <input asp-for="IdFactura" type="hidden" />
+        <input asp-for="IdFacturaProducto" type="hidden" />
+
+        <!-- Encabezado -->
+        <div class="mb-4 text-center">
+            <h2 class="text-danger fw-bold">
+                <i class="bi bi-trash3"></i> Confirmar Eliminación
             </h2>
+            <p class="text-muted mb-0">
+                ¿Estás seguro de que deseas eliminar este detalle de factura?
+            </p>
         </div>
 
-        <div class="mb-3 row p-1">
-            <label asp-for="CantidadAumentada" class="p-0"></label>
-            <input asp-for="CantidadAumentada" disabled class="form-control" />
+        <!-- Información del detalle -->
+        <div class="mb-3">
+            <label asp-for="CantidadAumentada" class="form-label fw-semibold"></label>
+            <input asp-for="CantidadAumentada" class="form-control bg-white" disabled />
         </div>
 
-        <div class="mb-3 row p-1">
-            <label asp-for="EntregadoA" class="p-0"></label>
-            <input asp-for="EntregadoA" disabled class=" form-control" />
+        <div class="mb-4">
+            <label asp-for="EntregadoA" class="form-label fw-semibold"></label>
+            <input asp-for="EntregadoA" class="form-control bg-white" disabled />
         </div>
 
-
-        <div class="row">
-            <div class="col-6 col-md-3">
-                <button type="submit" class="btn btn-danger form-control">Borrar</button>
-            </div>
-            <div class="col-6 col-md-3">
-                <a asp-controller="FacturaProducto" asp-action="Index" asp-route-IdFactura="@ViewBag.IdFactura" class="btn btn-outline-secondary form-control">
-                    Volver a la lista de detalles
-                </a>
-            </div>
+        <!-- Botones -->
+        <div class="d-flex justify-content-center gap-3">
+            <button type="submit" class="btn btn-danger px-4">
+                <i class="bi bi-trash-fill"></i> Borrar
+            </button>
+            <a asp-controller="FacturaProducto"
+               asp-action="Index"
+               asp-route-IdFactura="@ViewBag.IdFactura"
+               class="btn btn-outline-secondary px-4">
+                <i class="bi bi-arrow-left-circle"></i> Cancelar
+            </a>
         </div>
-    </div>
-</form>
+    </form>
+</div>

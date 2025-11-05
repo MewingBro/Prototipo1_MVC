@@ -1,4 +1,4 @@
-﻿@model Prototipo1.Models.ViewModels.FacturaCompletaVM
+﻿@model Prototipo1.Models.ViewModels.FacturaCompletaSalidaVM
 @{
     Layout = null;
     var factura = Model.Factura;
@@ -10,7 +10,7 @@
 <html lang="es">
 <head>
     <meta charset="utf-8" />
-    <title>Boleta de Entrada - @factura.IdFactura</title>
+    <title>Boleta de Salida - @factura.IdFactura</title>
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
@@ -77,7 +77,7 @@
             .info-factura th {
                 text-align: left;
                 padding: 4px;
-                width: 150px;
+                width: 180px;
             }
 
             .info-factura td {
@@ -159,7 +159,7 @@
                     <img src="/images/logo.png" alt="Logo Empresa" />
                 </div>
                 <div class="titulo">
-                    <h1>Boleta de Entrada de Materiales</h1>
+                    <h1>Boleta de Solicitud de Materiales de la Obra</h1>
                     <p>Sistema de Gestión</p>
                 </div>
                 <div class="info-reporte">
@@ -176,11 +176,23 @@
                         <td>@factura.Proyecto?.NombreProyecto</td>
                     </tr>
                     <tr>
+                        <th>Recinto:</th>
+                        <td>@factura.Recinto?.NombreRecinto</td>
+                    </tr>
+                    <tr>
+                        <th>Nivel:</th>
+                        <td>@factura.Recinto?.Aposento?.Nivel?.NombreNivel</td>
+                    </tr>
+                    <tr>
+                        <th>Aposento:</th>
+                        <td>@factura.Recinto?.Aposento?.NombreAposento</td>
+                    </tr>
+                    <tr>
                         <th>N° de Boleta:</th>
                         <td>@factura.IdFactura</td>
                     </tr>
                     <tr>
-                        <th>Fecha de Factura:</th>
+                        <th>Fecha de Solicitud:</th>
                         <td>@factura.Fecha.ToString("dd/MM/yyyy")</td>
                     </tr>
                     <tr>
@@ -192,7 +204,7 @@
 
             <!-- Detalles -->
             <div class="detalle-factura">
-                <h4>Detalles de Productos</h4>
+                <h4>Materiales Solicitados</h4>
                 <table>
                     <thead>
                         <tr>
@@ -200,7 +212,7 @@
                             <th>Código</th>
                             <th>Nombre</th>
                             <th>Unidad</th>
-                            <th>Cantidad</th>
+                            <th>Cantidad Solicitada</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -214,7 +226,7 @@
                                     <td>@item.Producto?.CodigoProducto</td>
                                     <td>@item.Producto?.NombreProducto</td>
                                     <td>@item.Producto?.Unidad?.NombreUnidad</td>
-                                    <td>@item.CantidadAumentada</td>
+                                    <td>@item.CantidadDisminuida</td>
                                 </tr>
                                 index++;
                             }
@@ -222,7 +234,7 @@
                         else
                         {
                             <tr>
-                                <td colspan="5">No hay productos registrados en esta factura.</td>
+                                <td colspan="5">No hay materiales solicitados en esta boleta.</td>
                             </tr>
                         }
                     </tbody>
@@ -232,7 +244,7 @@
             <!-- Firma -->
             <div class="firma">
                 <div class="campo">
-                    Recibido por: <strong>@factura.RecibidoPor</strong>
+                    Solicitado por: <strong>@factura.RecibidoPor</strong>
                 </div>
                 <div class="campo">
                     Firma y Sello
@@ -240,7 +252,7 @@
             </div>
 
             <div class="footer">
-                <p>Factura generada automáticamente por el sistema — @fechaGeneracion</p>
+                <p>Boleta generada automáticamente por el sistema — @fechaGeneracion</p>
             </div>
         </div>
     }

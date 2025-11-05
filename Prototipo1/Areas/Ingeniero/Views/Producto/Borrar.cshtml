@@ -1,43 +1,52 @@
 ﻿@model Producto
 
-<form method="post">
-    <input asp-for="IdProducto" hidden/>
-    <div class="border p-3 mt-4">
-        <div class="row pb-2">
-            <h2 class="text-primary">
-                Borrar Producto
+<div class="container py-4">
+    <form method="post" class="shadow-sm border rounded p-4 bg-light">
+        <!-- ID oculto -->
+        <input asp-for="IdProducto" hidden />
+
+        <!-- Encabezado -->
+        <div class="text-center mb-4">
+            <h2 class="text-danger fw-bold">
+                <i class="bi bi-trash3"></i> Borrar Producto
             </h2>
-        </div>
-        <div class="mb-3 row p-1">
-            <label asp-for="CodigoProducto" class="p-0"></label>
-            <input asp-for="CodigoProducto" disabled class="form-control" />
-        </div>
-
-        <div class="mb-3 row p-1">
-            <label asp-for="NombreProducto" class="p-0"></label>
-            <input asp-for="NombreProducto" disabled class="form-control" />
+            <p class="text-muted mb-0">
+                Confirme si desea eliminar el siguiente producto del sistema. Esta acción no se puede deshacer.
+            </p>
         </div>
 
-        <div class="mb-3 row p-1">
-            <label asp-for="Descripcion" class="p-0"></label>
-            <input asp-for="Descripcion" disabled class="form-control" />
-        </div>
-
-        <div class="mb-3 row p-1">
-            <label asp-for="MediaArtimetica" class="p-0"></label>
-            <input asp-for="MediaArtimetica" disabled class="form-control" />
-        </div>
-
-
-        <div class="row">
-            <div class="col-6 col-md-3">
-                <button type="submit" class="btn btn-danger form-control">Borrar</button>
+        <!-- Información del producto -->
+        <div class="row mb-3">
+            <div class="col-md-6 mb-3">
+                <label asp-for="CodigoProducto" class="form-label fw-semibold"></label>
+                <input asp-for="CodigoProducto" disabled class="form-control bg-white" />
             </div>
-            <div class="col-6 col-md-3">
-                <a asp-controller="Producto" asp-action="Index" class="btn btn-outline-secondary form-control">
-                    Volver a la lista
-                </a>
+
+            <div class="col-md-6 mb-3">
+                <label asp-for="NombreProducto" class="form-label fw-semibold"></label>
+                <input asp-for="NombreProducto" disabled class="form-control bg-white" />
+            </div>
+
+            <div class="col-12 mb-3">
+                <label asp-for="Descripcion" class="form-label fw-semibold"></label>
+                <textarea asp-for="Descripcion" disabled class="form-control bg-white" rows="2"></textarea>
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="MediaAritmetica" class="form-label fw-semibold"></label>
+                <input asp-for="MediaAritmetica" disabled class="form-control bg-white" />
             </div>
         </div>
-    </div>
-</form>
+
+        <!-- Botones -->
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            <button type="submit" class="btn btn-danger px-4">
+                <i class="bi bi-trash"></i> Borrar
+            </button>
+
+            <a asp-controller="Producto" asp-action="Index" class="btn btn-outline-secondary px-4">
+                <i class="bi bi-arrow-left-circle"></i> Volver a la lista
+            </a>
+        </div>
+    </form>
+</div>

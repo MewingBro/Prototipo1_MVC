@@ -2,62 +2,109 @@
 <partial name="_Notification" />
 
 <div class="container">
+
+    <!-- Título -->
     <div class="row pt-4 pb-3">
         <div class="col-6">
-            <h2 class="text-primary">Despacho de Productos</h2>
+            <h2 class="text-primary">Productos Despachados</h2>
         </div>
+
         <div class="col-6 text-end">
             <a asp-controller="FacturaSalidaProducto"
                asp-action="Upsert"
                asp-route-IdFactura="@ViewBag.IdFactura"
-               class="btn btn-primary @(ViewBag.SinPresupuesto == true ? "disabled" : "")">
-                <i class="bi bi-plus-circle"></i> Agregar Producto
+               class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i>
+                Agregar Producto
             </a>
         </div>
     </div>
 
-    <table class="table table-bordered table-stripped">
-        <thead>
-            <tr>
-                <th>Id de factura</th>
-                <th>Producto</th>
-                <th>Cantidad Disminuida</th>
-                <th>Entregado A</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var obj in Model.OrderBy(u => u.IdFactura))
-            {
-                <tr>
-                    <td>@obj.IdFactura</td>
-                    <td>@obj.Producto.NombreProducto</td>
-                    <td>@obj.CantidadDisminuida</td>
-                    <td>@obj.EntregadoA</td>
-                    <td>
-                        <div class="w-75 btn-group" role="group">
-                            <a asp-controller="FacturaSalidaProducto"
-                               asp-action="Upsert"
-                               asp-route-IdFactura="@ViewBag.IdFactura"
-                               asp-route-IdFacturaSalidaProducto="@obj.IdFacturaSalidaProducto"
-                               class="btn btn-primary mx-2">
-                                <i class="bi bi-pencil"></i> Editar detalle
-                            </a>
-                            <a asp-controller="FacturaSalidaProducto"
-                               asp-action="Borrar"
-                               asp-route-IdFactura="@ViewBag.IdFactura"
-                               asp-route-IdFacturaSalidaProducto="@obj.IdFacturaSalidaProducto"
-                               class="btn btn-danger mx-2">
-                                <i class="bi bi-trash3"></i> Borrar detalle
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <!-- Filtros -->
+    <div class="row mb-4">
+        <form method="get" asp-action="Index" class="row g-2">
+            <input type="hidden" name="IdFactura" value="@ViewBag.IdFactura" />
 
-    <div class="col-6 text-end">
+            <div class="col-12 col-md">
+                <input type="text" name="Producto" value="@ViewBag.Producto" placeholder="Producto" class="form-control w-100" />
+            </div>
+
+            <div class="col-12 col-md">
+                <input type="text" name="EntregadoA" value="@ViewBag.EntregadoA" placeholder="Entregado a" class="form-control w-100" />
+            </div>
+
+            <div class="col-12 col-md">
+                <input type="text" name="Familia" value="@ViewBag.Familia" placeholder="Familia" class="form-control w-100" />
+            </div>
+
+            <div class="col-12 col-md">
+                <input type="text" name="Unidad" value="@ViewBag.Unidad" placeholder="Unidad" class="form-control w-100" />
+            </div>
+
+            <!-- Botones -->
+            <div class="col-12 col-md-auto d-flex gap-2">
+                <button type="submit" class="btn btn-warning text-white w-100">Filtrar</button>
+                <a asp-action="Index" asp-route-IdFactura="@ViewBag.IdFactura" class="btn btn-outline-secondary w-100">Limpiar</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tabla -->
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-bordered table-hover align-middle text-center">
+            <thead class="table-primary">
+                <tr>
+                    <th>ID Factura</th>
+                    <th>Producto</th>
+                    <th>Familia</th>
+                    <th>Unidad</th>
+                    <th>Cantidad Disminuida</th>
+                    <th>Entregado A</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-3">No existen productos despachados en esta factura.</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var obj in Model)
+                    {
+                        <tr>
+                            <td>@obj.IdFactura</td>
+                            <td>@obj.Producto.NombreProducto</td>
+                            <td>@obj.Producto.Familia?.NombreFamilia</td>
+                            <td>@obj.Producto.Unidad?.NombreUnidad</td>
+                            <td>@obj.CantidadDisminuida</td>
+                            <td>@obj.EntregadoA</td>
+                            <td>
+                                <div class="btn-group w-100" role="group">
+                                    <a asp-controller="FacturaSalidaProducto"
+                                       asp-action="Upsert"
+                                       asp-route-IdFactura="@ViewBag.IdFactura"
+                                       asp-route-IdFacturaSalidaProducto="@obj.IdFacturaSalidaProducto"
+                                       class="btn btn-primary btn-sm">Editar</a>
+
+                                    <a asp-controller="FacturaSalidaProducto"
+                                       asp-action="Borrar"
+                                       asp-route-IdFactura="@ViewBag.IdFactura"
+                                       asp-route-IdFacturaSalidaProducto="@obj.IdFacturaSalidaProducto"
+                                       class="btn btn-danger btn-sm">Borrar</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Botón terminar factura -->
+    <div class="mt-4">
         <form asp-controller="FacturaSalidaProducto"
               asp-action="TerminarFactura"
               asp-route-IdFactura="@ViewBag.IdFactura"
@@ -90,6 +137,19 @@
         </script>
     }
 
+    @if (TempData["AlertaInventario"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'warning',
+                title: 'Advertencia de Inventario',
+                html: '@Html.Raw(TempData["AlertaInventario"])',
+                confirmButtonColor: '#f0ad4e',
+                confirmButtonText: 'Entendido'
+            });
+        </script>
+    }
+
     @if (TempData["AlertaPresupuesto"] != null)
     {
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
@@ -109,7 +169,9 @@
                     Volver a Facturas
                 </a>
             </div>
+
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 }
+

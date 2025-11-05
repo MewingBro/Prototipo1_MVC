@@ -1,59 +1,98 @@
 ﻿@model List<UsuariosProyectos>
-<partial name="_Notification" />
-<div class="container">
+@{
+    var idUsuario = ViewBag.IdUsuario;
+}
 
-    <div class="row pt-4 pb-3">
-        <div class="col-6">
-            <h2 class="text-primary">Proyectos Asignados</h2>
-        </div>
-        <div class="col-6 text-end">
-            <a asp-controller="UsuariosProyectos" asp-action="Upsert" asp-route-IdUsuario="@ViewBag.IdUsuario" class="btn btn-primary">
-                <i class="bi bi-plus-circle"></i> Agregar acceso a proyecto
-            </a>
-        </div>
+<partial name="_Notification" />
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="text-primary"><i class="bi bi-people"></i> Proyectos Asignados</h2>
+
+        <a asp-controller="UsuariosProyectos"
+           asp-action="Upsert"
+           asp-route-IdUsuario="@idUsuario"
+           class="btn btn-primary shadow-sm">
+            <i class="bi bi-plus-circle"></i> Agregar acceso a proyecto
+        </a>
     </div>
 
+    <!-- 🔍 Formulario de filtro -->
+    <form asp-controller="UsuariosProyectos" asp-action="Index" method="get" class="row g-2 mb-3">
+        <!-- ✅ Mantiene el IdUsuario -->
+        <input type="hidden" name="IdUsuario" value="@idUsuario" />
 
-    <table class="table table-bordered table-stripped">
-        <thead>
+        <div class="col-md-4">
+            <input type="text" name="filtroProyecto" class="form-control" placeholder="Buscar por nombre de proyecto..." value="@ViewBag.FiltroProyecto" />
+        </div>
+
+        <div class="col-md-2 d-flex gap-2">
+            <button type="submit" class="btn btn-outline-primary flex-fill">
+                <i class="bi bi-search"></i> Filtrar
+            </button>
+
+            <a asp-controller="UsuariosProyectos"
+               asp-action="Index"
+               asp-route-IdUsuario="@idUsuario"
+               class="btn btn-outline-secondary flex-fill">
+                <i class="bi bi-eraser"></i> Limpiar
+            </a>
+        </div>
+    </form>
+
+    <!-- Tabla -->
+    <table class="table table-bordered table-striped align-middle">
+        <thead class="table-light">
             <tr>
-                <th>
-                    Nombre de usuario
-                </th>
-                <th>
-                    Proyecto asignado
-                </th>
-                <th>
-
-                </th>
-
+                <th>Nombre de usuario</th>
+                <th>Proyecto asignado</th>
+                <th class="text-center">Acciones</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var obj in Model.OrderBy(u => u.IdUsuario))
+            @if (Model.Any())
+            {
+                foreach (var obj in Model)
+                {
+                    <tr>
+                        <td>@obj.Usuario.UserName</td>
+                        <td>@obj.Proyecto.NombreProyecto</td>
+                        <td class="text-center">
+                            <a asp-controller="UsuariosProyectos"
+                               asp-action="Borrar"
+                               asp-route-IdUsuario="@idUsuario"
+                               asp-route-IdUsuariosProyectos="@obj.IdUsuariosProyectos"
+                               class="btn btn-danger btn-sm">
+                                <i class="bi bi-trash3"></i> Quitar acceso
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
             {
                 <tr>
-                    <td>
-                        @obj.Usuario.UserName
-                    </td>
-                    <td>
-                        @obj.Proyecto.NombreProyecto
-                    </td>
-
-                    <td>
-                        <div class="w-75 btn-group" role="group">
-
-                            <a asp-controller="UsuariosProyectos" asp-action="Borrar" asp-route-IdUsuario="@ViewBag.IdUsuario" asp-route-IdUsuariosProyectos="@obj.IdUsuariosProyectos" class="btn btn-danger mx-2">
-                                <i class="bi bi-trash3">Quitar acceso a proyecto</i>
-                            </a>
-
-                        </div>
-                    </td>
-
+                    <td colspan="3" class="text-center text-muted">No se encontraron proyectos asignados.</td>
                 </tr>
             }
         </tbody>
     </table>
 
+    <!-- 📄 Paginación -->
+    <nav aria-label="Paginación">
+        <ul class="pagination justify-content-center">
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i == ViewBag.PageNumber ? "active" : "")">
+                    <a class="page-link"
+                       asp-controller="UsuariosProyectos"
+                       asp-action="Index"
+                       asp-route-IdUsuario="@idUsuario"
+                       asp-route-filtroProyecto="@ViewBag.FiltroProyecto"
+                       asp-route-page="@i">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
 
 </div>

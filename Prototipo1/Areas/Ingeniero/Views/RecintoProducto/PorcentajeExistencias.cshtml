@@ -22,7 +22,7 @@
         </div>
 
         <div class="col-md-3 mb-2 d-flex gap-2">
-            <button type="submit" class="btn btn-info w-50">Filtrar</button>
+            <button type="submit" class="btn btn-warning w-50">Filtrar</button>
             <a asp-action="PorcentajeExistencias" class="btn btn-outline-secondary w-50">Limpiar</a>
         </div>
     </form>
@@ -37,14 +37,16 @@
                 <th>Producto</th>
                 <th>Presupuesto</th>
                 <th>Existencias Actuales</th>
-                <th>Porcentaje</th>
+                <th>Unidades Usadas</th>
+                <th>% Producto entregado</th>
+                <th>% Total Entregado X Recinto</th>
             </tr>
         </thead>
         <tbody>
             @if (!Model.Any())
             {
                 <tr>
-                    <td colspan="7" class="text-muted py-3 text-center">
+                    <td colspan="8" class="text-muted py-3 text-center">
                         No hay registros que coincidan con los filtros.
                     </td>
                 </tr>
@@ -53,18 +55,9 @@
             {
                 @foreach (var item in Model)
                 {
-                var color = "";
-                if (item.Porcentaje < 50)
-                {
-                    color = "table-danger";
-                   
-                        
-                    } else if (item.Porcentaje < 80) {
-                        color = "table-warning";
-                } else
-                {
-                    color = "table-success";
-                };
+                    string color = item.Porcentaje < 50 ? "table-danger"
+                    : item.Porcentaje < 80 ? "table-warning"
+                    : "table-success";
 
                     <tr class="@color">
                         <td>@item.Nivel</td>
@@ -73,7 +66,9 @@
                         <td>@item.Producto</td>
                         <td>@item.Presupuesto</td>
                         <td>@item.Existencias</td>
+                        <td>@item.ExistenciasUsadas</td>
                         <td>@item.Porcentaje.ToString("0.##") %</td>
+                        <td>@item.PorcentajeTotalRecinto.ToString("0.##") %</td>
                     </tr>
                 }
             }

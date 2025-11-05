@@ -1,44 +1,47 @@
 ﻿@model Prototipo1.Models.ViewModels.NivelVM
 
-<form method="post" class="row" enctype="multipart/form-data">
-    <input asp-for="Nivel.IdNivel" hidden/>
-    <div class="row">
-        <div class="col-10">
-    <div class="border p-3 mt-4">
-        <div class="row pb-2">
-            <h2 class="text-primary">
-                        @(Model.Nivel.IdNivel != 0 ? "Actualizar" : "Crear") Nivel
+<div class="container py-4">
+    <form method="post" enctype="multipart/form-data" class="shadow-sm border rounded p-4 bg-light">
+        <!-- ID oculto -->
+        <input asp-for="Nivel.IdNivel" hidden />
+        <input asp-for="Nivel.IdProyecto" value="@Context.Session.GetInt32("IdProyecto")" hidden />
+
+        <!-- Encabezado -->
+        <div class="text-center mb-4">
+            <h2 class="text-primary fw-bold">
+                <i class="bi bi-layers"></i>
+                @(Model.Nivel.IdNivel != 0 ? "Editar Nivel" : "Agregar Nuevo Nivel")
             </h2>
+            <p class="text-muted mb-0">
+                Complete la información requerida para @(Model.Nivel.IdNivel != 0 ? "modificar" : "registrar") un nivel del proyecto.
+            </p>
         </div>
 
-
-        <div class="mb-3 row p-1">
-            <label asp-for="Nivel.NombreNivel" class="p-0"></label>
-            <input asp-for="Nivel.NombreNivel" class="form-control" />
-            <span asp-validation-for="Nivel.NombreNivel" class="text-danger"></span>
+        <!-- Campo de nombre -->
+        <div class="mb-3">
+            <label asp-for="Nivel.NombreNivel" class="form-label fw-semibold"></label>
+            <input asp-for="Nivel.NombreNivel" class="form-control" placeholder="Ingrese el nombre del nivel..." />
+            <span asp-validation-for="Nivel.NombreNivel" class="text-danger small"></span>
         </div>
 
-                <input asp-for="Nivel.IdProyecto" value="@Context.Session.GetInt32("IdProyecto")" hidden />
+        <!-- Botones de acción -->
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            @if (Model.Nivel.IdNivel != 0)
+            {
+                <button type="submit" class="btn btn-primary px-4">
+                    <i class="bi bi-pencil-square"></i> Actualizar
+                </button>
+            }
+            else
+            {
+                <button type="submit" class="btn btn-success px-4">
+                    <i class="bi bi-plus-circle"></i> Agregar
+                </button>
+            }
 
-        <div class="row">
-            <div class="col-6 col-md-3">
-                        @if (Model.Nivel.IdNivel != 0)
-                        {
-                        <button type="submit" class="btn btn-primary form-control">Actualizar</button>
-                        }
-                        else
-                        {
-                    <button type="submit" class="btn btn-primary form-control">Agregar</button>
-                        }
-            </div>
-            <div class="col-6 col-md-3">
-                <a asp-controller="Nivel" asp-action="Index" class="btn btn-outline-secondary form-control">
-                    Volver a la lista
-                </a>
-            </div>
+            <a asp-controller="Nivel" asp-action="Index" class="btn btn-outline-secondary px-4">
+                <i class="bi bi-arrow-left-circle"></i> Volver a la lista
+            </a>
         </div>
-    </div>
-    </div>
-    </div>
-    
-</form>
+    </form>
+</div>

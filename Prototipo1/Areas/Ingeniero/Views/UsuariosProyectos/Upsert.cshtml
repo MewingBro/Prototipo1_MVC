@@ -1,44 +1,47 @@
 ﻿@model Prototipo1.Models.ViewModels.UsuariosProyectosVM
 
-<form asp-action="Upsert" asp-controller="UsuariosProyectos" method="post" class="row" enctype="multipart/form-data">
-
-    <input asp-for="UsuariosProyectos.IdUsuario" value="@ViewBag.IdUsuario" hidden />
-    <input asp-for="UsuariosProyectos.IdUsuariosProyectos" hidden />
-    <div class="row">
-        <div class="col-10">
-            <div class="border p-3 mt-4">
-                <div class="row pb-2">
-                    <h2 class="text-primary">
-                        Agregar Proyecto
-                    </h2>
-                </div>
-
-                <div class="mb-3 row p-1">
-                    <label class="p-0">Proyecto</label>
-                    <select asp-for="@Model.UsuariosProyectos.IdProyecto" asp-items="@Model.ProyectoList" class="form-select">
-                        <option disabled selected>---Seleccionar Proyecto---</option>
-                    </select>
-                    <span asp-validation-for="UsuariosProyectos.IdProyecto" class="text-danger"></span>
-                </div>
-
-
-
-                <div class="row">
-                    <div class="col-6 col-md-3">
-
-                            <button type="submit" class="btn btn-primary form-control">Agregar acceso</button>
-
-
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <a asp-controller="UsuariosProyectos" asp-action="Index" asp-route-IdUsuario="@ViewBag.IdUsuario" class="btn btn-outline-secondary form-control">
-                            Volver a la lista de accesos
-                        </a>
-                    </div>
-                </div>
-            </div>
+<div class="container mt-4">
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-primary text-white d-flex align-items-center">
+            <i class="bi bi-folder-plus me-2"></i>
+            <h4 class="mb-0">Agregar acceso a proyecto</h4>
         </div>
 
-    </div>
+        <div class="card-body">
+            <form asp-action="Upsert" asp-controller="UsuariosProyectos" method="post" enctype="multipart/form-data" class="needs-validation row g-3" novalidate>
+                <input asp-for="UsuariosProyectos.IdUsuario" value="@ViewBag.IdUsuario" hidden />
+                <input asp-for="UsuariosProyectos.IdUsuariosProyectos" hidden />
 
-</form>
+                <!-- Selector de proyecto -->
+                <div class="col-12">
+                    <label asp-for="UsuariosProyectos.IdProyecto" class="form-label fw-semibold">
+                        <i class="bi bi-diagram-3 me-1"></i> Proyecto
+                    </label>
+                    <select asp-for="UsuariosProyectos.IdProyecto"
+                            asp-items="@Model.ProyectoList"
+                            class="form-select shadow-sm border-primary-subtle">
+                        <option disabled selected>--- Seleccionar Proyecto ---</option>
+                    </select>
+                    <span asp-validation-for="UsuariosProyectos.IdProyecto" class="text-danger small"></span>
+                </div>
+
+                <!-- Botones -->
+                <div class="col-12 d-flex justify-content-start mt-3">
+                    <button type="submit" class="btn btn-primary me-2 shadow-sm">
+                        <i class="bi bi-plus-circle me-1"></i> Agregar acceso
+                    </button>
+                    <a asp-controller="UsuariosProyectos"
+                       asp-action="Index"
+                       asp-route-IdUsuario="@ViewBag.IdUsuario"
+                       class="btn btn-outline-secondary shadow-sm">
+                        <i class="bi bi-arrow-left-circle me-1"></i> Volver a la lista
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

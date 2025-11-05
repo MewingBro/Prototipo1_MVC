@@ -4,51 +4,70 @@
     ViewData["Title"] = "Detalle de Solicitud de Cambio";
 }
 
-<div class="container mt-4">
-    <h2 class="text-primary mb-3">Detalle de Solicitud de Cambio</h2>
+<div class="container mt-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white text-center py-3 rounded-top">
+            <h3 class="mb-0 fw-semibold">
+                <i class="bi bi-arrow-repeat me-2"></i> Detalle de Solicitud de Cambio
+            </h3>
+        </div>
 
-    <table class="table table-bordered table-striped">
-        <thead class="table-light">
-            <tr>
-                <th>Producto</th>
-                <th>Cantidad Solicitada</th>
-                <th>Existencias Actuales Presupuestadas</th>
-                <th>Inventario del Proyecto</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr class="@(item.SeExcede ? "table-danger" : "")">
-                    <td>@item.NombreProducto</td>
-                    <td>@item.CantidadDisminuida</td>
-                    <td>@item.ExistenciasActuales</td>
-                    <td>@item.InventarioProyecto</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+        <div class="card-body px-4 py-4">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr class="text-center">
+                            <th>Producto</th>
+                            <th>Cantidad Solicitada</th>
+                            <th>Existencias Presupuestadas</th>
+                            <th>Inventario del Proyecto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr class="@(item.SeExcede ? "table-danger" : "") text-center">
+                                <td class="fw-semibold">@item.NombreProducto</td>
+                                <td>@item.CantidadDisminuida</td>
+                                <td>@item.ExistenciasActuales</td>
+                                <td>@item.InventarioProyecto</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
 
-    
-    <div class="mt-4 text-end">
-        @if (User.IsInRole(SD.Role_Admin) || User.IsInRole(SD.Role_Bodeguero)) {
-        <form asp-action="Aprobar" method="post" class="d-inline">
-            <input type="hidden" name="IdCambio" value="@ViewBag.IdCambio" />
-            <button type="submit" class="btn btn-success">
-                <i class="bi bi-check-circle"></i> Aprobar Solicitud
-            </button>
-        </form>
+            <div class="mt-4 text-center">
+                @if ((User.IsInRole(SD.Role_Admin) || User.IsInRole(SD.Role_Bodeguero)) && ViewBag.Estado == "Pendiente")
+                {
+                    <form asp-action="Aprobar" method="post" class="d-inline">
+                        <input type="hidden" name="IdCambio" value="@ViewBag.IdCambio" />
+                        <button type="submit" class="btn btn-success px-4 me-2">
+                            <i class="bi bi-check-circle me-1"></i> Aprobar Solicitud
+                        </button>
+                    </form>
 
-        <form asp-action="Rechazar" method="post" class="d-inline">
-            <input type="hidden" name="IdCambio" value="@ViewBag.IdCambio" />
-            <button type="submit" class="btn btn-danger">
-                <i class="bi bi-x-circle"></i> Rechazar Solicitud
-            </button>
-        </form>
-        }
+                    <form asp-action="Rechazar" method="post" class="d-inline">
+                        <input type="hidden" name="IdCambio" value="@ViewBag.IdCambio" />
+                        <button type="submit" class="btn btn-danger px-4">
+                            <i class="bi bi-x-circle me-1"></i> Rechazar Solicitud
+                        </button>
+                    </form>
+                }
+                else if ((User.IsInRole(SD.Role_Admin) || User.IsInRole(SD.Role_Bodeguero)) && ViewBag.Estado != "Pendiente")
+                {
+                    <div class="alert alert-info mt-3 d-inline-block shadow-sm">
+                        <i class="bi bi-info-circle me-2"></i>
+                        El cambio solicitado ya se encuentra <strong>@ViewBag.Estado.ToLower()</strong>.
+                    </div>
+                }
 
-        <a asp-action="Index" class="btn btn-secondary ms-2">
-            <i class="bi bi-arrow-left"></i> Volver
-        </a>
+                <div class="mt-4">
+                    <a asp-action="Index" class="btn btn-outline-secondary px-4">
+                        <i class="bi bi-arrow-left-circle me-1"></i> Volver a la lista
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

@@ -77,8 +77,10 @@
                     <th>Recinto</th>
                     <th>Producto</th>
                     <th>Presupuesto</th>
-                    <th>Existencias</th>
-                    <th>Porcentaje</th>
+                    <th>Existencias Actuales</th>
+                    <th>Unidades Usadas</th>
+                    <th>% Producto entregado</th>
+                    <th>% Total Entregado X Recinto</th>
                 </tr>
             </thead>
             <tbody>
@@ -103,7 +105,9 @@
                             <td>@item.Producto</td>
                             <td>@item.Presupuesto</td>
                             <td>@item.Existencias</td>
+                            <td>@item.ExistenciasUsadas</td>
                             <td>@item.Porcentaje.ToString("0.##") %</td>
+                            <td>@item.PorcentajeTotalRecinto.ToString("0.##") %</td>
                         </tr>
                     }
                 }

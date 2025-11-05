@@ -22,16 +22,46 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        public IActionResult Index(string? IdUsuario)
+        public IActionResult Index(string? IdUsuario, string? filtroProyecto, int page = 1)
         {
-            List<UsuariosProyectos> objUsuariosProyectosLista = _unitOfWork.UsuariosProyectos
-        .GetAllBYID(f => f.IdUsuario == IdUsuario, includeProperties: "Usuario,Proyecto")
-        .ToList();
+            const int pageSize = 10;
 
+            if (string.IsNullOrEmpty(IdUsuario))
+            {
+                TempData["error"] = "No se encontró el usuario seleccionado.";
+                return RedirectToAction("Index", "Usuarios");
+            }
+
+            // Obtiene todos los accesos del usuario incluyendo las relaciones
+            var query = _unitOfWork.UsuariosProyectos
+                .GetAllBYID(f => f.IdUsuario == IdUsuario, includeProperties: "Usuario,Proyecto")
+                .AsQueryable();
+
+            // 🔍 Filtro con búsqueda parcial e insensible a mayúsculas
+            if (!string.IsNullOrWhiteSpace(filtroProyecto))
+            {
+                string filtroLower = filtroProyecto.Trim().ToLower();
+                query = query.Where(f => f.Proyecto.NombreProyecto.ToLower().Contains(filtroLower));
+            }
+
+            // 📄 Paginación
+            int totalItems = query.Count();
+            var usuariosProyectos = query
+                .OrderBy(f => f.Proyecto.NombreProyecto)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            // Enviar datos a la vista
             ViewBag.IdUsuario = IdUsuario;
+            ViewBag.FiltroProyecto = filtroProyecto;
+            ViewBag.PageNumber = page;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)totalItems / pageSize);
 
-            return View(objUsuariosProyectosLista);
+            return View(usuariosProyectos);
         }
+
+
 
 
         public IActionResult Upsert(string? IdUsuario, int? IdUsuariosProyectos)

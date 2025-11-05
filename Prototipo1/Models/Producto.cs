@@ -25,7 +25,7 @@ namespace Prototipo1.Models
         public string NombreProducto { get; set; }
         public string Descripcion { get; set; }
         [Required]
-        public string MediaArtimetica { get; set; }
+        public int MediaAritmetica { get; set; }
 
         public int IdFamilia { get; set; }
         [ForeignKey("IdFamilia")]

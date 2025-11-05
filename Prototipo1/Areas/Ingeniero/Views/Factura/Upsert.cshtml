@@ -1,68 +1,77 @@
 ﻿@model Prototipo1.Models.ViewModels.FacturaVM
 
-<form method="post" class="row" enctype="multipart/form-data">
-    <input asp-for="Factura.IdFactura" hidden/>
+<form method="post" class="row justify-content-center" enctype="multipart/form-data">
+    <input asp-for="Factura.IdFactura" hidden />
     <input asp-for="Factura.IdProyecto" value="@Context.Session.GetInt32("IdProyecto")" hidden />
-    <div class="row">
-        <div class="col-10">
-    <div class="border p-3 mt-4">
-        <div class="row pb-2">
-            <h2 class="text-primary">
-                        @(Model.Factura.IdFactura != 0 ? "Actualizar" : "Crear") Factura
-            </h2>
-        </div>
-        <div class="mb-3 row p-1">
-            <label asp-for="Factura.Fecha" class="p-0"></label>
-            <input asp-for="Factura.Fecha" class="form-control"/>
-            <span asp-validation-for="Factura.Fecha" class="text-danger"></span>
-        </div>
+
+    <div class="col-lg-8 col-md-10 col-sm-12">
+        <div class="card shadow-lg border-0 mt-4">
+            <div class="card-header bg-primary text-white py-3">
+                <h4 class="mb-0 text-center fw-semibold">
+                    @(Model.Factura.IdFactura != 0 ? "Actualizar Factura" : "Crear Factura")
+                </h4>
+            </div>
+
+            <div class="card-body px-4 py-4">
+                <div class="mb-3">
+                    <label asp-for="Factura.Fecha" class="form-label fw-semibold"></label>
+                    <input asp-for="Factura.Fecha" class="form-control" />
+                    <span asp-validation-for="Factura.Fecha" class="text-danger"></span>
+                </div>
 
                 @if (ViewBag.Tipo == "Entrada")
                 {
                     <input asp-for="Factura.IdTipoFactura" value="1" hidden />
-                } else if (ViewBag.Tipo == "Salida")
+                }
+                else if (ViewBag.Tipo == "Salida")
                 {
                     <input asp-for="Factura.IdTipoFactura" value="2" hidden />
                 }
-                
 
-                <div class="mb-3 row p-1">
-                    <label asp-for="Factura.Comentario" class="p-0"></label>
+                <div class="mb-3">
+                    <label asp-for="Factura.Comentario" class="form-label fw-semibold"></label>
                     <input asp-for="Factura.Comentario" class="form-control" />
                     <span asp-validation-for="Factura.Comentario" class="text-danger"></span>
                 </div>
 
+                <div class="mb-3">
+                    <label asp-for="Factura.RecibidoPor" class="form-label fw-semibold"></label>
+                    <input asp-for="Factura.RecibidoPor" class="form-control" />
+                    <span asp-validation-for="Factura.RecibidoPor" class="text-danger"></span>
+                </div>
+
                 @if (ViewBag.Tipo == "Salida")
                 {
-                <div class="mb-3 row p-1">
-                    <label class="p-0">Recinto</label>
-                    <select asp-for="@Model.Factura.IdRecinto" asp-items="@Model.RecintoList" class="form-select">
-                        <option disabled selected>---Seleccionar Recinto---</option>
-                    </select>
-                    <span asp-validation-for="Factura.IdRecinto" class="text-danger"></span>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Recinto</label>
+                        <select asp-for="@Model.Factura.IdRecinto" asp-items="@Model.RecintoList" class="form-select">
+                            <option disabled selected>---Seleccionar Recinto---</option>
+                        </select>
+                        <span asp-validation-for="Factura.IdRecinto" class="text-danger"></span>
                     </div>
-                } else 
+                }
+                else
                 {
                     <input asp-for="Factura.IdRecinto" value="" hidden />
                 }
 
+                <hr class="my-4" />
 
-        
-        <div class="row">
-            <div class="col-6 col-md-3">
-
+                <!-- Botones principales -->
+                <div class="row g-3">
+                    <div class="col-md-6">
                         @if (ViewBag.Tipo == "Entrada")
                         {
                             @if (Model.Factura.IdFactura != 0)
                             {
-                                <a asp-controller="FacturaProducto" asp-action="Index" asp-route-IdFactura="@Model.Factura.IdFactura" class="btn btn-outline-secondary form-control">
-                                    Agregar Productos a la Factura
+                                <a asp-controller="FacturaProducto" asp-action="Index" asp-route-IdFactura="@Model.Factura.IdFactura" class="btn btn-outline-primary w-100">
+                                    <i class="bi bi-plus-circle me-1"></i> Agregar Productos a la Factura
                                 </a>
                             }
                             else
                             {
-                                <button type="submit" name="accion" value="AgregarProductosAhora" class="btn btn-outline-secondary form-control">
-                                    Guardar y Agregar Productos a la Factura
+                                <button type="submit" name="accion" value="AgregarProductosAhora" class="btn btn-outline-primary w-100">
+                                    <i class="bi bi-save me-1"></i> Guardar y Agregar Productos
                                 </button>
                             }
                         }
@@ -70,59 +79,57 @@
                         {
                             @if (Model.Factura.IdFactura != 0)
                             {
-                                <a asp-controller="FacturaSalidaProducto" asp-action="Index" asp-route-IdFactura="@Model.Factura.IdFactura"
+                                <a asp-controller="FacturaSalidaProducto"
+                                   asp-action="Index"
+                                   asp-route-IdFactura="@Model.Factura.IdFactura"
                                    asp-route-IdRecinto="@Model.Factura.IdRecinto"
-                                   class="btn btn-outline-secondary form-control">
-                                    Agregar Productos a la Factura
+                                   class="btn btn-outline-primary w-100">
+                                    <i class="bi bi-plus-circle me-1"></i> Agregar Productos a la Factura
                                 </a>
                             }
                             else
                             {
-                                <button type="submit" name="accion" value="AgregarProductosAhora" class="btn btn-outline-secondary form-control">
-                                    Guardar y Agregar Productos a la Factura
+                                <button type="submit" name="accion" value="AgregarProductosAhora" class="btn btn-outline-primary w-100">
+                                    <i class="bi bi-save me-1"></i> Guardar y Agregar Productos
                                 </button>
                             }
                         }
+                    </div>
 
-               
-                
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-6 col-md-3">
+                    <div class="col-md-6">
                         @if (Model.Factura.IdFactura != 0)
                         {
-                            <button type="submit" name="accion" value="AgregarProductosDespues" class="btn btn-primary form-control">
-                                Actualizar Factura
-                                </button>
+                            <button type="submit" name="accion" value="AgregarProductosDespues" class="btn btn-success w-100">
+                                <i class="bi bi-arrow-repeat me-1"></i> Actualizar Factura
+                            </button>
                         }
                         else
                         {
-                            
-                    <button type="submit" name="accion" value="AgregarProductosDespues" class="btn btn-primary form-control">
-                        Agregar Factura y volver al menú
-                        </button>
+                            <button type="submit" name="accion" value="AgregarProductosDespues" class="btn btn-success w-100">
+                                <i class="bi bi-check-circle me-1"></i> Agregar Factura y volver al menú
+                            </button>
                         }
-            </div>
-            <div class="col-6 col-md-3">
+                    </div>
+                </div>
+
+                <!-- Botón volver -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
                         @if (ViewBag.Tipo == "Entrada")
                         {
-                            <a asp-controller="Factura" asp-action="Index" asp-route-Tipo="Entrada" class="btn btn-outline-secondary form-control">
-                                Volver a la lista
+                            <a asp-controller="Factura" asp-action="Index" asp-route-Tipo="Entrada" class="btn btn-outline-secondary w-100">
+                                <i class="bi bi-arrow-left-circle me-1"></i> Volver a la lista
                             </a>
                         }
                         else if (ViewBag.Tipo == "Salida")
                         {
-                            <a asp-controller="Factura" asp-action="Index" asp-route-Tipo="Salida" class="btn btn-outline-secondary form-control">
-                                Volver a la lista
+                            <a asp-controller="Factura" asp-action="Index" asp-route-Tipo="Salida" class="btn btn-outline-secondary w-100">
+                                <i class="bi bi-arrow-left-circle me-1"></i> Volver a la lista
                             </a>
                         }
-                        
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    </div>
-    </div>
-    
 </form>

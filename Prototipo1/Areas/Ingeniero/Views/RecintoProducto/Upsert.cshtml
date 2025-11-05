@@ -1,27 +1,40 @@
 ﻿@model Prototipo1.Models.ViewModels.RecintoProductoVM
 
 <form asp-action="Upsert" asp-controller="RecintoProducto" method="post" class="row" enctype="multipart/form-data">
-
     <input asp-for="RecintoProducto.IdRecinto" value="@ViewBag.IdRecinto" hidden />
     <input asp-for="RecintoProducto.IdRecintoProducto" hidden />
     <div class="row">
         <div class="col-10">
-            <div class="border p-3 mt-4">
+            <div class="border p-3 mt-4 shadow-sm rounded bg-light">
                 <div class="row pb-2">
                     <h2 class="text-primary">
                         @(Model.RecintoProducto.IdRecintoProducto != 0 ? "Actualizar" : "Crear") Presupuesto
                     </h2>
                 </div>
 
-                <div class="mb-3 row p-1">
+                <!-- Campo de producto -->
+                <div class="mb-3 row p-1 align-items-center">
                     <label class="p-0">Producto</label>
-                    <select asp-for="@Model.RecintoProducto.IdProducto" asp-items="@Model.ProductoList" class="form-select">
-                        <option disabled selected>---Seleccionar Producto---</option>
-                    </select>
+                    <div class="input-group">
+                        <input type="text" id="productoNombreInput" class="form-control" placeholder="Seleccione un producto..." readonly />
+                        <input asp-for="RecintoProducto.IdProducto" type="hidden" id="productoIdInput" />
+                        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#buscarProductoModal">
+                            <i class="bi bi-search"></i> Buscar
+                        </button>
+                    </div>
                     <span asp-validation-for="RecintoProducto.IdProducto" class="text-danger"></span>
                 </div>
 
-                <div class="mb-3 row p-1">
+                <!-- Información del producto -->
+                <div id="productoInfo" class="border rounded p-2 bg-white mt-2" style="display:none;">
+                    <p class="mb-1"><strong>Código:</strong> <span id="productoCodigo"></span></p>
+                    <p class="mb-1"><strong>Familia:</strong> <span id="productoFamilia"></span></p>
+                    <p class="mb-1"><strong>Unidad:</strong> <span id="productoUnidad"></span></p>
+                    <p class="mb-1"><strong>Media Aritmética:</strong> <span id="productoMedia"></span></p>
+                    <p class="mb-1 text-success"><strong>Inventario actual:</strong> <span id="productoInventario">-</span></p>
+                </div>
+
+                <div class="mb-3 row p-1 mt-3">
                     <label asp-for="RecintoProducto.Presupuesto" class="p-0"></label>
                     <input asp-for="RecintoProducto.Presupuesto" class="form-control" id="PresupuestoInput" />
                     <span asp-validation-for="RecintoProducto.Presupuesto" class="text-danger"></span>
@@ -36,18 +49,16 @@
                     <span asp-validation-for="RecintoProducto.Desperdicio" class="text-danger"></span>
                 </div>
 
-
                 <div class="row">
                     <div class="col-6 col-md-3">
                         @if (Model.RecintoProducto.IdRecintoProducto != 0)
                         {
                             <button type="submit" class="btn btn-primary form-control">Actualizar</button>
-                            
-                        } else
+                        }
+                        else
                         {
                             <button type="submit" class="btn btn-primary form-control">Agregar</button>
                         }
-
                     </div>
                     <div class="col-6 col-md-3">
                         <a asp-controller="RecintoProducto" asp-action="Index" asp-route-IdRecinto="@ViewBag.IdRecinto" class="btn btn-outline-secondary form-control">
@@ -57,10 +68,45 @@
                 </div>
             </div>
         </div>
-
     </div>
-
 </form>
+
+<!-- Modal de búsqueda de productos -->
+<div class="modal fade" id="buscarProductoModal" tabindex="-1" aria-labelledby="buscarProductoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content shadow">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Buscar Producto</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="input-group mb-3">
+                    <input type="text" id="buscarProductoInput" class="form-control" placeholder="Buscar por código o nombre...">
+                    <button class="btn btn-primary" id="buscarProductoBtn">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                </div>
+
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Familia</th>
+                            <th>Unidad</th>
+                            <th>Media Aritmética</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaProductosBody">
+                        <tr><td colspan="6" class="text-center text-muted">Ingrese un término de búsqueda y haga clic en Buscar.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <script>
@@ -70,10 +116,75 @@
 
             if (presupuestoInput && existenciasInput) {
                 presupuestoInput.addEventListener("input", function () {
-                    // Actualiza el valor oculto dinámicamente
                     existenciasInput.value = this.value;
                 });
             }
+
+            const buscarBtn = document.getElementById("buscarProductoBtn");
+            const filtroInput = document.getElementById("buscarProductoInput");
+            const tablaBody = document.getElementById("tablaProductosBody");
+
+            buscarBtn.addEventListener("click", function () {
+                const filtro = filtroInput.value.trim();
+                if (!filtro) {
+                    tablaBody.innerHTML = "<tr><td colspan='6' class='text-center text-muted'>Ingrese un término de búsqueda.</td></tr>";
+                    return;
+                }
+
+                fetch(`/Ingeniero/Producto/BuscarProductosInventario?filtro=${encodeURIComponent(filtro)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        tablaBody.innerHTML = "";
+
+                        if (!data || data.length === 0) {
+                            tablaBody.innerHTML = "<tr><td colspan='6' class='text-center text-muted'>No se encontraron productos.</td></tr>";
+                            return;
+                        }
+
+                        data.forEach(p => {
+                            const fila = document.createElement("tr");
+                            fila.innerHTML = `
+                                <td>${p.codigoProducto}</td>
+                                <td>${p.nombreProducto}</td>
+                                <td>${p.familia}</td>
+                                <td>${p.unidad}</td>
+                                <td>${p.mediaAritmetica}</td>
+                                <td><button type="button" class="btn btn-success btn-sm seleccionar-producto">Seleccionar</button></td>
+                            `;
+                            tablaBody.appendChild(fila);
+
+                            fila.querySelector(".seleccionar-producto").addEventListener("click", function () {
+                                document.getElementById("productoIdInput").value = p.idProducto;
+                                document.getElementById("productoNombreInput").value = p.nombreProducto;
+
+                                document.getElementById("productoCodigo").innerText = p.codigoProducto;
+                                document.getElementById("productoFamilia").innerText = p.familia;
+                                document.getElementById("productoUnidad").innerText = p.unidad;
+                                document.getElementById("productoMedia").innerText = p.mediaAritmetica;
+                                document.getElementById("productoInfo").style.display = "block";
+
+                                // 🔹 Obtener inventario actual del producto
+                                fetch(`/Ingeniero/Producto/ObtenerInventarioProducto?idProducto=${p.idProducto}`)
+                                    .then(r => r.json())
+                                    .then(inv => {
+                                        const cantidad = inv.existencias ?? 0;
+                                        document.getElementById("productoInventario").innerText = cantidad + " unidades";
+                                    })
+                                    .catch(err => {
+                                        console.error("Error al cargar inventario:", err);
+                                        document.getElementById("productoInventario").innerText = "Error";
+                                    });
+
+                                const modal = bootstrap.Modal.getInstance(document.getElementById("buscarProductoModal"));
+                                modal.hide();
+                            });
+                        });
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        tablaBody.innerHTML = "<tr><td colspan='6' class='text-center text-danger'>Error al buscar productos.</td></tr>";
+                    });
+            });
         });
     </script>
 }

@@ -8,12 +8,27 @@
         <div class="col-6">
             @if (ViewBag.Tipo == "Entrada")
             {
-                <h2 class="text-primary mb-3">Lista de Facturas de Entrada</h2>
+                if (ViewBag.Impresion == "1")
+                {
+                    <h2 class="text-primary mb-3">Impresion de Facturas de Entrada</h2>
+                }
+                else
+                {
+                    <h2 class="text-primary mb-3">Lista de Facturas de Entrada</h2>
+                }
+                
             }
             else if (ViewBag.Tipo == "Salida")
             {
-                <h2 class="text-primary mb-3">Lista de Facturas de Salida</h2>
-            }
+                if (ViewBag.Impresion == "1")
+                {
+                    <h2 class="text-primary mb-3">Impresion de Facturas de Salida</h2>
+                } else
+                {
+                    <h2 class="text-primary mb-3">Lista de Facturas de Salida</h2>
+                }
+                
+            } 
         </div>
         <div class="col-6 text-end">
             <a asp-controller="Factura" asp-action="Upsert" asp-route-Tipo="@ViewBag.Tipo"
@@ -69,7 +84,7 @@
             </div>
 
             <div class="col-12 col-md-auto d-flex gap-2">
-                <button type="submit" class="btn btn-info w-100 text-white">Filtrar</button>
+                <button type="submit" class="btn btn-warning w-100 text-white">Filtrar</button>
                 <a asp-action="Index" asp-route-Tipo="@ViewBag.Tipo" class="btn btn-outline-secondary w-100">Limpiar</a>
             </div>
         </form>
@@ -92,6 +107,7 @@
                     <th>Tipo</th>
                     <th>Comentario</th>
                     <th>Estado</th>
+
                     <th colspan="2">Acciones</th>
                 </tr>
             </thead>
@@ -137,20 +153,33 @@
                             }
 
                             <td>
-                                <a asp-controller="Factura" asp-action="DetalleFactura" asp-route-idFactura="@obj.IdFactura"
-                                   class="btn btn-outline-secondary btn-sm w-100">Imprimir</a>
+                                @if (obj.TipoFactura.NombreTipoFactura == "Entrada")
+                                {
+                                    <a asp-controller="Factura" asp-action="DetalleFactura" asp-route-idFactura="@obj.IdFactura"
+                                    class="btn btn-outline-secondary btn-sm w-100">Imprimir</a>
+                                } else if (obj.TipoFactura.NombreTipoFactura == "Salida")
+                                {
+                                    <a asp-controller="Factura" asp-action="DetalleSalida" asp-route-idFactura="@obj.IdFactura"
+                                       class="btn btn-outline-secondary btn-sm w-100">Imprimir</a>
+                                }
+
                             </td>
+
                             <td>
                                 @if (User.IsInRole(SD.Role_Admin) || obj.EstadoFactura == 0)
                                 {
-                                    <div class="btn-group w-100" role="group">
-                                        <a asp-controller="Factura" asp-action="Upsert"
-                                           asp-route-IdFactura="@obj.IdFactura"
-                                           asp-route-Tipo="@ViewBag.Tipo"
-                                           class="btn btn-primary btn-sm">Editar</a>
-                                        <a asp-controller="Factura" asp-action="Borrar" asp-route-IdFactura="@obj.IdFactura"
-                                           class="btn btn-danger btn-sm">Borrar</a>
-                                    </div>
+                                    if (ViewBag.Impresion != "1")
+                                    {
+                                        <div class="btn-group w-100" role="group">
+                                            <a asp-controller="Factura" asp-action="Upsert"
+                                               asp-route-IdFactura="@obj.IdFactura"
+                                               asp-route-Tipo="@ViewBag.Tipo"
+                                               class="btn btn-primary btn-sm">Editar</a>
+                                            <a asp-controller="Factura" asp-action="Borrar" asp-route-IdFactura="@obj.IdFactura"
+                                               class="btn btn-danger btn-sm">Borrar</a>
+                                        </div>
+                                    }
+                                    
                                 }
                             </td>
                         </tr>

@@ -1,0 +1,100 @@
+﻿@model IEnumerable<Prototipo1.Models.Producto>
+
+<div class="modal fade" id="buscarProductoModal" tabindex="-1" aria-labelledby="buscarProductoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Buscar Producto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="input-group mb-3">
+                    <input type="text" id="buscarProductoInput" class="form-control" placeholder="Buscar por código o nombre...">
+                    <button class="btn btn-primary" id="buscarProductoBtn">Buscar</button>
+                </div>
+
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Familia</th>
+                            <th>Unidad</th>
+                            <th>Media Aritmética</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaProductosBody">
+                        <tr><td colspan="6" class="text-center text-muted">Ingrese un término de búsqueda y haga click en Buscar.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const buscarBtn = document.getElementById("buscarProductoBtn");
+        const filtroInput = document.getElementById("buscarProductoInput");
+        const tablaBody = document.getElementById("tablaProductosBody");
+
+        buscarBtn.addEventListener("click", function () {
+            const filtro = filtroInput.value.trim();
+
+            if (!filtro) {
+                tablaBody.innerHTML = "<tr><td colspan='6' class='text-center text-muted'>Ingrese un término de búsqueda.</td></tr>";
+                return;
+            }
+
+            fetch(`/Ingeniero/Producto/BuscarProductos?filtro=${encodeURIComponent(filtro)}`)
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data);
+                    tablaBody.innerHTML = "";
+
+
+                    if (!data || data.length === 0) {
+                        tablaBody.innerHTML = "<tr><td colspan='6' class='text-center text-muted'>No se encontraron productos.</td></tr>";
+                        return;
+                    }
+
+                    data.forEach(p => {
+                        const fila = document.createElement("tr");
+
+                        fila.innerHTML = `
+    <td>${p.codigoProducto}</td>
+    <td>${p.nombreProducto}</td>
+    <td>${p.familia}</td>
+    <td>${p.unidad}</td>
+    <td>${p.mediaAritmetica}</td>
+    <td>
+        <button type="button" class="btn btn-success btn-sm seleccionar-producto">Seleccionar</button>
+    </td>`;
+
+                        tablaBody.appendChild(fila);
+
+                        // Asignar evento al botón de seleccionar
+                        fila.querySelector(".seleccionar-producto").addEventListener("click", function () {
+                            document.getElementById("productoId").value = p.IdProducto;
+                            document.getElementById("productoId").value = p.idProducto;
+    document.getElementById("productoNombre").value = p.nombreProducto;
+    document.getElementById("productoCodigo").value = p.codigoProducto;
+    document.getElementById("productoFamilia").value = p.familia;
+    document.getElementById("productoUnidad").value = p.unidad;
+    document.getElementById("productoMedia").value = p.mediaAritmetica;
+    document.getElementById("productoDescripcion").value = p.descripcion;
+
+                            const modal = bootstrap.Modal.getInstance(document.getElementById("buscarProductoModal"));
+                            modal.hide();
+                        });
+                    });
+                })
+                .catch(err => {
+                    console.error(err);
+                    tablaBody.innerHTML = "<tr><td colspan='6' class='text-center text-danger'>Error al buscar productos.</td></tr>";
+                });
+        });
+    });
+</script>

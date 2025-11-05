@@ -82,6 +82,21 @@
                                 <li><a class="dropdown-item" asp-area="Ingeniero" asp-controller="Inventario" asp-action="Index">Inventario</a></li>
                                 <li><a class="dropdown-item" asp-area="Ingeniero" asp-controller="RecintoProducto" asp-action="Detalle" asp-route-Tipo="Salida">Presupuesto</a></li>
                                 <li><a class="dropdown-item" asp-area="Ingeniero" asp-controller="RecintoProducto" asp-action="PorcentajeExistencias">% de salidas por recinto</a></li>
+                                <li>
+                                    <a class="dropdown-item" asp-area="Ingeniero" asp-controller="Factura" asp-action="Index" asp-route-Tipo="Entrada" asp-route-Impresion="1">
+                                        <i class="bi bi-printer"></i> Boletas de entrada
+                                </a>
+                                </li>
+                                <li><a class="dropdown-item" asp-area="Ingeniero" asp-controller="Factura" asp-action="Index" asp-route-Tipo="Salida" asp-route-Impresion="1">
+                                        <i class="bi bi-printer"></i> Boletas de entrada
+                                    </a>
+                                    </li>
+                                <li>
+                                    <a class="dropdown-item" asp-area="Ingeniero" asp-controller="Factura" asp-action="Kardex">
+                                       Kardex
+                                    </a>
+                                </li>
+
                             </ul>
                         </li>
 
@@ -108,6 +123,8 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

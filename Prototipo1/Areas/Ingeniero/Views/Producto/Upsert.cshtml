@@ -1,86 +1,101 @@
 ﻿@model Prototipo1.Models.ViewModels.ProductoVM
 
-<form method="post" class="row" enctype="multipart/form-data">
-    <input asp-for="Producto.IdProducto" hidden/>
-    <input asp-for="Producto.ImageURL" hidden/>
-    <div class="row">
-        <div class="col-10">
-    <div class="border p-3 mt-4">
-        <div class="row pb-2">
-            <h2 class="text-primary">
-                        @(Model.Producto.IdProducto != 0 ? "Actualizar" : "Crear") Producto
+<div class="container py-4">
+    <form method="post" class="row shadow-sm border rounded p-4 bg-light" enctype="multipart/form-data">
+        <!-- Campos ocultos -->
+        <input asp-for="Producto.IdProducto" hidden />
+        <input asp-for="Producto.ImageURL" hidden />
+
+        <!-- Título -->
+        <div class="text-center mb-4">
+            <h2 class="text-primary fw-bold">
+                @(Model.Producto.IdProducto != 0 ? "Actualizar Producto" : "Crear Producto")
             </h2>
-        </div>
-        <div class="mb-3 row p-1">
-            <label asp-for="Producto.CodigoProducto" class="p-0"></label>
-            <input asp-for="Producto.CodigoProducto" class="form-control" />
-            <span asp-validation-for="Producto.CodigoProducto" class="text-danger"></span>
+            <p class="text-muted mb-0">
+                Complete los datos del producto y seleccione su familia, unidad y una imagen representativa.
+            </p>
         </div>
 
-        <div class="mb-3 row p-1">
-            <label asp-for="Producto.NombreProducto" class="p-0"></label>
-            <input asp-for="Producto.NombreProducto" class="form-control" />
-            <span asp-validation-for="Producto.NombreProducto" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3 row p-1">
-            <label asp-for="Producto.Descripcion" class="p-0"></label>
-            <input asp-for="Producto.Descripcion" class="form-control" />
-            <span asp-validation-for="Producto.Descripcion" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3 row p-1">
-            <label asp-for="Producto.MediaArtimetica" class="p-0"></label>
-            <input asp-for="Producto.MediaArtimetica" class="form-control" />
-            <span asp-validation-for="Producto.MediaArtimetica" class="text-danger"></span>
-        </div>
-
-
-        <div class="mb-3 row p-1">
-            <label class="p-0">Familia</label>
-            <select asp-for="@Model.Producto.IdFamilia" asp-items="@Model.FamiliaList" class="form-select">
-                <option disabled selected>---Seleccionar Familia---</option>
-            </select>
-            <span asp-validation-for="Producto.IdFamilia" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3 row p-1">
-            <label class="p-0">Unidad</label>
-            <select asp-for="@Model.Producto.IdUnidad" asp-items="@Model.UnidadList" class="form-select">
-                <option disabled selected>---Seleccionar Unidad---</option>
-            </select>
-            <span asp-validation-for="Producto.IdUnidad" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3 row p-1">
-            <label asp-for="Producto.ImageURL" class="p-0"></label>
-            <input type="file" name="file" class="form-control" />
-            <span asp-validation-for="Producto.ImageURL" class="text-danger"></span>
-        </div>
-
+        <!-- Formulario principal -->
         <div class="row">
-            <div class="col-6 col-md-3">
-                        @if (Model.Producto.IdProducto != 0)
-                        {
-                        <button type="submit" class="btn btn-primary form-control">Actualizar</button>
-                        }
-                        else
-                        {
-                    <button type="submit" class="btn btn-primary form-control">Agregar</button>
-                        }
+            <div class="col-lg-9">
+                <div class="mb-3">
+                    <label asp-for="Producto.CodigoProducto" class="form-label fw-semibold"></label>
+                    <input asp-for="Producto.CodigoProducto" class="form-control" placeholder="Ingrese el código del producto" />
+                    <span asp-validation-for="Producto.CodigoProducto" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Producto.NombreProducto" class="form-label fw-semibold"></label>
+                    <input asp-for="Producto.NombreProducto" class="form-control" placeholder="Ingrese el nombre del producto" />
+                    <span asp-validation-for="Producto.NombreProducto" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Producto.Descripcion" class="form-label fw-semibold"></label>
+                    <textarea asp-for="Producto.Descripcion" class="form-control" rows="2" placeholder="Ingrese una descripción breve"></textarea>
+                    <span asp-validation-for="Producto.Descripcion" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Producto.MediaAritmetica" class="form-label fw-semibold"></label>
+                    <input asp-for="Producto.MediaAritmetica" class="form-control" placeholder="Ingrese el valor medio" />
+                    <span asp-validation-for="Producto.MediaAritmetica" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Familia</label>
+                    <select asp-for="Producto.IdFamilia" asp-items="@Model.FamiliaList" class="form-select">
+                        <option disabled selected>--- Seleccionar Familia ---</option>
+                    </select>
+                    <span asp-validation-for="Producto.IdFamilia" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Unidad</label>
+                    <select asp-for="Producto.IdUnidad" asp-items="@Model.UnidadList" class="form-select">
+                        <option disabled selected>--- Seleccionar Unidad ---</option>
+                    </select>
+                    <span asp-validation-for="Producto.IdUnidad" class="text-danger"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Producto.ImageURL" class="form-label fw-semibold">Imagen del Producto</label>
+                    <input type="file" name="file" class="form-control" />
+                    <span asp-validation-for="Producto.ImageURL" class="text-danger"></span>
+                </div>
+
+                <!-- Botones -->
+                <div class="d-flex gap-3">
+                    @if (Model.Producto.IdProducto != 0)
+                    {
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="bi bi-save"></i> Actualizar
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="submit" class="btn btn-success px-4">
+                            <i class="bi bi-plus-circle"></i> Agregar
+                        </button>
+                    }
+
+                    <a asp-controller="Producto" asp-action="Index" class="btn btn-outline-secondary px-4">
+                        <i class="bi bi-arrow-left-circle"></i> Volver a la lista
+                    </a>
+                </div>
             </div>
-            <div class="col-6 col-md-3">
-                <a asp-controller="Producto" asp-action="Index" class="btn btn-outline-secondary form-control">
-                    Volver a la lista
-                </a>
+
+            <!-- Imagen lateral -->
+            <div class="col-lg-3 d-flex align-items-start justify-content-center mt-4 mt-lg-0">
+                <div class="text-center">
+                    <img src="@Model.Producto.ImageURL"
+                         class="img-fluid rounded border"
+                         alt="Imagen del producto"
+                         style="max-height: 200px; object-fit: contain;" />
+                    <p class="text-muted small mt-2">Vista previa del producto</p>
+                </div>
             </div>
         </div>
-    </div>
-    </div>
-    <div class="col-2">
-        <img src="@Model.Producto.ImageURL" width="100%"
-         style="border-radius:5px; border:1px solid #bbb9b9"/>
-    </div>
-    </div>
-    
-</form>
+    </form>
+</div>

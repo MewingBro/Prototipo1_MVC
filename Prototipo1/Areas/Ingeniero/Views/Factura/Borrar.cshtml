@@ -1,32 +1,46 @@
 ﻿@model Factura
 
-<form method="post">
-    <input asp-for="IdFactura" hidden/>
-    <div class="border p-3 mt-4">
-        <div class="row pb-2">
-            <h2 class="text-primary">
-                Borrar Factura
-            </h2>
-        </div>
-        <div class="mb-3 row p-1">
-            <label asp-for="Fecha" class="p-0"></label>
-            <input asp-for="Fecha" disabled class="form-control" />
+<form method="post" class="container mt-5">
+    <input asp-for="IdFactura" hidden />
+
+    <div class="card shadow-lg border-0 rounded-3">
+        <div class="card-header bg-danger text-white text-center py-3 rounded-top">
+            <h3 class="mb-0">
+                <i class="bi bi-trash3-fill me-2"></i> Borrar Factura
+            </h3>
         </div>
 
-        <div class="mb-3 row p-1">
-            <label asp-for="Comentario" class="p-0"></label>
-            <input asp-for="Comentario" disabled class="form-control" />
-        </div>
-
-
-        <div class="row">
-            <div class="col-6 col-md-3">
-                <button type="submit" class="btn btn-danger form-control">Borrar</button>
+        <div class="card-body p-4">
+            <div class="alert alert-warning d-flex align-items-center" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                <div>
+                    ¿Está seguro de que desea eliminar esta factura? Esta acción no se puede deshacer.
+                </div>
             </div>
-            <div class="col-6 col-md-3">
-                <a asp-controller="Factura" asp-action="Index" class="btn btn-outline-secondary form-control">
-                    Volver a la lista
-                </a>
+
+            <div class="mb-3">
+                <label asp-for="Fecha" class="form-label fw-semibold"></label>
+                <input asp-for="Fecha" class="form-control bg-light" disabled />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Comentario" class="form-label fw-semibold"></label>
+                <input asp-for="Comentario" class="form-control bg-light" disabled />
+            </div>
+        </div>
+
+        <div class="card-footer bg-light text-center">
+            <div class="row justify-content-center">
+                <div class="col-6 col-md-3 mb-2 mb-md-0">
+                    <button type="submit" class="btn btn-danger w-100 shadow-sm">
+                        <i class="bi bi-trash"></i> Borrar
+                    </button>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a asp-controller="Factura" asp-action="Index" class="btn btn-outline-secondary w-100 shadow-sm">
+                        <i class="bi bi-arrow-left-circle"></i> Volver
+                    </a>
+                </div>
             </div>
         </div>
     </div>

@@ -1,28 +1,34 @@
 ﻿@model Nivel
 
-<form method="post">
-    <input asp-for="IdNivel" hidden/>
-    <div class="border p-3 mt-4">
-        <div class="row pb-2">
-            <h2 class="text-primary">
-                Borrar Nivel
+<div class="container py-4">
+    <form method="post" class="shadow-sm border rounded p-4 bg-light">
+        <!-- ID oculto -->
+        <input asp-for="IdNivel" hidden />
+
+        <!-- Encabezado -->
+        <div class="text-center mb-4">
+            <h2 class="text-danger fw-bold">
+                <i class="bi bi-exclamation-triangle"></i> Borrar Nivel
             </h2>
+            <p class="text-muted mb-0">
+                ¿Está seguro de que desea eliminar este nivel? Esta acción no se puede deshacer.
+            </p>
         </div>
 
-        <div class="mb-3 row p-1">
-            <label asp-for="NombreNivel" class="p-0"></label>
-            <input asp-for="NombreNivel" disabled class="form-control" />
+        <!-- Campo de solo lectura -->
+        <div class="mb-4">
+            <label asp-for="NombreNivel" class="form-label fw-semibold"></label>
+            <input asp-for="NombreNivel" class="form-control" disabled />
         </div>
 
-        <div class="row">
-            <div class="col-6 col-md-3">
-                <button type="submit" class="btn btn-danger form-control">Borrar</button>
-            </div>
-            <div class="col-6 col-md-3">
-                <a asp-controller="Nivel" asp-action="Index" class="btn btn-outline-secondary form-control">
-                    Volver a la lista
-                </a>
-            </div>
+        <!-- Botones de acción -->
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            <button type="submit" class="btn btn-danger px-4">
+                <i class="bi bi-trash"></i> Confirmar Borrado
+            </button>
+            <a asp-controller="Nivel" asp-action="Index" class="btn btn-outline-secondary px-4">
+                <i class="bi bi-arrow-left-circle"></i> Cancelar
+            </a>
         </div>
-    </div>
-</form>
+    </form>
+</div>

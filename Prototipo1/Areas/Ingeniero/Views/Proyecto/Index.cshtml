@@ -1,58 +1,131 @@
 ﻿@model List<Proyecto>
 <partial name="_Notification" />
-    <div class="container">
 
-    <div class="row pt-4 pb-3">
-        <div class="col-6">
-            <h2 class="text-primary">Lista de Proyectos</h2>
+<div class="container py-4">
+
+    <!-- Encabezado -->
+    <div class="row align-items-center mb-4">
+        <div class="col-md-6">
+            <h2 class="text-primary mb-0">
+                <i class="bi bi-folder2-open"></i> Lista de Proyectos
+            </h2>
         </div>
-        <div class="col-6 text-end">
-            <a asp-controller="Proyecto" asp-action="Upsert" asp-route-IdProyecto="@ViewBag.IdProyecto" class="btn btn-primary">
+        <div class="col-md-6 text-end">
+            <a asp-controller="Proyecto" asp-action="Upsert" class="btn btn-primary shadow-sm">
                 <i class="bi bi-plus-circle"></i> Agregar Proyecto
             </a>
         </div>
     </div>
 
+    <!-- Filtro -->
+    <form method="get" class="row g-2 mb-4">
+        <div class="col-12 col-md-4">
+            <input type="text" name="searchNombre"
+                   value="@ViewBag.SearchNombre"
+                   class="form-control"
+                   placeholder="Buscar por nombre de proyecto..." />
+        </div>
+        <div class="col-12 col-md-auto d-flex gap-2">
+            <button type="submit" class="btn btn-warning text-white">
+                <i class="bi bi-search"></i> Filtrar
+            </button>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-eraser"></i> Limpiar
+            </a>
+        </div>
+    </form>
 
-<table class="table table-bordered table-stripped">
-    <thead>
-    <tr>
-        <th>
-            Id de Proyecto
-        </th>
-        <th>
-            Nombre del Proyecto
-        </th>
-        <th>
+    <!-- Tabla -->
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-bordered table-hover align-middle text-center">
+            <thead class="table-primary">
+                <tr>
+                    <th>ID Proyecto</th>
+                    <th>Nombre del Proyecto</th>
+                    <th style="width: 25%;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="3" class="text-muted py-3">
+                            <i class="bi bi-exclamation-circle"></i>
+                            No se encontraron proyectos.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var proyecto in Model)
+                    {
+                        <tr>
+                            <td>@proyecto.IdProyecto</td>
+                            <td class="text-start">@proyecto.NombreProyecto</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a asp-controller="Proyecto"
+                                       asp-action="Upsert"
+                                       asp-route-IdProyecto="@proyecto.IdProyecto"
+                                       class="btn btn-sm btn-primary">
+                                        <i class="bi bi-pencil-square"></i> Editar
+                                    </a>
+                                    <a asp-controller="Proyecto"
+                                       asp-action="Borrar"
+                                       asp-route-IdProyecto="@proyecto.IdProyecto"
+                                       class="btn btn-sm btn-danger">
+                                        <i class="bi bi-trash3"></i> Borrar
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
 
-        </th>
-    </tr>
-    </thead>
-    <tbody>
-        @foreach (var obj in Model.OrderBy(u=>u.IdProyecto))
-        {
-            <tr>
-            <td>
-                @obj.IdProyecto
-            </td>
-            <td>
-                @obj.NombreProyecto
-            </td>
-            <td>
-                <div class="w-75 btn-group" role="group">
-                    <a asp-controller="Proyecto" asp-action="Upsert" asp-route-IdProyecto="@obj.IdProyecto" class="btn btn-primary mx-2">
-                                <i class="bi bi-pencil">Editar Proyecto</i>
+    <!-- Paginación -->
+    @if (ViewBag.TotalPages > 1)
+    {
+        <nav aria-label="Paginación de proyectos" class="mt-3">
+            <ul class="pagination justify-content-center">
+                <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@(ViewBag.CurrentPage - 1)"
+                       asp-route-searchNombre="@ViewBag.SearchNombre">
+                        Anterior
                     </a>
-                            <a asp-controller="Proyecto" asp-action="Borrar" asp-route-IdProyecto="@obj.IdProyecto" class="btn btn-danger mx-2">
-                                <i class="bi bi-trash3"></i>Borrar Proyecto
-                            </a>
-                            
-                </div>
-            </td>
-        
-        </tr>
-        }
-    </tbody>
-</table>
+                </li>
 
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-page="@i"
+                           asp-route-searchNombre="@ViewBag.SearchNombre">@i</a>
+                    </li>
+                }
+
+                <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@(ViewBag.CurrentPage + 1)"
+                       asp-route-searchNombre="@ViewBag.SearchNombre">
+                        Siguiente
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    }
 </div>
+
+<!-- Estilo hover -->
+<style>
+    table tbody tr:hover {
+        background-color: #f6f9ff;
+        transition: background-color 0.2s ease-in-out;
+    }
+</style>

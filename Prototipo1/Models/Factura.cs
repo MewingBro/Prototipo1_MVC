@@ -21,6 +21,9 @@ namespace Prototipo1.Models
         [Required]
         public string Comentario { get; set; }
 
+        [Required]
+        public string RecibidoPor { get; set; }
+
         public int IdProyecto { get; set; }
         [ForeignKey("IdProyecto")]
         [ValidateNever]

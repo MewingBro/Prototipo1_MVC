@@ -106,23 +106,23 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 return RedirectToAction("SeleccionarProyecto", "Proyecto");
             }
 
-            // 1️⃣ Obtener los productos del inventario del proyecto
+            // 1️ Obtener los productos del inventario del proyecto
             var inventarios = _unitOfWork.Inventario
                 .GetAllBYID(i => i.IdProyecto == idProyecto)
                 .ToList();
 
-            // 2️⃣ Extraer sus IdProducto
+            // 2️ Extraer sus IdProducto
             var idsProductosInventario = inventarios
                 .Select(i => i.IdProducto)
                 .ToList();
 
-            // 3️⃣ Obtener todos los productos y luego filtrar en memoria
+            // 3️ Obtener todos los productos y luego filtrar en memoria
             var productos = _unitOfWork.Producto
                 .GetAll()
                 .Where(p => idsProductosInventario.Contains(p.IdProducto))
                 .ToList();
 
-            // 4️⃣ Armar la lista para el dropdown
+            // 4️ Armar la lista para el dropdown
             IEnumerable<SelectListItem> ProductoList = productos.Select(u => new SelectListItem
             {
                 Text = u.NombreProducto,
@@ -359,7 +359,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
     string nombreRecinto,
     int page = 1)
         {
-            int pageSize = 10; // 🔹 10 registros por página
+            int pageSize = 10;
 
             int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
 
@@ -367,6 +367,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 includeProperties: "Recinto,Recinto.Aposento.Nivel,Producto"
             );
 
+            // 🔹 Filtrar por proyecto
             if (idProyecto.HasValue)
                 query = query.Where(rp => rp.Recinto.Aposento.Nivel.IdProyecto == idProyecto);
 
@@ -380,11 +381,27 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             if (!string.IsNullOrWhiteSpace(nombreRecinto))
                 query = query.Where(rp => rp.Recinto.NombreRecinto.ToLower().Contains(nombreRecinto.ToLower()));
 
-            // Total de registros antes de paginar
+            // 📊 Cálculo de porcentajes totales por recinto
+            var totalesPorRecinto = query
+                .GroupBy(rp => rp.Recinto.NombreRecinto)
+                .Select(g => new
+                {
+                    Recinto = g.Key,
+                    TotalPresupuesto = g.Sum(x => x.Presupuesto),
+                    TotalExistencias = g.Sum(x => x.ExistenciasActuales)
+                })
+                .ToDictionary(
+                    x => x.Recinto,
+                    x => x.TotalPresupuesto > 0
+                        ? (x.TotalExistencias / (double)x.TotalPresupuesto) * 100
+                        : 0
+                );
+
+            // 📄 Total de registros antes de paginar
             int totalRegistros = query.Count();
             int totalPages = (int)Math.Ceiling(totalRegistros / (double)pageSize);
 
-            // Aplicar paginación
+            // 📦 Aplicar paginación y proyección
             var lista = query
                 .OrderBy(rp => rp.Recinto.Aposento.Nivel.NombreNivel)
                 .Skip((page - 1) * pageSize)
@@ -398,11 +415,17 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                     Producto = rp.Producto.NombreProducto,
                     Presupuesto = rp.Presupuesto,
                     Existencias = rp.ExistenciasActuales,
-                    Porcentaje = rp.Presupuesto > 0 ? (rp.ExistenciasActuales / rp.Presupuesto) * 100 : 0
+                    ExistenciasUsadas = rp.Presupuesto - rp.ExistenciasActuales,
+                    Porcentaje = rp.Presupuesto > 0
+                        ? (rp.ExistenciasActuales / (double)rp.Presupuesto) * 100
+                        : 0,
+                    PorcentajeTotalRecinto = totalesPorRecinto.ContainsKey(rp.Recinto.NombreRecinto)
+                        ? totalesPorRecinto[rp.Recinto.NombreRecinto]
+                        : 0
                 })
                 .ToList();
 
-            // Guardar filtros y datos de paginación
+            // 📋 Guardar filtros y datos de paginación
             ViewBag.NombreNivel = nombreNivel;
             ViewBag.NombreAposento = nombreAposento;
             ViewBag.NombreRecinto = nombreRecinto;
@@ -411,6 +434,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
 
             return View(lista);
         }
+
 
         [HttpGet]
         public IActionResult ReportePorcentajeExistencias(
@@ -427,6 +451,21 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             var query = _unitOfWork.RecintoProducto.GetAll(
                 includeProperties: "Recinto,Recinto.Aposento.Nivel,Producto"
             );
+
+            var totalesPorRecinto = query
+                .GroupBy(rp => rp.Recinto.NombreRecinto)
+                .Select(g => new
+                {
+                    Recinto = g.Key,
+                    TotalPresupuesto = g.Sum(x => x.Presupuesto),
+                    TotalExistencias = g.Sum(x => x.ExistenciasActuales)
+                })
+                .ToDictionary(
+                    x => x.Recinto,
+                    x => x.TotalPresupuesto > 0
+                        ? (x.TotalExistencias / (double)x.TotalPresupuesto) * 100
+                        : 0
+                );
 
             if (idProyecto.HasValue)
                 query = query.Where(rp => rp.Recinto.Aposento.Nivel.IdProyecto == idProyecto);
@@ -453,7 +492,13 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                     Producto = rp.Producto.NombreProducto,
                     Presupuesto = rp.Presupuesto,
                     Existencias = rp.ExistenciasActuales,
-                    Porcentaje = rp.Presupuesto > 0 ? (rp.ExistenciasActuales / rp.Presupuesto) * 100 : 0
+                    ExistenciasUsadas = rp.Presupuesto - rp.ExistenciasActuales,
+                    Porcentaje = rp.Presupuesto > 0
+                        ? (rp.ExistenciasActuales / (double)rp.Presupuesto) * 100
+                        : 0,
+                    PorcentajeTotalRecinto = totalesPorRecinto.ContainsKey(rp.Recinto.NombreRecinto)
+                        ? totalesPorRecinto[rp.Recinto.NombreRecinto]
+                        : 0
                 })
                 .ToList();
 

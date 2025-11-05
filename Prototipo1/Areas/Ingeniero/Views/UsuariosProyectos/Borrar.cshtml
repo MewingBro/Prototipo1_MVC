@@ -1,25 +1,42 @@
 ﻿@model UsuariosProyectos
 
-<form asp-action="Borrar" method="post">
-    <input asp-for="IdUsuario" hidden />
-    <input asp-for="IdUsuariosProyectos" hidden />
-    <div class="border p-3 mt-4">
-        <div class="row pb-2">
-            <h2 class="text-primary">
-                Borrar acceso al usuario?
-            </h2>
+<div class="container mt-4">
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-danger text-white py-3">
+            <h4 class="mb-0 fw-semibold">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                Borrar acceso al usuario
+            </h4>
         </div>
 
+        <div class="card-body p-4">
+            <form asp-action="Borrar" method="post">
+                <input asp-for="IdUsuario" hidden />
+                <input asp-for="IdUsuariosProyectos" hidden />
 
-        <div class="row">
-            <div class="col-6 col-md-3">
-                <button type="submit" class="btn btn-danger form-control">Borrar</button>
-            </div>
-            <div class="col-6 col-md-3">
-                <a asp-controller="UsuariosProyectos" asp-action="Index" asp-route-IdUsuario="@ViewBag.IdUsuario" class="btn btn-outline-secondary form-control">
-                    Volver a la lista de accesos
-                </a>
-            </div>
+                <div class="alert alert-warning mt-2" role="alert">
+                    <i class="bi bi-info-circle me-2"></i>
+                    ¿Está seguro de que desea eliminar este acceso de proyecto para el usuario?
+                    <br />
+                    <strong>Esta acción no se puede deshacer.</strong>
+                </div>
+
+                <div class="row mt-4 g-2">
+                    <div class="col-12 col-md-6">
+                        <button type="submit" class="btn btn-danger w-100 py-2 shadow-sm">
+                            <i class="bi bi-trash3 me-1"></i> Borrar acceso
+                        </button>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <a asp-controller="UsuariosProyectos"
+                           asp-action="Index"
+                           asp-route-IdUsuario="@ViewBag.IdUsuario"
+                           class="btn btn-outline-secondary w-100 py-2 shadow-sm">
+                            <i class="bi bi-arrow-left-circle me-1"></i> Volver a la lista de accesos
+                        </a>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
-</form>
+</div>

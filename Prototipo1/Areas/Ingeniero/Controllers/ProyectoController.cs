@@ -24,12 +24,36 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
         }
 
 
-        public IActionResult Index()
+        public IActionResult Index(string searchNombre, int page = 1)
         {
-            List<Proyecto> objProyectoLista = _unitOfWork.Proyecto.GetAll().ToList();
+            const int pageSize = 10; // Número de registros por página
 
+            // Consulta base
+            var proyectos = _unitOfWork.Proyecto.GetAll();
 
-            return View(objProyectoLista);
+            // Filtro por nombre
+            if (!string.IsNullOrWhiteSpace(searchNombre))
+            {
+                proyectos = proyectos.Where(p =>
+                    p.NombreProyecto.ToLower().Contains(searchNombre.ToLower()));
+            }
+
+            // Total de registros para paginación
+            int totalProyectos = proyectos.Count();
+
+            // Obtener la página actual
+            var proyectosPaginados = proyectos
+                .OrderBy(p => p.IdProyecto)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            // Datos de paginación para la vista
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling(totalProyectos / (double)pageSize);
+            ViewBag.SearchNombre = searchNombre;
+
+            return View(proyectosPaginados);
         }
 
         public IActionResult Upsert(int? IdProyecto)

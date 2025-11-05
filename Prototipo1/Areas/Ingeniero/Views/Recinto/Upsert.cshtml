@@ -1,50 +1,47 @@
 ﻿@model Prototipo1.Models.ViewModels.RecintoVM
 
-<form method="post" class="row" enctype="multipart/form-data">
-    <input asp-for="Recinto.IdRecinto" hidden/>
-    <div class="row">
-        <div class="col-10">
-    <div class="border p-3 mt-4">
-        <div class="row pb-2">
-            <h2 class="text-primary">
-                        @(Model.Recinto.IdRecinto != 0 ? "Actualizar" : "Crear") Recinto
+<div class="container py-4">
+    <form method="post" enctype="multipart/form-data" class="shadow-sm border rounded p-4 bg-light">
+        <!-- Campos ocultos -->
+        <input asp-for="Recinto.IdRecinto" hidden />
+
+        <!-- Título -->
+        <div class="mb-4">
+            <h2 class="text-primary fw-bold">
+                <i class="bi @(Model.Recinto.IdRecinto != 0 ? "bi-pencil-square" : "bi-plus-circle")"></i>
+                @(Model.Recinto.IdRecinto != 0 ? "Actualizar Recinto" : "Crear Recinto")
             </h2>
+            <p class="text-muted mb-0">
+                Complete los datos del recinto y seleccione el aposento correspondiente.
+            </p>
         </div>
 
-
-        <div class="mb-3 row p-1">
-            <label asp-for="Recinto.NombreRecinto" class="p-0"></label>
-            <input asp-for="Recinto.NombreRecinto" class="form-control" />
-                    <span asp-validation-for="Recinto.NombreRecinto" class="text-danger"></span>
+        <!-- Nombre del recinto -->
+        <div class="mb-3">
+            <label asp-for="Recinto.NombreRecinto" class="form-label fw-semibold"></label>
+            <input asp-for="Recinto.NombreRecinto" class="form-control" placeholder="Ingrese el nombre del recinto" />
+            <span asp-validation-for="Recinto.NombreRecinto" class="text-danger"></span>
         </div>
 
-                <div class="mb-3 row p-1">
-                    <label class="p-0">Aposento</label>
-                    <select asp-for="@Model.Recinto.IdAposento" asp-items="@Model.AposentoList" class="form-select">
-                        <option disabled selected>---Seleccionar Aposento---</option>
-                    </select>
-                    <span asp-validation-for="Recinto.IdAposento" class="text-danger"></span>
-                </div>
-
-        <div class="row">
-            <div class="col-6 col-md-3">
-                        @if (Model.Recinto.IdRecinto != 0)
-                        {
-                        <button type="submit" class="btn btn-primary form-control">Actualizar</button>
-                        }
-                        else
-                        {
-                    <button type="submit" class="btn btn-primary form-control">Agregar</button>
-                        }
-            </div>
-            <div class="col-6 col-md-3">
-                        <a asp-controller="Recinto" asp-action="Index" class="btn btn-outline-secondary form-control">
-                    Volver a la lista
-                </a>
-            </div>
+        <!-- Aposento -->
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Aposento</label>
+            <select asp-for="Recinto.IdAposento" asp-items="Model.AposentoList" class="form-select">
+                <option disabled selected>--- Seleccionar Aposento ---</option>
+            </select>
+            <span asp-validation-for="Recinto.IdAposento" class="text-danger"></span>
         </div>
-    </div>
-    </div>
-    </div>
-    
-</form>
+
+        <!-- Botones de acción -->
+        <div class="d-flex gap-3 mt-4">
+            <button type="submit" class="btn btn-primary px-4">
+                <i class="bi @(Model.Recinto.IdRecinto != 0 ? "bi-save" : "bi-plus-lg")"></i>
+                @(Model.Recinto.IdRecinto != 0 ? "Actualizar" : "Agregar")
+            </button>
+
+            <a asp-controller="Recinto" asp-action="Index" class="btn btn-outline-secondary px-4">
+                <i class="bi bi-arrow-left-circle"></i> Volver a la lista
+            </a>
+        </div>
+    </form>
+</div>

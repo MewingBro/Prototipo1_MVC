@@ -178,22 +178,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
 
 
         }
-        /*
-        public IActionResult Editar(int? IdProducto)
-        {
-            if (IdProducto == null || IdProducto == 0)
-            {
-                return NotFound();
-            }
 
-            Producto? Producto = _unitOfWork.Producto.GetID(u => u.IdProducto == IdProducto);
-            if (Producto == null)
-            {
-                return NotFound();
-            }
-            return View(Producto);
-        }
-        */
 
         [HttpPost]
         public IActionResult Editar(Producto obj)
@@ -247,5 +232,121 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             return RedirectToAction("Index");
 
         }
+
+        [HttpGet]
+        public IActionResult BuscarProductos(string filtro)
+        {
+            var productos = _unitOfWork.Producto
+                .GetAllBYID(p => p.CodigoProducto.Contains(filtro) || p.NombreProducto.Contains(filtro),
+                    includeProperties: "Familia,Unidad")
+                .Select(p => new {
+                    p.IdProducto,
+                    p.CodigoProducto,
+                    p.NombreProducto,
+                    Familia = p.Familia.NombreFamilia,
+                    Unidad = p.Unidad.NombreUnidad,
+                    p.MediaAritmetica,
+                    p.Descripcion
+                }).ToList();
+
+            return Json(productos);
+        }
+
+        [HttpGet]
+        public IActionResult BuscarProductosPresupuestados(string filtro, int idFactura)
+        {
+            // Obtener la factura con su recinto
+            var factura = _unitOfWork.Factura.GetID(
+                f => f.IdFactura == idFactura,
+                includeProperties: "Recinto"
+            );
+
+            if (factura == null || factura.IdRecinto == null)
+                return Json(new List<object>()); // sin resultados
+
+            // Obtener solo productos presupuestados de ese recinto
+            var productos = _unitOfWork.RecintoProducto
+                .GetAllBYID(
+                    rp => rp.IdRecinto == factura.IdRecinto &&
+                          (rp.Producto.CodigoProducto.Contains(filtro) || rp.Producto.NombreProducto.Contains(filtro)),
+                    includeProperties: "Producto.Familia,Producto.Unidad"
+                )
+                .Select(rp => new
+                {
+                    idProducto = rp.Producto.IdProducto,
+                    codigoProducto = rp.Producto.CodigoProducto,
+                    nombreProducto = rp.Producto.NombreProducto,
+                    familia = rp.Producto.Familia.NombreFamilia,
+                    unidad = rp.Producto.Unidad.NombreUnidad,
+                    mediaArtimetica = rp.Producto.MediaAritmetica,
+                    descripcion = rp.Producto.Descripcion
+                })
+                .Distinct()
+                .ToList();
+
+            return Json(productos);
+        }
+
+        [HttpGet]
+        public IActionResult BuscarProductosInventario(string filtro)
+        {
+            int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
+
+            if (idProyecto == null)
+            {
+                return Json(new { error = "No hay proyecto seleccionado." });
+            }
+
+            // 1️⃣ Obtener los productos del inventario del proyecto actual
+            var inventarios = _unitOfWork.Inventario
+                .GetAllBYID(i => i.IdProyecto == idProyecto)
+                .ToList();
+
+            var idsProductosInventario = inventarios
+                .Select(i => i.IdProducto)
+                .ToList();
+
+            // 2️⃣ Buscar solo productos que estén en ese inventario
+            var productos = _unitOfWork.Producto
+                .GetAllBYID(
+                    p => idsProductosInventario.Contains(p.IdProducto) &&
+                         (p.CodigoProducto.Contains(filtro) || p.NombreProducto.Contains(filtro)),
+                    includeProperties: "Familia,Unidad"
+                )
+                .Select(p => new {
+                    idProducto = p.IdProducto,
+                    codigoProducto = p.CodigoProducto,
+                    nombreProducto = p.NombreProducto,
+                    familia = p.Familia.NombreFamilia,
+                    unidad = p.Unidad.NombreUnidad,
+                    mediaAritmetica = p.MediaAritmetica,
+                    descripcion = p.Descripcion
+                })
+                .ToList();
+
+            return Json(productos);
+        }
+
+        [HttpGet]
+        public IActionResult ObtenerInventarioProducto(int idProducto)
+        {
+            int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
+
+            if (idProyecto == null)
+            {
+                return Json(new { existencias = 0 });
+            }
+
+            var inventario = _unitOfWork.Inventario
+                .GetID(i => i.IdProyecto == idProyecto && i.IdProducto == idProducto);
+
+            if (inventario == null)
+            {
+                return Json(new { existencias = 0 });
+            }
+
+            return Json(new { existencias = inventario.Existencias });
+        }
+
     }
 }
