@@ -1,23 +1,21 @@
 ﻿@model Prototipo1.Models.ViewModels.KardexVM
 
 <div class="container py-4">
-    <!-- Título -->
     <div class="row mb-3">
         <div class="col-12 d-flex justify-content-between align-items-center">
-            <h2 class="text-primary">
-                <i class="bi bi-clipboard-data"></i> Reporte Kardex
-            </h2>
+            <h2 class="text-primary"><i class="bi bi-clipboard-data"></i> Reporte Kardex</h2>
             <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
                 <i class="bi bi-arrow-left-circle"></i> Volver
             </a>
         </div>
     </div>
 
-    <!-- Selección de producto -->
+    <!-- Filtros -->
     <div class="border rounded p-3 shadow-sm mb-4">
-        <h5 class="text-secondary mb-3">Seleccionar Producto</h5>
+        <h5 class="text-secondary mb-3">Filtros del reporte</h5>
 
         <form method="get" asp-action="Kardex" class="row g-3 align-items-end">
+            <!-- Selección de Producto -->
             <div class="col-md-5">
                 <label>Producto</label>
                 <div class="input-group">
@@ -29,6 +27,23 @@
                     </button>
                 </div>
                 <input type="hidden" id="productoId" name="idProducto" value="@Model.Producto?.IdProducto" />
+            </div>
+
+            <!-- Selección de Recinto -->
+            <div class="col-md-4">
+                <label>Recinto</label>
+                <select name="idRecinto" class="form-select">
+                    <option value="">-- Todos los Recintos --</option>
+                    @if (Model.Recintos != null)
+                    {
+                        foreach (var r in Model.Recintos)
+                        {
+                            <option value="@r.IdRecinto" selected="@(Model.RecintoSeleccionadoId == r.IdRecinto)">
+                                @r.NombreRecinto
+                            </option>
+                        }
+                    }
+                </select>
             </div>
 
             <div class="col-md-auto">
@@ -43,11 +58,13 @@
             </div>
         </form>
     </div>
+
     @if (Model.Movimientos != null && Model.Movimientos.Any())
     {
-        <div class="col-md-auto">
+        <div class="col-md-auto mb-3">
             <a asp-action="ImprimirKardex"
                asp-route-idProducto="@Model.Producto?.IdProducto"
+               asp-route-idRecinto="@Model.RecintoSeleccionadoId"
                class="btn btn-warning" target="_blank">
                 <i class="bi bi-printer"></i> Imprimir Reporte
             </a>
@@ -122,30 +139,10 @@
     else if (Model.Producto != null)
     {
         <div class="alert alert-info mt-4">
-            <i class="bi bi-info-circle"></i> No se encontraron movimientos para este producto.
+            <i class="bi bi-info-circle"></i> No se encontraron movimientos para este producto o recinto.
         </div>
     }
 </div>
 
 <!-- Modal de selección de producto -->
 @await Html.PartialAsync("_BuscarProducto", new List<Prototipo1.Models.Producto>())
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Al seleccionar producto en el modal, actualizar los campos del Kardex
-        document.addEventListener("click", function (e) {
-            if (e.target && e.target.classList.contains("seleccionar-producto")) {
-                const fila = e.target.closest("tr");
-                const id = e.target.dataset.id || fila.children[0].innerText;
-                const nombre = fila.children[1].innerText;
-                const codigo = fila.children[0].innerText;
-
-                document.getElementById("productoId").value = id;
-                document.getElementById("productoNombre").value = nombre;
-
-                const modal = bootstrap.Modal.getInstance(document.getElementById("buscarProductoModal"));
-                modal.hide();
-            }
-        });
-    });
-</script>

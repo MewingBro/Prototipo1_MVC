@@ -53,7 +53,10 @@
                     <th>Nivel</th>
                     <th>Proyecto</th>
                     <th>Presupuesto</th>
+                    <th>Estado Presupuesto</th>
+
                     <th>Acciones</th>
+                    
                 </tr>
             </thead>
             <tbody>
@@ -75,12 +78,30 @@
                             <td>@obj.Aposento.NombreAposento</td>
                             <td>@obj.Aposento.Nivel.NombreNivel</td>
                             <td>@obj.Aposento.Nivel.Proyecto.NombreProyecto</td>
+                            @if (obj.EstadoRecinto == 0)
+                            {
+                                <td>
+                                    Pendiente
+                                </td>
+
+                            }
+                            else
+                            {
+                                <td>
+                                    Confirmado
+                                </td>
+                            }
 
                             <td>
                                 @if (User.IsInRole(SD.Role_Admin) || obj.EstadoRecinto == 0)
                                 {
-                                    <a asp-controller="RecintoProducto" asp-action="Index" asp-route-IdRecinto="@obj.IdRecinto" class="btn btn-outline-secondary btn-sm">
+                                    <a asp-controller="RecintoProducto" asp-action="Index" asp-route-IdRecinto="@obj.IdRecinto" asp-route-Completado="0" class="btn btn-outline-secondary btn-sm">
                                         Modificar Presupuesto
+                                    </a>
+                                }else if (obj.EstadoRecinto != 0)
+                                {
+                                    <a asp-controller="RecintoProducto" asp-action="Index" asp-route-IdRecinto="@obj.IdRecinto" asp-route-Completado="1" class="btn btn-outline-secondary btn-sm">
+                                        Ver Presupuesto
                                     </a>
                                 }
                             </td>

@@ -9,6 +9,7 @@ using Prototipo1.Repository.IRepository;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Prototipo1.Models { 
 
@@ -31,6 +32,9 @@ namespace Prototipo1.Models {
         public IdentityUser Usuario { get; set; }
 
         public DateTime FechaSolicitud { get; set; } = DateTime.Now;
+
+        [ValidateNever]
+        public string Comentario { get; set; }
 
 
     }

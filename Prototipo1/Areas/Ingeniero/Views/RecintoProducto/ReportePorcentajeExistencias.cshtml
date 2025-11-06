@@ -77,7 +77,7 @@
                     <th>Recinto</th>
                     <th>Producto</th>
                     <th>Presupuesto</th>
-                    <th>Existencias Actuales</th>
+                    <th>Existencias Disponibles</th>
                     <th>Unidades Usadas</th>
                     <th>% Producto entregado</th>
                     <th>% Total Entregado X Recinto</th>
@@ -96,8 +96,8 @@
                 {
                     foreach (var item in Model)
                     {
-                        var color = item.Porcentaje < 50 ? "table-danger"
-                        : item.Porcentaje < 80 ? "table-warning" : "table-success";
+                        var color = item.Porcentaje < 50 ? "table-success"
+                        : item.Porcentaje < 80 ? "table-warning" : "table-danger";
                         <tr class="@color">
                             <td>@item.Nivel</td>
                             <td>@item.Aposento</td>

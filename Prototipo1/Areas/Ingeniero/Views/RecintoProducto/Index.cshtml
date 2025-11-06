@@ -7,9 +7,13 @@
             <h2 class="text-primary">Presupuesto del Recinto</h2>
         </div>
         <div class="col-12 col-md-6 text-end">
-            <a asp-controller="RecintoProducto" asp-action="Upsert" asp-route-IdRecinto="@ViewBag.IdRecinto" class="btn btn-primary">
-                <i class="bi bi-plus-circle"></i> Agregar Producto
-            </a>
+            @if (ViewBag.Completado == "0")
+            {
+                <a asp-controller="RecintoProducto" asp-action="Upsert" asp-route-IdRecinto="@ViewBag.IdRecinto" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Agregar Producto
+                </a>
+            }
+
         </div>
     </div>
 
@@ -52,7 +56,11 @@
                 <th>Presupuesto</th>
                 <th>Desperdicio</th>
                 <th>Existencias Actuales</th>
-                <th>Acciones</th>
+                
+                @if (ViewBag.Completado == "0")
+                {
+                    <th>Acciones</th>
+                }
             </tr>
         </thead>
         <tbody>
@@ -75,22 +83,30 @@
                         <td>@obj.Desperdicio</td>
                         <td>@obj.ExistenciasActuales</td>
 
-                        <td>
-                            <div class="btn-group w-100" role="group">
-                                <a asp-controller="RecintoProducto" asp-action="Upsert"
-                                   asp-route-IdRecinto="@ViewBag.IdRecinto"
-                                   asp-route-IdRecintoProducto="@obj.IdRecintoProducto"
-                                   class="btn btn-primary btn-sm mx-1">
-                                    <i class="bi bi-pencil"></i> Editar
-                                </a>
-                                <a asp-controller="RecintoProducto" asp-action="Borrar"
-                                   asp-route-IdRecinto="@ViewBag.IdRecinto"
-                                   asp-route-IdRecintoProducto="@obj.IdRecintoProducto"
-                                   class="btn btn-danger btn-sm mx-1">
-                                    <i class="bi bi-trash3"></i> Borrar
-                                </a>
-                            </div>
-                        </td>
+                        
+
+                        
+                            @if (ViewBag.Completado == "0")
+        {
+                            <td>
+                                <div class="btn-group w-100" role="group">
+                                    <a asp-controller="RecintoProducto" asp-action="Upsert"
+                                       asp-route-IdRecinto="@ViewBag.IdRecinto"
+                                       asp-route-IdRecintoProducto="@obj.IdRecintoProducto"
+                                       class="btn btn-primary btn-sm mx-1">
+                                        <i class="bi bi-pencil"></i> Editar
+                                    </a>
+                                    <a asp-controller="RecintoProducto" asp-action="Borrar"
+                                       asp-route-IdRecinto="@ViewBag.IdRecinto"
+                                       asp-route-IdRecintoProducto="@obj.IdRecintoProducto"
+                                       class="btn btn-danger btn-sm mx-1">
+                                        <i class="bi bi-trash3"></i> Borrar
+                                    </a>
+                                </div>
+                            </td>
+                            }
+
+                        
                     </tr>
                 }
             }
@@ -128,10 +144,13 @@
 
     <!-- ✅ BOTÓN CONFIRMAR -->
     <div class="col-12 mt-3">
-        <form asp-controller="RecintoProducto" asp-action="ConfirmarPresupuesto" asp-route-IdRecinto="@ViewBag.IdRecinto" method="post">
-            <button type="submit" class="btn btn-primary">
-                <i class="bi bi-check-circle"></i> Confirmar presupuesto
-            </button>
-        </form>
+        @if (ViewBag.Completado == "0")
+        {
+            <form asp-controller="RecintoProducto" asp-action="ConfirmarPresupuesto" asp-route-IdRecinto="@ViewBag.IdRecinto" method="post">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle"></i> Confirmar presupuesto
+                </button>
+            </form>
+        }
     </div>
 </div>

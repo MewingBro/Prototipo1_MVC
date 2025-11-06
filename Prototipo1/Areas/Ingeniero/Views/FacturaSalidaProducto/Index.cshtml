@@ -154,21 +154,23 @@
     {
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
             <strong>@TempData["AlertaPresupuesto"]</strong>
-            <div class="mt-2">
-                <form asp-controller="Cambio" asp-action="Create" method="post">
+            <div class="d-flex justify-content-center align-items-center gap-3 mt-4">
+                <form asp-controller="Cambio" asp-action="Create" method="post" class="m-0">
                     <input type="hidden" name="IdFactura" value="@ViewBag.IdFactura" />
-                    <button type="submit" class="btn btn-primary btn-sm">
-                        Iniciar Solicitud de Cambio
+                    <input type="hidden" name="Comentario" value="" />
+                    <button type="submit" class="btn btn-primary px-4 shadow-sm">
+                        <i class="bi bi-arrow-repeat me-2"></i> Iniciar Solicitud de Cambio
                     </button>
                 </form>
 
                 <a asp-controller="Factura"
                    asp-action="Index"
                    asp-route-Tipo="Salida"
-                   class="btn btn-secondary btn-sm">
-                    Volver a Facturas
+                   class="btn btn-outline-secondary px-4 shadow-sm">
+                    <i class="bi bi-arrow-left-circle me-2"></i> Volver a Facturas
                 </a>
             </div>
+
 
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>

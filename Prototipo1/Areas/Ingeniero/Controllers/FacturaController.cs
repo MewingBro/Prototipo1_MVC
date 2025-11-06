@@ -362,25 +362,11 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             return View(vm);
         }
 
-        public IActionResult Kardex(int? idProducto)
+        public IActionResult Kardex(int? idProducto, int? idRecinto)
         {
             KardexVM vm = new();
 
-            if (idProducto == null)
-                return View(vm);
-
-            // Obtener el producto
-            var producto = _unitOfWork.Producto.GetID(
-                p => p.IdProducto == idProducto,
-                includeProperties: "Familia,Unidad"
-            );
-
-            if (producto == null)
-                return NotFound();
-
-            vm.Producto = producto;
-
-            // Proyecto seleccionado en sesión
+            // Proyecto actual desde sesión
             int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
             if (idProyecto == null)
             {
@@ -388,10 +374,37 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 return RedirectToAction("Index", "Proyecto");
             }
 
-            // Obtener facturas de entrada (solo del proyecto actual)
+            // 🔹 Cargar lista de recintos del proyecto actual
+            vm.Recintos = _unitOfWork.Recinto
+                .GetAllBYID(r => r.Aposento.Nivel.IdProyecto == idProyecto, includeProperties: "Aposento.Nivel")
+                .OrderBy(r => r.NombreRecinto)
+                .ToList();
+
+            // Si no hay producto ni recinto seleccionado, devolver vista vacía
+            if (idProducto == null && idRecinto == null)
+                return View(vm);
+
+            // 🔹 Obtener el producto (si se seleccionó)
+            if (idProducto != null)
+            {
+                var producto = _unitOfWork.Producto.GetID(
+                    p => p.IdProducto == idProducto,
+                    includeProperties: "Familia,Unidad"
+                );
+
+                if (producto == null)
+                    return NotFound();
+
+                vm.Producto = producto;
+            }
+
+            // 🔹 Entradas (filtrar por recinto si se indicó)
             var entradas = _unitOfWork.FacturaProducto.GetAllBYID(
-                f => f.IdProducto == idProducto && f.Factura.IdProyecto == idProyecto,
-                includeProperties: "Factura,Factura.Recinto,Factura.Recinto.Aposento"
+                f =>
+                    (idProducto == null || f.IdProducto == idProducto) &&
+                    f.Factura.IdProyecto == idProyecto &&
+                    (idRecinto == null || f.Factura.IdRecinto == idRecinto),
+                includeProperties: "Factura,Factura.Recinto,Factura.Recinto.Aposento.Nivel"
             ).Select(e => new KardexItemVM
             {
                 FechaFactura = e.Factura.Fecha,
@@ -401,13 +414,16 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 CantidadDisminuida = 0,
                 Comentario = e.Factura.Comentario,
                 Recinto = e.Factura.Recinto?.NombreRecinto ?? "-",
-                Nivel = e.Factura.Recinto?.Aposento?.Nivel?.NombreNivel?.ToString() ?? "-",
-                Aposento = e.Factura.Recinto?.Aposento?.NombreAposento?.ToString() ?? "-"
+                Nivel = e.Factura.Recinto?.Aposento?.Nivel?.NombreNivel ?? "-",
+                Aposento = e.Factura.Recinto?.Aposento?.NombreAposento ?? "-"
             });
 
-            // 🔹 Obtener facturas de salida (solo del proyecto actual)
+            // 🔹 Salidas
             var salidas = _unitOfWork.FacturaSalidaProducto.GetAllBYID(
-                f => f.IdProducto == idProducto && f.Factura.IdProyecto == idProyecto,
+                f =>
+                    (idProducto == null || f.IdProducto == idProducto) &&
+                    f.Factura.IdProyecto == idProyecto &&
+                    (idRecinto == null || f.Factura.IdRecinto == idRecinto),
                 includeProperties: "Factura,Factura.Recinto,Factura.Recinto.Aposento.Nivel"
             ).Select(s => new KardexItemVM
             {
@@ -418,8 +434,8 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 CantidadDisminuida = s.CantidadDisminuida,
                 Comentario = s.Factura.Comentario,
                 Recinto = s.Factura.Recinto?.NombreRecinto ?? "-",
-                Nivel = s.Factura.Recinto?.Aposento?.Nivel?.NombreNivel?.ToString() ?? "-",
-                Aposento = s.Factura.Recinto?.Aposento?.NombreAposento?.ToString() ?? "-"
+                Nivel = s.Factura.Recinto?.Aposento?.Nivel?.NombreNivel ?? "-",
+                Aposento = s.Factura.Recinto?.Aposento?.NombreAposento ?? "-"
             });
 
             // 🔹 Combinar y ordenar cronológicamente
@@ -438,27 +454,104 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
 
             vm.Movimientos = movimientos;
 
+            // Guardar recinto seleccionado
+            if (idRecinto != null)
+                vm.RecintoSeleccionadoId = idRecinto.Value;
+
             return View(vm);
         }
 
 
-        public IActionResult ImprimirKardex(int idProducto)
+
+        public IActionResult ImprimirKardex(int idProducto, int? idRecinto)
         {
-            // Reutilizamos la lógica del Kardex original
-            var kardexData = Kardex(idProducto) as ViewResult;
+            // Obtenemos el proyecto actual
             int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
-            var Proyecto = _unitOfWork.Proyecto.GetID(m => m.IdProyecto == idProyecto);
-
-            ViewBag.Proyecto = Proyecto.NombreProyecto;
-
-            if (kardexData?.Model is KardexVM vm && vm.Producto != null)
+            if (idProyecto == null)
             {
-                // Pasamos el mismo ViewModel pero usamos un View distinto sin layout
-                return View("KardexImprimir", vm);
+                TempData["Error"] = "Debe seleccionar un proyecto antes de imprimir el Kardex.";
+                return RedirectToAction("Index", "Proyecto");
             }
 
-            return RedirectToAction("Kardex");
+            var proyecto = _unitOfWork.Proyecto.GetID(m => m.IdProyecto == idProyecto);
+            ViewBag.Proyecto = proyecto?.NombreProyecto ?? "Proyecto desconocido";
+
+            KardexVM vm = new();
+
+            // Obtenemos el producto con relaciones
+            var producto = _unitOfWork.Producto.GetID(
+                p => p.IdProducto == idProducto,
+                includeProperties: "Familia,Unidad"
+            );
+            if (producto == null)
+                return NotFound();
+
+            vm.Producto = producto;
+
+            // Facturas de entrada
+            var entradas = _unitOfWork.FacturaProducto.GetAllBYID(
+                f => f.IdProducto == idProducto &&
+                     f.Factura.IdProyecto == idProyecto &&
+                     (idRecinto == null || f.Factura.IdRecinto == idRecinto),
+                includeProperties: "Factura,Factura.Recinto,Factura.Recinto.Aposento.Nivel"
+            ).Select(e => new KardexItemVM
+            {
+                FechaFactura = e.Factura.Fecha,
+                IdFactura = e.IdFactura,
+                TipoFactura = "Entrada",
+                CantidadAumentada = e.CantidadAumentada,
+                CantidadDisminuida = 0,
+                Comentario = e.Factura.Comentario,
+                Recinto = e.Factura.Recinto?.NombreRecinto ?? "-",
+                Nivel = e.Factura.Recinto?.Aposento?.Nivel?.NombreNivel ?? "-",
+                Aposento = e.Factura.Recinto?.Aposento?.NombreAposento ?? "-"
+            });
+
+            // Facturas de salida
+            var salidas = _unitOfWork.FacturaSalidaProducto.GetAllBYID(
+                f => f.IdProducto == idProducto &&
+                     f.Factura.IdProyecto == idProyecto &&
+                     (idRecinto == null || f.Factura.IdRecinto == idRecinto),
+                includeProperties: "Factura,Factura.Recinto,Factura.Recinto.Aposento.Nivel"
+            ).Select(s => new KardexItemVM
+            {
+                FechaFactura = s.Factura.Fecha,
+                IdFactura = s.IdFactura,
+                TipoFactura = "Salida",
+                CantidadAumentada = 0,
+                CantidadDisminuida = s.CantidadDisminuida,
+                Comentario = s.Factura.Comentario,
+                Recinto = s.Factura.Recinto?.NombreRecinto ?? "-",
+                Nivel = s.Factura.Recinto?.Aposento?.Nivel?.NombreNivel ?? "-",
+                Aposento = s.Factura.Recinto?.Aposento?.NombreAposento ?? "-"
+            });
+
+            // Combinar y ordenar cronológicamente
+            var movimientos = entradas.Concat(salidas)
+                .OrderBy(m => m.FechaFactura)
+                .ToList();
+
+            // Calcular saldo acumulado
+            int saldo = 0;
+            foreach (var m in movimientos)
+            {
+                saldo += m.CantidadAumentada;
+                saldo -= m.CantidadDisminuida;
+                m.Saldo = saldo;
+            }
+
+            vm.Movimientos = movimientos;
+
+            // Guardamos el nombre del recinto (si aplica)
+            if (idRecinto != null)
+            {
+                var recinto = _unitOfWork.Recinto.GetID(r => r.IdRecinto == idRecinto);
+                ViewBag.Recinto = recinto?.NombreRecinto ?? "Desconocido";
+            }
+
+            return View("KardexImprimir", vm);
         }
+
 
 
 

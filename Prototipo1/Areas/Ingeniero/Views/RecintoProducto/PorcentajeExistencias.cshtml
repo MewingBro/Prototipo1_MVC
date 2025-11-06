@@ -36,7 +36,7 @@
                 <th>Recinto</th>
                 <th>Producto</th>
                 <th>Presupuesto</th>
-                <th>Existencias Actuales</th>
+                <th>Existencias Disponibles</th>
                 <th>Unidades Usadas</th>
                 <th>% Producto entregado</th>
                 <th>% Total Entregado X Recinto</th>
@@ -55,9 +55,9 @@
             {
                 @foreach (var item in Model)
                 {
-                    string color = item.Porcentaje < 50 ? "table-danger"
+                    string color = item.Porcentaje < 50 ? "table-success"
                     : item.Porcentaje < 80 ? "table-warning"
-                    : "table-success";
+                    : "table-danger";
 
                     <tr class="@color">
                         <td>@item.Nivel</td>

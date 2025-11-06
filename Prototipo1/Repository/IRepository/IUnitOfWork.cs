@@ -42,6 +42,8 @@ namespace Prototipo1.Repository.IRepository
 
         ICambioRepository Cambio { get; }
 
+        ICambioDetalleRepository CambioDetalle { get; }
+
         void Save();
     }
 }

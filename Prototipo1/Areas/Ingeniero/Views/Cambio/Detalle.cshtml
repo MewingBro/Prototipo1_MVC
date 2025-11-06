@@ -19,7 +19,8 @@
                         <tr class="text-center">
                             <th>Producto</th>
                             <th>Cantidad Solicitada</th>
-                            <th>Existencias Presupuestadas</th>
+                            <th>Existencias presupuestadas para ese recinto</th>
+                            <th>Existencias Disponibles para ese recinto</th>
                             <th>Inventario del Proyecto</th>
                         </tr>
                     </thead>
@@ -29,6 +30,7 @@
                             <tr class="@(item.SeExcede ? "table-danger" : "") text-center">
                                 <td class="fw-semibold">@item.NombreProducto</td>
                                 <td>@item.CantidadDisminuida</td>
+                                <td>@item.Presupuesto</td>
                                 <td>@item.ExistenciasActuales</td>
                                 <td>@item.InventarioProyecto</td>
                             </tr>
@@ -40,8 +42,17 @@
             <div class="mt-4 text-center">
                 @if ((User.IsInRole(SD.Role_Admin) || User.IsInRole(SD.Role_Bodeguero)) && ViewBag.Estado == "Pendiente")
                 {
+                    <div class="mb-3 mx-auto" style="max-width: 600px;">
+                        <label for="comentario" class="form-label fw-semibold">
+                            Comentario (opcional)
+                        </label>
+                        <textarea id="comentario" name="Comentario" class="form-control" rows="3"
+                              placeholder="Escriba un comentario sobre esta solicitud..."></textarea>
+                    </div>
+
                     <form asp-action="Aprobar" method="post" class="d-inline">
                         <input type="hidden" name="IdCambio" value="@ViewBag.IdCambio" />
+                        <input type="hidden" name="Comentario" id="ComentarioAprobar" />
                         <button type="submit" class="btn btn-success px-4 me-2">
                             <i class="bi bi-check-circle me-1"></i> Aprobar Solicitud
                         </button>
@@ -49,10 +60,23 @@
 
                     <form asp-action="Rechazar" method="post" class="d-inline">
                         <input type="hidden" name="IdCambio" value="@ViewBag.IdCambio" />
+                        <input type="hidden" name="Comentario" id="ComentarioRechazar" />
                         <button type="submit" class="btn btn-danger px-4">
                             <i class="bi bi-x-circle me-1"></i> Rechazar Solicitud
                         </button>
                     </form>
+
+                    <script>
+                        // Sincroniza el comentario con ambos formularios antes de enviar
+                        const textarea = document.getElementById('comentario');
+                        const aprobar = document.getElementById('ComentarioAprobar');
+                        const rechazar = document.getElementById('ComentarioRechazar');
+
+                        textarea.addEventListener('input', () => {
+                            aprobar.value = textarea.value;
+                            rechazar.value = textarea.value;
+                        });
+                    </script>
                 }
                 else if ((User.IsInRole(SD.Role_Admin) || User.IsInRole(SD.Role_Bodeguero)) && ViewBag.Estado != "Pendiente")
                 {
@@ -60,6 +84,15 @@
                         <i class="bi bi-info-circle me-2"></i>
                         El cambio solicitado ya se encuentra <strong>@ViewBag.Estado.ToLower()</strong>.
                     </div>
+
+                    @* Mostrar comentario si existe *@
+                    @if (!string.IsNullOrWhiteSpace(ViewBag.Comentario as string))
+                    {
+                        <div class="alert alert-secondary mt-3 mx-auto text-start" style="max-width: 600px;">
+                            <strong>Comentario:</strong>
+                            <p class="mb-0">@ViewBag.Comentario</p>
+                        </div>
+                    }
                 }
 
                 <div class="mt-4">

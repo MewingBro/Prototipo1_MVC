@@ -102,7 +102,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
 
         [HttpPost]
         [Authorize] // Asegura que solo usuarios logueados puedan crear solicitudes
-        public IActionResult Create(int IdFactura)
+        public IActionResult Create(int IdFactura,string Comentario)
         {
             // 🔹 Obtener el usuario actual (Identity)
             var userId = _userManager.GetUserId(User);
@@ -119,7 +119,8 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 IdFactura = IdFactura,
                 Estado = "Pendiente",
                 IdUsuario = userId,
-                FechaSolicitud = DateTime.Now 
+                FechaSolicitud = DateTime.Now, 
+                Comentario = ""
             };
 
             // Guardar en base de datos
@@ -154,6 +155,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             int idFactura = cambio.IdFactura;
             int idProyecto = cambio.Factura.IdProyecto;
             int? idRecinto = cambio.Factura.IdRecinto;
+            
 
             // Obtener productos asociados a la factura
             var productos = _unitOfWork.FacturaSalidaProducto.GetAllBYID(
@@ -178,6 +180,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 {
                     NombreProducto = p.Producto.NombreProducto,
                     CantidadDisminuida = p.CantidadDisminuida,
+                    Presupuesto = recintoProd.Presupuesto,
                     ExistenciasActuales = (int)(recintoProd?.ExistenciasActuales ?? 0),
                     InventarioProyecto = inventario?.Existencias ?? 0,
                     SeExcede = (recintoProd != null && p.CantidadDisminuida > recintoProd.ExistenciasActuales)
@@ -191,7 +194,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
         }
 
         [HttpPost]
-        public IActionResult Aprobar(int IdCambio)
+        public IActionResult Aprobar(int IdCambio, string Comentario)
         {
             var cambio = _unitOfWork.Cambio.GetID(
                 c => c.IdCambio == IdCambio,
@@ -205,32 +208,43 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             int idProyecto = cambio.Factura.IdProyecto;
             int? idRecinto = cambio.Factura.IdRecinto;
 
-            // Obtener los productos asociados a la factura
             var productos = _unitOfWork.FacturaSalidaProducto.GetAllBYID(
                 f => f.IdFactura == idFactura,
                 includeProperties: "Producto"
             ).ToList();
 
+            // 🔹 Lista para registrar los detalles del cambio
+            List<CambioDetalle> detallesExcedidos = new();
+
             foreach (var p in productos)
             {
-                // Buscar el registro de RecintoProducto
                 var recintoProducto = _unitOfWork.RecintoProducto.GetID(
                     r => r.IdRecinto == idRecinto && r.IdProducto == p.IdProducto
                 );
 
                 if (recintoProducto == null)
-                    continue; // si no hay vínculo, saltar
+                    continue;
 
-                // Verificar si se pasó del presupuesto
                 bool excedePresupuesto = p.CantidadDisminuida > recintoProducto.ExistenciasActuales;
 
                 if (excedePresupuesto)
                 {
-                    // Solo para los que se pasan del presupuesto:
+                    // ✅ Guardar detalle del producto excedido
+                    var detalle = new CambioDetalle
+                    {
+                        IdCambio = IdCambio,
+                        IdProducto = p.IdProducto,
+                        Presupuesto = recintoProducto.Presupuesto, // si existe el campo, ajústalo según tu modelo
+                        ExistenciasActuales = recintoProducto.ExistenciasActuales,
+                        CantidadDisminuida = p.CantidadDisminuida
+                    };
+                    detallesExcedidos.Add(detalle);
+
+                    // Ajustar existencias a cero en el recinto
                     recintoProducto.ExistenciasActuales = 0;
                     _unitOfWork.RecintoProducto.Update(recintoProducto);
 
-                    // Resta del inventario general del proyecto
+                    // Actualizar inventario general del proyecto
                     var inventario = _unitOfWork.Inventario.GetID(
                         i => i.IdProducto == p.IdProducto && i.IdProyecto == idProyecto
                     );
@@ -239,13 +253,23 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                     {
                         inventario.Existencias -= p.CantidadDisminuida;
                         if (inventario.Existencias < 0)
-                            inventario.Existencias = 0; // seguridad
+                            inventario.Existencias = 0;
+
                         _unitOfWork.Inventario.Update(inventario);
                     }
                 }
             }
 
-            // Cambiar estado de la factura
+            // 🔹 Guardar todos los detalles de productos excedidos
+            if (detallesExcedidos.Any())
+            {
+                foreach (var d in detallesExcedidos)
+                {
+                    _unitOfWork.CambioDetalle.Add(d);
+                }
+            }
+
+            // ✅ Cambiar estado y guardar comentario
             var factura = _unitOfWork.Factura.GetID(f => f.IdFactura == idFactura);
             if (factura != null)
             {
@@ -253,21 +277,20 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 _unitOfWork.Factura.Update(factura);
             }
 
-            // Cambiar estado del cambio
             cambio.Estado = "Aprobado";
+            cambio.Comentario = Comentario;
             _unitOfWork.Cambio.Update(cambio);
 
-            // Guardar todo
             _unitOfWork.Save();
 
             TempData["Success"] = "Solicitud de cambio aprobada. Se ajustaron los productos que excedían el presupuesto.";
-
             return RedirectToAction("Index");
         }
 
 
+
         [HttpPost]
-        public IActionResult Rechazar(int IdCambio)
+        public IActionResult Rechazar(int IdCambio, string Comentario)
         {
             var cambio = _unitOfWork.Cambio.GetID(
                 c => c.IdCambio == IdCambio,
@@ -277,11 +300,10 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             if (cambio == null)
                 return NotFound();
 
-            // 🔹 Cambiar estado del cambio
             cambio.Estado = "Rechazado";
+            cambio.Comentario = Comentario; 
             _unitOfWork.Cambio.Update(cambio);
 
-            // 🔹 Cambiar estado de la factura a 3 (rechazada)
             var factura = _unitOfWork.Factura.GetID(f => f.IdFactura == cambio.IdFactura);
             if (factura != null)
             {
@@ -289,12 +311,117 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 _unitOfWork.Factura.Update(factura);
             }
 
-            // 🔹 Guardar cambios
             _unitOfWork.Save();
 
             TempData["Info"] = "La solicitud de cambio ha sido rechazada. No se realizaron modificaciones al inventario.";
-
             return RedirectToAction("Index");
+        }
+
+        public IActionResult ReporteCambios(string nivel, string aposento, string recinto, string codigo, string nombre)
+        {
+            int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
+
+            if (idProyecto == null)
+            {
+                TempData["Error"] = "No se ha seleccionado un proyecto activo.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // 🔹 Cargar los cambios aprobados del proyecto activo
+            var cambios = _unitOfWork.Cambio.GetAllBYID(
+                c => c.Estado == "Aprobado" && c.Factura.IdProyecto == idProyecto,
+                includeProperties: "Factura,Factura.Recinto,Factura.Proyecto,Factura.Recinto.Aposento.Nivel"
+            ).ToList();
+
+            var detalles = _unitOfWork.CambioDetalle.GetAll(
+                includeProperties: "Producto"
+            ).ToList();
+
+            // 🔹 Construir el resultado uniendo los datos necesarios
+            var resultado = (from c in cambios
+                             join d in detalles on c.IdCambio equals d.IdCambio
+                             let rec = c.Factura.Recinto
+                             select new CambioPresupuestoVM
+                             {
+                                 IdFactura = c.IdFactura,
+                                 CodigoProducto = d.Producto.CodigoProducto,
+                                 NombreProducto = d.Producto.NombreProducto,
+                                 Presupuesto = d.Presupuesto,
+                                 CantidadDisminuida = d.CantidadDisminuida,
+                                 Nivel = rec?.Aposento?.Nivel?.NombreNivel ?? "-",
+                                 Aposento = rec?.Aposento?.NombreAposento ?? "-",
+                                 Recinto = rec?.NombreRecinto ?? "-",
+                                 Comentario = c.Comentario
+                             }).ToList();
+
+            // 🔹 Aplicar filtros dinámicos
+            if (!string.IsNullOrWhiteSpace(nivel))
+                resultado = resultado.Where(x => x.Nivel.Contains(nivel, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            if (!string.IsNullOrWhiteSpace(aposento))
+                resultado = resultado.Where(x => x.Aposento.Contains(aposento, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            if (!string.IsNullOrWhiteSpace(recinto))
+                resultado = resultado.Where(x => x.Recinto.Contains(recinto, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            if (!string.IsNullOrWhiteSpace(codigo))
+                resultado = resultado.Where(x => x.CodigoProducto.Contains(codigo, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            if (!string.IsNullOrWhiteSpace(nombre))
+                resultado = resultado.Where(x => x.NombreProducto.Contains(nombre, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            ViewBag.IdProyecto = idProyecto;
+            return View(resultado);
+        }
+
+        public IActionResult ImprimirReporteCambios(string nivel, string aposento, string recinto, string codigo, string nombre)
+        {
+            int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
+            if (idProyecto == null)
+            {
+                TempData["Error"] = "No se ha seleccionado un proyecto activo.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var cambios = _unitOfWork.Cambio.GetAllBYID(
+                c => c.Estado == "Aprobado" && c.Factura.IdProyecto == idProyecto,
+                includeProperties: "Factura,Factura.Recinto,Factura.Recinto.Aposento.Nivel"
+            ).ToList();
+
+            var detalles = _unitOfWork.CambioDetalle.GetAll(includeProperties: "Producto").ToList();
+
+            var resultado = (from c in cambios
+                             join d in detalles on c.IdCambio equals d.IdCambio
+                             let rec = c.Factura.Recinto
+                             select new CambioPresupuestoVM
+                             {
+                                 IdFactura = c.IdFactura,
+                                 CodigoProducto = d.Producto.CodigoProducto,
+                                 NombreProducto = d.Producto.NombreProducto,
+                                 Presupuesto = d.Presupuesto,
+                                 CantidadDisminuida = d.CantidadDisminuida,
+                                 Nivel = rec?.Aposento?.Nivel?.NombreNivel ?? "-",
+                                 Aposento = rec?.Aposento?.NombreAposento ?? "-",
+                                 Recinto = rec?.NombreRecinto ?? "-",
+                                 Comentario = c.Comentario
+                             }).ToList();
+
+            // 🔹 Aplicar filtros igual que en el action principal
+            if (!string.IsNullOrWhiteSpace(nivel))
+                resultado = resultado.Where(x => x.Nivel.Contains(nivel, StringComparison.OrdinalIgnoreCase)).ToList();
+            if (!string.IsNullOrWhiteSpace(aposento))
+                resultado = resultado.Where(x => x.Aposento.Contains(aposento, StringComparison.OrdinalIgnoreCase)).ToList();
+            if (!string.IsNullOrWhiteSpace(recinto))
+                resultado = resultado.Where(x => x.Recinto.Contains(recinto, StringComparison.OrdinalIgnoreCase)).ToList();
+            if (!string.IsNullOrWhiteSpace(codigo))
+                resultado = resultado.Where(x => x.CodigoProducto.Contains(codigo, StringComparison.OrdinalIgnoreCase)).ToList();
+            if (!string.IsNullOrWhiteSpace(nombre))
+                resultado = resultado.Where(x => x.NombreProducto.Contains(nombre, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            var proyecto = _unitOfWork.Proyecto.GetID(p => p.IdProyecto == idProyecto);
+            ViewBag.Proyecto = proyecto?.NombreProyecto ?? "Proyecto desconocido";
+
+            return View("ReporteCambiosImprimir", resultado);
         }
 
 

@@ -1,0 +1,106 @@
+﻿@model List<Prototipo1.Models.ViewModels.CambioPresupuestoVM>
+
+@{
+    ViewData["Title"] = "Reporte de Cambios de Presupuesto";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white text-center py-3 rounded-top d-flex justify-content-between align-items-center">
+            <h3 class="mb-0 fw-semibold">
+                <i class="bi bi-cash-stack me-2"></i> Reporte de Cambios de Presupuesto
+            </h3>
+        </div>
+
+        <div class="card-body px-4 py-4">
+            <!-- 🔹 Filtros -->
+            <form method="get" asp-action="ReporteCambios" class="row g-3 mb-3">
+                <div class="col-md-2">
+                    <input type="text" name="nivel" class="form-control" placeholder="Nivel" value="@Context.Request.Query["nivel"]" />
+                </div>
+                <div class="col-md-2">
+                    <input type="text" name="aposento" class="form-control" placeholder="Aposento" value="@Context.Request.Query["aposento"]" />
+                </div>
+                <div class="col-md-2">
+                    <input type="text" name="recinto" class="form-control" placeholder="Recinto" value="@Context.Request.Query["recinto"]" />
+                </div>
+                <div class="col-md-2">
+                    <input type="text" name="codigo" class="form-control" placeholder="Código Producto" value="@Context.Request.Query["codigo"]" />
+                </div>
+                <div class="col-md-2">
+                    <input type="text" name="nombre" class="form-control" placeholder="Nombre Producto" value="@Context.Request.Query["nombre"]" />
+                </div>
+                <div class="col-md-2 d-flex justify-content-end">
+                    <div class="btn-group w-100" role="group">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="bi bi-search"></i> Filtrar
+                        </button>
+                        <a asp-action="ReporteCambios" class="btn btn-outline-warning">
+                            <i class="bi bi-x-circle"></i> Limpiar
+                        </a>
+                        <a asp-action="ImprimirReporteCambios"
+                           asp-route-nivel="@Context.Request.Query["nivel"]"
+                           asp-route-aposento="@Context.Request.Query["aposento"]"
+                           asp-route-recinto="@Context.Request.Query["recinto"]"
+                           asp-route-codigo="@Context.Request.Query["codigo"]"
+                           asp-route-nombre="@Context.Request.Query["nombre"]"
+                           target="_blank"
+                           class="btn btn-primary">
+                            <i class="bi bi-printer"></i> Imprimir
+                        </a>
+                    </div>
+                </div>
+            </form>
+
+            <!-- 🔹 Tabla -->
+            <div class="table-responsive">
+                <table class="table table-hover align-middle text-center">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID Factura</th>
+                            <th>Código Producto</th>
+                            <th>Nombre Producto</th>
+                            <th>Presupuesto</th>
+                            <th>Unidades Entregadas</th>
+                            <th>Sobregiro</th>
+                            <th>Nivel</th>
+                            <th>Aposento</th>
+                            <th>Recinto</th>
+                            <th>Comentario</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Any())
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.IdFactura</td>
+                                    <td>@item.CodigoProducto</td>
+                                    <td class="text-start">@item.NombreProducto</td>
+                                    <td>@item.Presupuesto</td>
+                                    <td>@item.CantidadDisminuida</td>
+                                    <td class="fw-bold @(item.Sobregiro > 0 ? "text-danger" : "text-success")">
+                                        @item.Sobregiro
+                                    </td>
+                                    <td>@item.Nivel</td>
+                                    <td>@item.Aposento</td>
+                                    <td>@item.Recinto</td>
+                                    <td class="text-start">@item.Comentario</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="10" class="text-center text-muted py-3">
+                                    <i class="bi bi-info-circle me-2"></i> No se encontraron resultados.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -13,7 +13,17 @@
             <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
             <div class="form-floating mb-3">
                 <input asp-for="Username" class="form-control" disabled />
-                <p>Para cambiar su nombre de usuario o rol, consulte con su administrador</p>
+                @if (User.IsInRole(SD.Role_Admin))
+                {
+                    <p>Usted es un usuario administrador. Para cambiar su nombre de usuario o rol, consulte con su administrador</p>
+                } else if (User.IsInRole(SD.Role_Bodeguero)) {
+
+                    <p>Usted es un usuario bodeguero. Para cambiar su nombre de usuario o rol, consulte con su administrador</p>
+                }
+                else if (User.IsInRole(SD.Role_Ingeniero)) {
+
+                <p>Usted es un usuario ingeniero. Para cambiar su nombre de usuario o rol, consulte con su administrador</p>
+                }
             </div>
 
         </form>

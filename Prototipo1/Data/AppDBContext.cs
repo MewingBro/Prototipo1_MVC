@@ -39,6 +39,8 @@ namespace Prototipo1.Data
 
         public DbSet<Cambio> Cambio { get; set; }
 
+        public DbSet<CambioDetalle> CambioDetalle { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

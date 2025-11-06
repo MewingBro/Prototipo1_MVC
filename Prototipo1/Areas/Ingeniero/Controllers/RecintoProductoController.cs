@@ -24,6 +24,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
 
         [HttpGet]
         public IActionResult Index(
+            string? Completado,
     int? IdRecinto,
     string nombreProducto,
     string nombreRecinto,
@@ -33,6 +34,8 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
     int page = 1,
     int pageSize = 10)
         {
+            ViewBag.Completado = Completado;
+
             var query = _unitOfWork.RecintoProducto.GetAllBYID(
                 f => f.IdRecinto == IdRecinto,
                 includeProperties: "Recinto,Recinto.Aposento.Nivel,Producto"
@@ -393,7 +396,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 .ToDictionary(
                     x => x.Recinto,
                     x => x.TotalPresupuesto > 0
-                        ? (x.TotalExistencias / (double)x.TotalPresupuesto) * 100
+                        ? 100-((x.TotalExistencias / (double)x.TotalPresupuesto) * 100)
                         : 0
                 );
 
@@ -417,7 +420,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                     Existencias = rp.ExistenciasActuales,
                     ExistenciasUsadas = rp.Presupuesto - rp.ExistenciasActuales,
                     Porcentaje = rp.Presupuesto > 0
-                        ? (rp.ExistenciasActuales / (double)rp.Presupuesto) * 100
+                        ? 100-((rp.ExistenciasActuales / (double)rp.Presupuesto) * 100)
                         : 0,
                     PorcentajeTotalRecinto = totalesPorRecinto.ContainsKey(rp.Recinto.NombreRecinto)
                         ? totalesPorRecinto[rp.Recinto.NombreRecinto]
@@ -463,7 +466,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 .ToDictionary(
                     x => x.Recinto,
                     x => x.TotalPresupuesto > 0
-                        ? (x.TotalExistencias / (double)x.TotalPresupuesto) * 100
+                        ? 100-((x.TotalExistencias / (double)x.TotalPresupuesto) * 100)
                         : 0
                 );
 
@@ -494,7 +497,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                     Existencias = rp.ExistenciasActuales,
                     ExistenciasUsadas = rp.Presupuesto - rp.ExistenciasActuales,
                     Porcentaje = rp.Presupuesto > 0
-                        ? (rp.ExistenciasActuales / (double)rp.Presupuesto) * 100
+                        ? 100-((rp.ExistenciasActuales / (double)rp.Presupuesto) * 100)
                         : 0,
                     PorcentajeTotalRecinto = totalesPorRecinto.ContainsKey(rp.Recinto.NombreRecinto)
                         ? totalesPorRecinto[rp.Recinto.NombreRecinto]

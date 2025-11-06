@@ -57,7 +57,11 @@
             <div class="text-end">
                 <h5 class="mb-0">Reporte Kardex</h5>
                 <small>Fecha de generación: @fechaGeneracion</small><br />
-                <small>Proyecto: @ViewBag.Proyecto</small>
+                <small>Proyecto: @ViewBag.Proyecto</small><br />
+                @if (ViewBag.Recinto != null)
+                {
+                    <small>Recinto: @ViewBag.Recinto</small>
+                }
             </div>
         </div>
 
@@ -91,25 +95,34 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var mov in Model.Movimientos)
+                @if (Model.Movimientos != null && Model.Movimientos.Any())
+                {
+                    @foreach (var mov in Model.Movimientos)
+                    {
+                        <tr>
+                            <td>@mov.FechaFactura.ToShortDateString()</td>
+                            <td>@mov.IdFactura</td>
+                            <td>@mov.TipoFactura</td>
+                            <td>@(mov.CantidadAumentada == 0 ? "-" : mov.CantidadAumentada.ToString())</td>
+                            <td>@(mov.CantidadDisminuida == 0 ? "-" : mov.CantidadDisminuida.ToString())</td>
+                            <td><strong>@mov.Saldo</strong></td>
+                            <td>@mov.Nivel</td>
+                            <td>@mov.Aposento</td>
+                            <td>@mov.Recinto</td>
+                            <td class="text-start">@mov.Comentario</td>
+                        </tr>
+                    }
+                }
+                else
                 {
                     <tr>
-                        <td>@mov.FechaFactura.ToShortDateString()</td>
-                        <td>@mov.IdFactura</td>
-                        <td>@mov.TipoFactura</td>
-                        <td>@(mov.CantidadAumentada == 0 ? "-" : mov.CantidadAumentada.ToString())</td>
-                        <td>@(mov.CantidadDisminuida == 0 ? "-" : mov.CantidadDisminuida.ToString())</td>
-                        <td><strong>@mov.Saldo</strong></td>
-                        <td>@mov.Nivel</td>
-                        <td>@mov.Aposento</td>
-                        <td>@mov.Recinto</td>
-                        <td class="text-start">@mov.Comentario</td>
+                        <td colspan="10" class="text-center text-muted">No se encontraron movimientos.</td>
                     </tr>
                 }
             </tbody>
         </table>
 
-        <!-- Botón para imprimir -->
+        <!-- Botones -->
         <div class="text-center mt-4 no-print">
             <button class="btn btn-primary" onclick="window.print()">
                 <i class="bi bi-printer"></i> Imprimir

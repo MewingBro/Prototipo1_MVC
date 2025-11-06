@@ -30,6 +30,7 @@ namespace Prototipo1.Repository
                 CambioFromDB.IdFactura = Cambio.IdFactura;
                 CambioFromDB.Estado = Cambio.Estado;
                 CambioFromDB.IdUsuario = Cambio.IdUsuario;
+                CambioFromDB.Comentario = Cambio.Comentario;
 
                 }         
             

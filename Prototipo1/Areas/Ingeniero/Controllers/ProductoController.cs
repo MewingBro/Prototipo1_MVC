@@ -278,7 +278,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                     nombreProducto = rp.Producto.NombreProducto,
                     familia = rp.Producto.Familia.NombreFamilia,
                     unidad = rp.Producto.Unidad.NombreUnidad,
-                    mediaArtimetica = rp.Producto.MediaAritmetica,
+                    mediaAritmetica = rp.Producto.MediaAritmetica,
                     descripcion = rp.Producto.Descripcion
                 })
                 .Distinct()
