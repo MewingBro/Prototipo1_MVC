@@ -75,8 +75,6 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             }
             );
 
-            //ViewBag.FamiliaList = FamiliaList;
-            //ViewBag.UnidadList = UnidadList;
             NivelVM NivelVM = new()
             {
                 ProyectoList = ProyectoList,
@@ -130,22 +128,6 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             
 
         }
-        /*
-        public IActionResult Editar(int? IdNivel)
-        {
-            if (IdNivel == null || IdNivel == 0)
-            {
-                return NotFound();
-            }
-
-            Nivel? Nivel = _unitOfWork.Nivel.GetID(u => u.IdNivel == IdNivel);
-            if (Nivel == null)
-            {
-                return NotFound();
-            }
-            return View(Nivel);
-        }
-        */
 
 
         public IActionResult Borrar(int? IdNivel)

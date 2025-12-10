@@ -7,7 +7,7 @@
         </div>
     </div>
 
-    <!-- 🔍 FILTROS -->
+    <!--  FILTROS -->
     <form asp-action="PorcentajeExistencias" method="get" class="row mb-3">
         <div class="col-md-3 mb-2">
             <input type="text" name="nombreNivel" value="@ViewBag.NombreNivel" class="form-control" placeholder="Buscar por nivel" />
@@ -27,7 +27,7 @@
         </div>
     </form>
 
-    <!-- 📊 TABLA -->
+    <!--  TABLA -->
     <table class="table table-bordered table-striped align-middle text-center">
         <thead class="table-primary">
             <tr>
@@ -87,7 +87,7 @@
 
 </div>
 
-<!-- 📄 PAGINACIÓN -->
+<!--  PAGINACIÓN -->
 @{
     int page = ViewBag.Page;
     int totalPages = ViewBag.TotalPages;

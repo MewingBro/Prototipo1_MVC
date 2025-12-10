@@ -26,10 +26,10 @@ namespace Prototipo1.Models
         public Producto Producto { get; set; }
 
 
-        [Required]
+        [Required(ErrorMessage = "Debe indicar la cantidad disminuida")]
         public int CantidadDisminuida { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Debe indicar a quién se le hizo la entrega")]
         public string EntregadoA { get; set; }
     }
 }

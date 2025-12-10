@@ -84,6 +84,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
         [HttpPost]
         public IActionResult TerminarFactura(int? IdFactura)
         {
+            // AFECTA EL INVENTARIO Y REDUCE UNIDADES EN PRESUPUESTOS E INVENTARIOS
             var listaSalidas = _unitOfWork.FacturaSalidaProducto
                 .GetAllBYID(f => f.IdFactura == IdFactura, includeProperties: "Factura,Producto")
                 .ToList();
@@ -114,6 +115,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             // Si hay exceso, mostrar alerta y no ejecutar cambios
             if (excedePresupuesto)
             {
+                // PERMITE INICIAR UNA SOLICITUD DE CAMBIO
                 TempData["AlertaPresupuesto"] = "Uno o más productos exceden el presupuesto asignado. ¿Desea iniciar una solicitud de cambio?";
                 return RedirectToAction("Index", "FacturaSalidaProducto", new { IdFactura = IdFactura, IdRecinto = idRecinto });
             }
@@ -227,7 +229,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
 
                     int? idRecinto = factura.IdRecinto;
 
-                    // 3️⃣ Obtener todas las facturas de salida confirmadas de los últimos N días
+                    // Obtener todas las facturas de salida confirmadas de los últimos N días
                     var fechaCorte = DateTime.Now.AddDays(-N);
                     var facturasRelacionadas = _unitOfWork.Factura.GetAllBYID(
                         f => f.IdTipoFactura == 2 &&
@@ -235,10 +237,10 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                              f.Fecha >= fechaCorte
                     ).ToList();
 
-                    // 🔹 Tomamos solo los IDs
+                    // Tomamos solo los IDs
                     var facturasRelacionadasIds = facturasRelacionadas.Select(f => f.IdFactura).ToList();
 
-                    // 4️⃣ Obtener todas las salidas de ese producto en esas facturas
+                    // Obtener todas las salidas de ese producto en esas facturas
                     var salidas = _unitOfWork.FacturaSalidaProducto.GetAllBYID(
                         s => s.IdProducto == detalle.IdProducto &&
                              facturasRelacionadasIds.Contains(s.IdFactura)

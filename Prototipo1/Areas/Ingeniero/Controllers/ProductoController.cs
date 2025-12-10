@@ -30,7 +30,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             // Incluye relaciones
             var productos = _unitOfWork.Producto.GetAll(includeProperties: "Familia,Unidad").AsQueryable();
 
-            // 🔍 Filtro por texto
+            // Filtro por texto
             if (!string.IsNullOrEmpty(searchString))
             {
                 var searchLower = searchString.ToLower();
@@ -39,19 +39,19 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                     p.CodigoProducto.ToLower().Contains(searchLower));
             }
 
-            // 🧩 Filtro por familia
+            // Filtro por familia
             if (idFamilia.HasValue && idFamilia.Value > 0)
             {
                 productos = productos.Where(p => p.IdFamilia == idFamilia.Value);
             }
 
-            // ⚙️ Filtro por unidad
+            // Filtro por unidad
             if (idUnidad.HasValue && idUnidad.Value > 0)
             {
                 productos = productos.Where(p => p.IdUnidad == idUnidad.Value);
             }
 
-            // 📄 Total y paginación
+            // Total y paginación
             var totalProductos = productos.Count();
             var productosPaginados = productos
                 .OrderBy(p => p.IdProducto)
@@ -59,14 +59,14 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 .Take(pageSize)
                 .ToList();
 
-            // 🔹 Cargar listas para los dropdowns
+            // Cargar listas para los dropdowns
             ViewBag.FamiliaList = _unitOfWork.Familia.GetAll()
                 .Select(f => new SelectListItem { Text = f.NombreFamilia, Value = f.IdFamilia.ToString() });
 
             ViewBag.UnidadList = _unitOfWork.Unidad.GetAll()
                 .Select(u => new SelectListItem { Text = u.NombreUnidad, Value = u.IdUnidad.ToString() });
 
-            // 🔹 Variables para la vista
+            // Variables para la vista
             ViewBag.SearchString = searchString;
             ViewBag.IdFamilia = idFamilia;
             ViewBag.IdUnidad = idUnidad;
@@ -306,7 +306,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 .Select(i => i.IdProducto)
                 .ToList();
 
-            // 2️⃣ Buscar solo productos que estén en ese inventario
+            // 2️Buscar solo productos que estén en ese inventario
             var productos = _unitOfWork.Producto
                 .GetAllBYID(
                     p => idsProductosInventario.Contains(p.IdProducto) &&

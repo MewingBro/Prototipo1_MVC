@@ -21,7 +21,7 @@
                 <div class="mb-3">
                     <label for="nivel" class="form-label fw-semibold">Nivel</label>
                     <select asp-for="Aposento.IdNivel" asp-items="@Model.NivelList" class="form-select">
-                        <option disabled selected>--- Seleccionar Nivel ---</option>
+                        <option value="">--- Seleccionar Nivel ---</option>
                     </select>
                     <span asp-validation-for="Aposento.IdNivel" class="text-danger small"></span>
                 </div>

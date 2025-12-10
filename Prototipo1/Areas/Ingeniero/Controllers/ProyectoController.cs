@@ -59,8 +59,6 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
         public IActionResult Upsert(int? IdProyecto)
         {
 
-            //ViewBag.FamiliaList = FamiliaList;
-            //ViewBag.UnidadList = UnidadList;
             Proyecto proyecto = new Proyecto();
 
             if (IdProyecto == null || IdProyecto ==0)
@@ -70,7 +68,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             }
             else
             {
-                //update
+                //actualizar
                 Proyecto proyectoID = _unitOfWork.Proyecto.GetID(u=>u.IdProyecto == IdProyecto);
                 return View(proyectoID);
             }

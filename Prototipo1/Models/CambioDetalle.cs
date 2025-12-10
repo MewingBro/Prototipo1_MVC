@@ -27,7 +27,7 @@ namespace Prototipo1.Models {
         [ValidateNever]
         public Producto Producto { get; set; }
 
-        public double Presupuesto { get; set; }
+        public double? Presupuesto { get; set; }
 
         public double ExistenciasActuales { get; set; }
 

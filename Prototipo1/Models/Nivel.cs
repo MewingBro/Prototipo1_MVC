@@ -14,7 +14,7 @@ namespace Prototipo1.Models
     {
         [Key]
         public int IdNivel { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Debe indicar el nombre del nivel")]
         [Display(Name = "Nombre del Nivel")]
         public string NombreNivel { get; set; }
         public int IdProyecto { get; set; }

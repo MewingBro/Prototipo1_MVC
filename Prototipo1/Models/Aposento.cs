@@ -14,11 +14,12 @@ namespace Prototipo1.Models
     {
         [Key]
         public int IdAposento { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Debe ingresar el nombre del aposento")]
         [Display(Name = "Nombre del Aposento")]
         public string NombreAposento { get; set; }
 
-        public int IdNivel { get; set; }
+        [Required(ErrorMessage = "Debe seleccionar un nivel")]
+        public int? IdNivel { get; set; }
         [ForeignKey("IdNivel")]
         [ValidateNever]
         public Nivel Nivel { get; set; }

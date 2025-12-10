@@ -23,17 +23,18 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
         }
 
         public IActionResult Index(
-    int? IdFactura,
-    string Producto,
-    string EntregadoA,
-    string Familia,
-    string Unidad)
+            int? IdFactura,
+            string Producto,
+            string EntregadoA,
+            string Familia,
+            string Unidad)
         {
             if (!IdFactura.HasValue)
             {
                 TempData["Error"] = "Debe seleccionar una factura válida.";
                 return RedirectToAction("Index", "Factura");
             }
+            //MUESTRA LOS DETALLES DE UNA FACTURA SELECCIONADA
 
             // Consulta base
             var query = _unitOfWork.FacturaProducto.GetAllBYID(
@@ -73,6 +74,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
         [HttpPost]
         public IActionResult TerminarFactura(int? IdFactura)
         {
+            //FUNCIONA PARA APLICAR LOS CAMBIOS DE UNA FACTURA DE ENTRADA Y MODIFICAR EL INVENTARIO
             List<FacturaProducto> objFacturaProductoLista = _unitOfWork.FacturaProducto
         .GetAllBYID(f => f.IdFactura == IdFactura, includeProperties: "Factura,Producto")
         .ToList();
@@ -139,12 +141,14 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 
                 if (FacturaProductoVM.FacturaProducto.IdFacturaProducto == 0)
                 {
+                    //agrega un nuevo detalle
                     _unitOfWork.FacturaProducto.Add(FacturaProductoVM.FacturaProducto);
                     TempData["success"] = "Detalle de Factura agregado exitosamente";
                     
                 }
                 else
                 {
+                    //modifica un detalle existente
                     _unitOfWork.FacturaProducto.Update(FacturaProductoVM.FacturaProducto);
                     TempData["success"] = "Detalle de Factura actualizado exitosamente";
                 }

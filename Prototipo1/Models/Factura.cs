@@ -10,24 +10,27 @@ namespace Prototipo1.Models
     {
         [Key]
         public int IdFactura { get; set; }
-        [Required]
+        
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
-        public DateTime Fecha { get; set; }
+        [Required(ErrorMessage = "Debe seleccionar una fecha")]
+        public DateTime? Fecha { get; set; }
         public int IdTipoFactura { get; set; }
         [ForeignKey("IdTipoFactura")]
         [ValidateNever]
         public TipoFactura TipoFactura { get; set; }
-        [Required]
+        [ValidateNever]
         public string Comentario { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Debe indicar la persona que recibió el producto")]
         public string RecibidoPor { get; set; }
 
         public int IdProyecto { get; set; }
         [ForeignKey("IdProyecto")]
         [ValidateNever]
         public Proyecto Proyecto { get; set; }
+
+
         public int? IdRecinto { get; set; }
         [ForeignKey("IdRecinto")]
         [ValidateNever]

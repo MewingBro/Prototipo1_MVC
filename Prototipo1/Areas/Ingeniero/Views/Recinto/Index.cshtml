@@ -15,7 +15,7 @@
         </div>
     </div>
 
-    <!-- 🔍 FILTROS -->
+    <!--  FILTROS -->
     <form method="get" asp-action="Index" class="row g-3 mb-4">
         <div class="col-md-4">
             <label class="form-label fw-bold">Buscar por Recinto</label>
@@ -42,7 +42,7 @@
         </div>
     </form>
 
-    <!-- 📋 TABLA -->
+    <!--  TABLA -->
     <div class="table-responsive shadow-sm rounded">
         <table class="table table-bordered table-hover align-middle text-center">
             <thead class="table-primary">
@@ -123,7 +123,7 @@
         </table>
     </div>
 
-    <!-- 📄 PAGINACIÓN -->
+    <!--  PAGINACIÓN -->
     @{
         int page = ViewBag.Page;
         int pageSize = ViewBag.PageSize;

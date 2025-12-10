@@ -70,7 +70,7 @@
                             <td>@obj.IdCambio</td>
                             <td>@obj.IdFactura</td>
                             <td>@obj.Factura.Comentario</td>
-                            <td>@obj.Factura.Fecha.ToString("dd/MM/yyyy")</td>
+                            <td>@obj.Factura.Fecha?.ToString("dd/MM/yyyy")</td>
                             <td>@obj.Usuario.Email</td>
                             <td>@obj.Estado</td>
                             <td>

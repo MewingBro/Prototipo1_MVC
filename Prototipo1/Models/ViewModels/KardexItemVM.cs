@@ -5,7 +5,7 @@ namespace Prototipo1.Models.ViewModels
 {
     public class KardexItemVM
     {
-        public DateTime FechaFactura { get; set; }
+        public DateTime? FechaFactura { get; set; }
         public int IdFactura { get; set; }
         public string TipoFactura { get; set; } // Entrada o Salida
         public int CantidadAumentada { get; set; }

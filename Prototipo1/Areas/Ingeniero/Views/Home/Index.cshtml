@@ -9,7 +9,7 @@
 }
 
 <div class="container mt-4">
-    <!-- 🔹 Título según sesión -->
+    <!-- Título según sesión -->
     <div class="row pb-3">
         @if (Context.Session.GetInt32("IdProyecto") == 0 || Context.Session.GetInt32("IdProyecto") == null)
         {
@@ -23,14 +23,14 @@
         }
     </div>
 
-    <!-- 🔍 Barra de búsqueda -->
+    <!--  Barra de búsqueda -->
     <div class="row mb-4">
         <div class="col-md-6">
             <input id="searchBox" type="text" class="form-control" placeholder="Buscar proyecto por nombre..." value="@search" />
         </div>
     </div>
 
-    <!-- 📦 Contenedor de tarjetas -->
+    <!-- Contenedor de tarjetas -->
     <div class="row g-3" id="proyectoContainer">
         @foreach (var proyecto in Model)
         {
@@ -56,7 +56,7 @@
         }
     </div>
 
-    <!-- 📄 Paginación -->
+    <!--  Paginación -->
     <nav aria-label="Paginación de proyectos" class="mt-4">
         <ul class="pagination justify-content-center">
             @for (int i = 1; i <= totalPages; i++)
@@ -71,7 +71,7 @@
 
 @section Scripts {
     <script>
-        // 🔎 Filtrado dinámico sin recargar la página
+        // Filtrado dinámico sin recargar la página
         document.getElementById("searchBox").addEventListener("keyup", function () {
             const query = this.value.trim();
             const url = '@Url.Action("Index", "Home")' + '?searchString=' + encodeURIComponent(query);

@@ -37,14 +37,14 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 .GetAllBYID(f => f.IdUsuario == IdUsuario, includeProperties: "Usuario,Proyecto")
                 .AsQueryable();
 
-            // 🔍 Filtro con búsqueda parcial e insensible a mayúsculas
+            // Filtro con búsqueda parcial e insensible a mayúsculas
             if (!string.IsNullOrWhiteSpace(filtroProyecto))
             {
                 string filtroLower = filtroProyecto.Trim().ToLower();
                 query = query.Where(f => f.Proyecto.NombreProyecto.ToLower().Contains(filtroLower));
             }
 
-            // 📄 Paginación
+            // Paginación
             int totalItems = query.Count();
             var usuariosProyectos = query
                 .OrderBy(f => f.Proyecto.NombreProyecto)

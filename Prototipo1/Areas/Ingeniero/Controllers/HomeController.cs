@@ -33,12 +33,12 @@ public IActionResult Index(string searchString, int page = 1)
 
         List<Proyecto> proyectoList = new List<Proyecto>();
 
-        // 🔹 Admin ve todos los proyectos
+        // Admin ve todos los proyectos
         if (User.IsInRole(SD.Role_Admin))
         {
             proyectoList = _unitOfWork.Proyecto.GetAll().ToList();
         }
-        // 🔹 Ingeniero o Bodeguero solo ven sus proyectos
+        // Ingeniero o Bodeguero solo ven proyectos a los cuales tienen acceso
         else if (User.IsInRole(SD.Role_Ingeniero) || User.IsInRole(SD.Role_Bodeguero))
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -55,7 +55,7 @@ public IActionResult Index(string searchString, int page = 1)
             }
         }
 
-        // 🔹 Filtrado por búsqueda
+        // Filtrado por búsqueda
         if (!string.IsNullOrEmpty(searchString))
         {
             proyectoList = proyectoList
@@ -63,7 +63,7 @@ public IActionResult Index(string searchString, int page = 1)
                 .ToList();
         }
 
-        // 🔹 Paginación
+        // Paginación
         const int pageSize = 8;
         int total = proyectoList.Count();
         int totalPages = (int)Math.Ceiling((double)total / pageSize);
@@ -72,7 +72,7 @@ public IActionResult Index(string searchString, int page = 1)
             .Take(pageSize)
             .ToList();
 
-        // 🔹 Pasar valores a la vista
+        //Pasar valores a la vista
         ViewBag.Page = page;
         ViewBag.PageSize = pageSize;
         ViewBag.TotalProyectos = total;

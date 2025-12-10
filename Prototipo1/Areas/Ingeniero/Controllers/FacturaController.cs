@@ -25,18 +25,18 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
 
 
         public IActionResult Index(
-    string Tipo,
-    int? IdFactura,
-    string? Impresion,
-    string Aposento,
-    string Nivel,
-    string Recinto,
-    DateTime? Fecha,
-    string Comentario,
-    string Estado,
-    int page = 1,
-    int pageSize = 10)
-    
+            string Tipo,
+            int? IdFactura,
+            string? Impresion,
+            string Aposento,
+            string Nivel,
+            string Recinto,
+            DateTime? Fecha,
+            string Comentario,
+            string Estado,
+            int page = 1,
+            int pageSize = 10)
+
         {
             ViewBag.Impresion = Impresion;
             int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
@@ -55,7 +55,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                     idTipoFactura = 2;
             }
 
-            // Base query
+            // consulta base
             var query = _unitOfWork.Factura.GetAllBYID(
                 f => f.IdProyecto == idProyecto,
                 includeProperties: "TipoFactura,Proyecto,Recinto,Recinto.Aposento.Nivel"
@@ -74,7 +74,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                                          f.Comentario.ToLower().Contains(Comentario.ToLower()));
 
             if (Fecha.HasValue)
-                query = query.Where(f => f.Fecha.Date == Fecha.Value.Date);
+                query = query.Where(f => f.Fecha?.Date == Fecha.Value.Date);
 
             if (!string.IsNullOrWhiteSpace(Aposento))
                 query = query.Where(f => f.Recinto != null &&
@@ -84,9 +84,13 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 query = query.Where(f => f.Recinto != null &&
                                          f.Recinto.Aposento.Nivel.NombreNivel.ToLower().Contains(Nivel.ToLower()));
 
-            if (!string.IsNullOrWhiteSpace(Recinto))
-                query = query.Where(f => f.Recinto != null &&
-                                         f.Recinto.NombreRecinto.ToLower().Contains(Recinto.ToLower()));
+            if (Tipo.Equals("Salida", StringComparison.OrdinalIgnoreCase))
+            {
+                if (!string.IsNullOrWhiteSpace(Recinto))
+                    query = query.Where(f => f.Recinto != null &&
+                                             f.Recinto.NombreRecinto.ToLower().Contains(Recinto.ToLower()));
+            }
+
 
             // Filtro por estado
             if (!string.IsNullOrWhiteSpace(Estado))
@@ -125,14 +129,11 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             return View(objFacturaLista);
         }
 
-
-
-
         public IActionResult Upsert(int? IdFactura, string? Tipo)
         {
             ViewBag.Tipo = Tipo;
             ViewBag.IdFactura = IdFactura;
-            
+
 
             // Lista de tipos de factura
             IEnumerable<SelectListItem> TipoFacturaList = _unitOfWork.TipoFactura.GetAll()
@@ -142,14 +143,14 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                     Value = u.IdTipoFactura.ToString()
                 });
 
-            // ✅ Lista de recintos filtrados por proyecto (si hay proyecto seleccionado)
+            // Lista de recintos filtrados por proyecto (si hay proyecto seleccionado)
             IEnumerable<SelectListItem> RecintoList = new List<SelectListItem>();
             int? IdProyecto = HttpContext.Session.GetInt32("IdProyecto");
             if (IdProyecto != null && IdProyecto != 0)
             {
                 RecintoList = _unitOfWork.Recinto.GetAllBYID(
                     filter: r => r.Aposento.Nivel.Proyecto.IdProyecto == IdProyecto,
-                    includeProperties: "Aposento" // necesario si usas navegación
+                    includeProperties: "Aposento" // necesario si se usa navegación
                 )
                 .Select(r => new SelectListItem
                 {
@@ -161,7 +162,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             FacturaVM FacturaVM = new()
             {
                 TipoFacturaList = TipoFacturaList,
-                RecintoList = RecintoList, // ✅ Se agrega al ViewModel
+                RecintoList = RecintoList, // Se agrega al ViewModel
                 Factura = new Factura()
             };
 
@@ -251,11 +252,32 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             }
             else
             {
-                FacturaVM.TipoFacturaList = _unitOfWork.TipoFactura.GetAll().Select(u => new SelectListItem
+
+
+                int? IdProyecto = HttpContext.Session.GetInt32("IdProyecto");
+                if (IdProyecto != null && IdProyecto != 0)
                 {
-                    Text = u.NombreTipoFactura,
-                    Value = u.IdTipoFactura.ToString()
-                });
+                    FacturaVM.RecintoList = _unitOfWork.Recinto.GetAllBYID(
+                        filter: r => r.Aposento.Nivel.Proyecto.IdProyecto == IdProyecto,
+                        includeProperties: "Aposento" // necesario si se usa navegación
+                    )
+                    .Select(r => new SelectListItem
+                    {
+                        Text = r.NombreRecinto,    // ajusta al nombre real del campo
+                        Value = r.IdRecinto.ToString()
+                    });
+                }
+
+                int TipoNum = FacturaVM.Factura.IdTipoFactura;
+                if (TipoNum == 1)
+                {
+                    ViewBag.Tipo = "Entrada";
+                }
+                else
+                {
+                    ViewBag.Tipo = "Salida";
+                }
+
                 return View(FacturaVM);
             }
 
@@ -263,20 +285,6 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
 
         }
 
-        [HttpPost]
-        public IActionResult Editar(Factura obj)
-        {
-            if (ModelState.IsValid)
-            {
-                _unitOfWork.Factura.Update(obj);
-                _unitOfWork.Save();
-                TempData["success"] = "Factura actualizada exitosamente";
-                return RedirectToAction("Index");
-            }
-
-            return View();
-
-        }
 
         public IActionResult Borrar(int? IdFactura)
         {
@@ -313,6 +321,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
 
         public IActionResult DetalleFactura(int idFactura)
         {
+            // muestra los detalles de facturas de entrada
             var factura = _unitOfWork.Factura.GetID(
                 f => f.IdFactura == idFactura,
                 includeProperties: "Proyecto,TipoFactura"
@@ -337,6 +346,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
 
         public IActionResult DetalleSalida(int idFactura)
         {
+            // muestra los detalles de facturas de salida
             // Obtener la factura junto con sus relaciones
             var factura = _unitOfWork.Factura.GetID(
                 f => f.IdFactura == idFactura,
@@ -374,7 +384,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 return RedirectToAction("Index", "Proyecto");
             }
 
-            // 🔹 Cargar lista de recintos del proyecto actual
+            // cargar lista de recintos del proyecto actual
             vm.Recintos = _unitOfWork.Recinto
                 .GetAllBYID(r => r.Aposento.Nivel.IdProyecto == idProyecto, includeProperties: "Aposento.Nivel")
                 .OrderBy(r => r.NombreRecinto)
@@ -384,7 +394,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             if (idProducto == null && idRecinto == null)
                 return View(vm);
 
-            // 🔹 Obtener el producto (si se seleccionó)
+            // Obtener el producto (si se seleccionó)
             if (idProducto != null)
             {
                 var producto = _unitOfWork.Producto.GetID(
@@ -398,7 +408,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 vm.Producto = producto;
             }
 
-            // 🔹 Entradas (filtrar por recinto si se indicó)
+            // Entradas (filtrar por recinto si se indicó)
             var entradas = _unitOfWork.FacturaProducto.GetAllBYID(
                 f =>
                     (idProducto == null || f.IdProducto == idProducto) &&
@@ -418,7 +428,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 Aposento = e.Factura.Recinto?.Aposento?.NombreAposento ?? "-"
             });
 
-            // 🔹 Salidas
+            // Salidas
             var salidas = _unitOfWork.FacturaSalidaProducto.GetAllBYID(
                 f =>
                     (idProducto == null || f.IdProducto == idProducto) &&
@@ -438,12 +448,12 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 Aposento = s.Factura.Recinto?.Aposento?.NombreAposento ?? "-"
             });
 
-            // 🔹 Combinar y ordenar cronológicamente
+            // Combinar y ordenar cronológicamente
             var movimientos = entradas.Concat(salidas)
                 .OrderBy(m => m.FechaFactura)
                 .ToList();
 
-            // 🔹 Calcular saldo acumulado
+            // Calcular saldo acumulado
             int saldo = 0;
             foreach (var m in movimientos)
             {
@@ -551,8 +561,6 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
 
             return View("KardexImprimir", vm);
         }
-
-
 
 
     }

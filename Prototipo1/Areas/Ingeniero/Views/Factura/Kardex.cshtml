@@ -111,7 +111,7 @@
                     @foreach (var mov in Model.Movimientos)
                     {
                         <tr>
-                            <td>@mov.FechaFactura.ToShortDateString()</td>
+                            <td>@mov.FechaFactura?.ToShortDateString()</td>
                             <td>@mov.IdFactura</td>
                             <td>
                                 @if (mov.TipoFactura == "Entrada")

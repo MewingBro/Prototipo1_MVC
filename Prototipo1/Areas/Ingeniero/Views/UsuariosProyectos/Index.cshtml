@@ -17,9 +17,9 @@
         </a>
     </div>
 
-    <!-- 🔍 Formulario de filtro -->
+    <!--  Formulario de filtro -->
     <form asp-controller="UsuariosProyectos" asp-action="Index" method="get" class="row g-2 mb-3">
-        <!-- ✅ Mantiene el IdUsuario -->
+        <!--  Mantiene el IdUsuario -->
         <input type="hidden" name="IdUsuario" value="@idUsuario" />
 
         <div class="col-md-4">
@@ -78,7 +78,7 @@
         </tbody>
     </table>
 
-    <!-- 📄 Paginación -->
+    <!--  Paginación -->
     <nav aria-label="Paginación">
         <ul class="pagination justify-content-center">
             @for (int i = 1; i <= ViewBag.TotalPages; i++)

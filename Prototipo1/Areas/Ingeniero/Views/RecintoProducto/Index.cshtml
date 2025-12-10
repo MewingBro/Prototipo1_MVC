@@ -17,7 +17,7 @@
         </div>
     </div>
 
-    <!-- 🔍 FILTROS -->
+    <!--  FILTROS -->
     <form asp-action="Index" asp-controller="RecintoProducto" method="get" class="row mb-3">
         <input type="hidden" name="IdRecinto" value="@ViewBag.IdRecinto" />
 
@@ -45,7 +45,7 @@
         </div>
     </form>
 
-    <!-- 🔢 TABLA -->
+    <!--  TABLA -->
     <table class="table table-bordered table-striped align-middle text-center">
         <thead class="table-primary">
             <tr>
@@ -113,7 +113,7 @@
         </tbody>
     </table>
 
-    <!-- 📄 PAGINACIÓN -->
+    <!--  PAGINACIÓN -->
     @{
         int page = ViewBag.Page;
         int totalPages = ViewBag.TotalPages;
@@ -142,7 +142,7 @@
         </nav>
     }
 
-    <!-- ✅ BOTÓN CONFIRMAR -->
+    <!--  BOTÓN CONFIRMAR -->
     <div class="col-12 mt-3">
         @if (ViewBag.Completado == "0")
         {

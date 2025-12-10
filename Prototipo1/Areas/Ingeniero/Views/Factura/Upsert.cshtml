@@ -45,7 +45,7 @@
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Recinto</label>
                         <select asp-for="@Model.Factura.IdRecinto" asp-items="@Model.RecintoList" class="form-select">
-                            <option disabled selected>---Seleccionar Recinto---</option>
+                            <option value="">---Seleccionar Recinto---</option>
                         </select>
                         <span asp-validation-for="Factura.IdRecinto" class="text-danger"></span>
                     </div>

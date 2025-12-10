@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Prototipo1.Data;
+using Prototipo1.Migrations;
 using Prototipo1.Models;
 using Prototipo1.Models.ViewModels;
 using Prototipo1.Repository;
@@ -14,6 +15,8 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
     [Authorize]
     public class RecintoProductoController : Controller
     {
+        //ESTE CONTROLADOR FUNCIONA PARA CONTROLAR LAS FUNCIONES DE LOS PRESUPUESTOS
+
         private readonly IUnitOfWork _unitOfWork;
         private readonly IWebHostEnvironment _webHostEnvironment;
         public RecintoProductoController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment)
@@ -41,7 +44,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 includeProperties: "Recinto,Recinto.Aposento.Nivel,Producto"
             );
 
-            // 🔍 Filtros dinámicos
+            // Filtros dinámicos
             if (!string.IsNullOrWhiteSpace(nombreProducto))
                 query = query.Where(rp => rp.Producto.NombreProducto.ToLower().Contains(nombreProducto.ToLower()));
 
@@ -57,7 +60,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             if (SoloCero.HasValue && SoloCero.Value)
                 query = query.Where(rp => rp.ExistenciasActuales == 0);
 
-            // 📊 Paginación
+            // Paginación
             int totalItems = query.Count();
             int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
@@ -109,23 +112,23 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 return RedirectToAction("SeleccionarProyecto", "Proyecto");
             }
 
-            // 1️ Obtener los productos del inventario del proyecto
+            // Obtener los productos del inventario del proyecto
             var inventarios = _unitOfWork.Inventario
                 .GetAllBYID(i => i.IdProyecto == idProyecto)
                 .ToList();
 
-            // 2️ Extraer sus IdProducto
+            // Extraer sus IdProducto
             var idsProductosInventario = inventarios
                 .Select(i => i.IdProducto)
                 .ToList();
 
-            // 3️ Obtener todos los productos y luego filtrar en memoria
+            // Obtener todos los productos y luego filtrar en memoria
             var productos = _unitOfWork.Producto
                 .GetAll()
                 .Where(p => idsProductosInventario.Contains(p.IdProducto))
                 .ToList();
 
-            // 4️ Armar la lista para el dropdown
+            // Armar la lista para el dropdown
             IEnumerable<SelectListItem> ProductoList = productos.Select(u => new SelectListItem
             {
                 Text = u.NombreProducto,
@@ -179,16 +182,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             else
             {
 
-                RecintoProductoVM.RecintoList = _unitOfWork.Recinto.GetAll().Select(u => new SelectListItem
-                {
-                    Text = u.NombreRecinto.ToString(),
-                    Value = u.IdRecinto.ToString()
-                });
-                RecintoProductoVM.ProductoList = _unitOfWork.Producto.GetAll().Select(u => new SelectListItem
-                {
-                    Text = u.NombreProducto.ToString(),
-                    Value = u.IdProducto.ToString()
-                });
+
 
                 return View(RecintoProductoVM);
             }
@@ -253,7 +247,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             query = query.Where(n => n.Recinto.Aposento.Nivel.IdProyecto == idProyecto);
 
 
-            // 🔍 Filtros dinámicos
+            // Filtros dinámicos
             if (!string.IsNullOrWhiteSpace(nombreNivel))
                 query = query.Where(rp => rp.Recinto.Aposento.Nivel.NombreNivel.ToLower().Contains(nombreNivel.ToLower()));
 
@@ -280,7 +274,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 };
             }
 
-            // 📊 Paginación
+            // Paginación
             int totalItems = query.Count();
             int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
@@ -324,7 +318,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             // Filtrar solo por proyecto
             query = query.Where(rp => rp.Recinto.Aposento.Nivel.IdProyecto == idProyecto);
 
-            // 🔍 Aplicar los filtros que vinieron del view Detalle
+            // Aplicar los filtros que vinieron del view Detalle
             if (!string.IsNullOrWhiteSpace(nombreNivel))
                 query = query.Where(rp => rp.Recinto.Aposento.Nivel.NombreNivel.ToLower().Contains(nombreNivel.ToLower()));
 
@@ -370,11 +364,11 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 includeProperties: "Recinto,Recinto.Aposento.Nivel,Producto"
             );
 
-            // 🔹 Filtrar por proyecto
+            // Filtrar por proyecto
             if (idProyecto.HasValue)
                 query = query.Where(rp => rp.Recinto.Aposento.Nivel.IdProyecto == idProyecto);
 
-            // 🔍 Filtros dinámicos
+            // Filtros dinámicos
             if (!string.IsNullOrWhiteSpace(nombreNivel))
                 query = query.Where(rp => rp.Recinto.Aposento.Nivel.NombreNivel.ToLower().Contains(nombreNivel.ToLower()));
 
@@ -384,7 +378,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             if (!string.IsNullOrWhiteSpace(nombreRecinto))
                 query = query.Where(rp => rp.Recinto.NombreRecinto.ToLower().Contains(nombreRecinto.ToLower()));
 
-            // 📊 Cálculo de porcentajes totales por recinto
+            // Cálculo de porcentajes totales por recinto
             var totalesPorRecinto = query
                 .GroupBy(rp => rp.Recinto.NombreRecinto)
                 .Select(g => new
@@ -400,11 +394,11 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                         : 0
                 );
 
-            // 📄 Total de registros antes de paginar
+            // Total de registros antes de paginar
             int totalRegistros = query.Count();
             int totalPages = (int)Math.Ceiling(totalRegistros / (double)pageSize);
 
-            // 📦 Aplicar paginación y proyección
+            // Aplicar paginación y proyección
             var lista = query
                 .OrderBy(rp => rp.Recinto.Aposento.Nivel.NombreNivel)
                 .Skip((page - 1) * pageSize)
@@ -428,7 +422,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 })
                 .ToList();
 
-            // 📋 Guardar filtros y datos de paginación
+            // Guardar filtros y datos de paginación
             ViewBag.NombreNivel = nombreNivel;
             ViewBag.NombreAposento = nombreAposento;
             ViewBag.NombreRecinto = nombreRecinto;

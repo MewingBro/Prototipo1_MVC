@@ -27,8 +27,10 @@ namespace Prototipo1.Models
         [ValidateNever]
         public Producto Producto { get; set; }
 
-        public double Presupuesto { get; set; }
-        public double Desperdicio { get; set; }
+        [Required(ErrorMessage = "Debe indicar el presupuesto")]
+        public double? Presupuesto { get; set; }
+        [Required(ErrorMessage = "Debe indicar el desperdicio")]
+        public double? Desperdicio { get; set; }
         [ValidateNever]
         public double ExistenciasActuales { get; set; }
 

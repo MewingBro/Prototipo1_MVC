@@ -163,7 +163,7 @@
                                 document.getElementById("productoMedia").innerText = p.mediaAritmetica;
                                 document.getElementById("productoInfo").style.display = "block";
 
-                                // 🔹 Obtener inventario actual del producto
+                                // Obtener inventario actual del producto
                                 fetch(`/Ingeniero/Producto/ObtenerInventarioProducto?idProducto=${p.idProducto}`)
                                     .then(r => r.json())
                                     .then(inv => {

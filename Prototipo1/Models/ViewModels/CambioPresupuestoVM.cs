@@ -8,9 +8,9 @@ namespace Prototipo1.Models.ViewModels
         public int IdFactura { get; set; }
         public string CodigoProducto { get; set; }
         public string NombreProducto { get; set; }
-        public double Presupuesto { get; set; }
+        public double? Presupuesto { get; set; }
         public double CantidadDisminuida { get; set; }
-        public double Sobregiro => CantidadDisminuida - Presupuesto;
+        public double? Sobregiro => CantidadDisminuida - Presupuesto;
         public string Nivel { get; set; }
         public string Aposento { get; set; }
         public string Recinto { get; set; }

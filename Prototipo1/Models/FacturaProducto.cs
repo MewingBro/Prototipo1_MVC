@@ -25,10 +25,10 @@ namespace Prototipo1.Models
         [ValidateNever]
         public Producto Producto { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Debe indicar la cantidad aumentada")]
         public int CantidadAumentada { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Debe indicar a quién se le hizo la entrega")]
         public string EntregadoA { get; set; }
     }
 }

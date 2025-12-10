@@ -7,7 +7,7 @@ namespace Prototipo1.Models
     {
         [Key]
         public int IdUnidad{ get; set; }
-        [Required(ErrorMessage = "El campo es requerido")]
+        [Required(ErrorMessage = "Debe indicar el nombre de la unidad")]
         [MaxLength(200)]
         [DisplayName("Nombre de la Unidad de Producto")]
         public string NombreUnidad { get; set; }

@@ -15,7 +15,7 @@ namespace Prototipo1.Models
         [Key]
         public int IdProyecto { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Debe indicar el nombre del proyecto")]
         [Display(Name = "Nombre del proyecto")]
         public string NombreProyecto { get; set; }
 

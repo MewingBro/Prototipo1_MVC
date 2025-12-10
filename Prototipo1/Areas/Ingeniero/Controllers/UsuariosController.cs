@@ -135,7 +135,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                     return View(model);
                 }
 
-                // 🧩 Actualizar rol
+                // Actualizar rol
                 var rolesActuales = await _userManager.GetRolesAsync(user);
                 if (!rolesActuales.Contains(model.Role))
                 {
@@ -143,7 +143,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                     await _userManager.AddToRoleAsync(user, model.Role);
                 }
 
-                // 🔐 Cambiar contraseña si el campo no está vacío
+                // Cambiar contraseña si el campo no está vacío
                 if (!string.IsNullOrWhiteSpace(model.Password))
                 {
                     var removePass = await _userManager.RemovePasswordAsync(user);
@@ -177,7 +177,6 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             return View(model);
         }
 
-        // GET: Ingeniero/Usuarios/Delete/id
         public async Task<IActionResult> Borrar(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -190,7 +189,6 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             return View(user);
         }
 
-        // POST: Ingeniero/Usuarios/Delete
         [HttpPost]
         [ValidateAntiForgeryToken]
         [HttpPost, ActionName("Borrar")]

@@ -8,7 +8,7 @@ namespace Prototipo1.Data
     {
         public AppDBContext(DbContextOptions<AppDBContext> options) : base(options) 
         {
-                
+               
         }
 
         public DbSet<Familia> Familia { get; set; }
@@ -47,6 +47,7 @@ namespace Prototipo1.Data
             // necesario cuando se instala Identity
             base.OnModelCreating(modelBuilder); 
 
+            //datos precargados de las familias
             modelBuilder.Entity<Familia>().HasData(
                 new Familia { IdFamilia = 1, NombreFamilia = "BAÑOS" },
                 new Familia { IdFamilia = 2, NombreFamilia = "BASES" },
@@ -63,6 +64,7 @@ namespace Prototipo1.Data
 
                 );
 
+            // datos precargados de las unidades
             modelBuilder.Entity<Unidad>().HasData(
                 new Unidad { IdUnidad = 1, NombreUnidad = "BOLSA" },
                 new Unidad { IdUnidad = 2, NombreUnidad = "CUBETA" },
@@ -72,6 +74,7 @@ namespace Prototipo1.Data
 
                 );
 
+            // datos para los tipos de factura
             modelBuilder.Entity<TipoFactura>().HasData(
                 new TipoFactura { IdTipoFactura = 1, NombreTipoFactura = "Entrada" },
                 new TipoFactura { IdTipoFactura = 2, NombreTipoFactura = "Salida" }

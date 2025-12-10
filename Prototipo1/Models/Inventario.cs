@@ -22,7 +22,7 @@ namespace Prototipo1.Models
         public Producto Producto { get; set; }
 
 
-        [Required]
+        [Required(ErrorMessage = "Debe indicar las existencias")]
         public double Existencias { get; set; }
 
         public int IdProyecto { get; set; }

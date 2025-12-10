@@ -38,12 +38,14 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
+            //obtiene datos del usuario logueado
             var userId = _userManager.GetUserId(User);
             var roles = _userManager.GetRolesAsync(_userManager.GetUserAsync(User).Result).Result;
             bool esIngeniero = roles.Contains("Ingeniero");
 
             IEnumerable<Cambio> cambiosQuery;
 
+            // la lista de cambios varia segun el tipo de usuario logueado
             if (esIngeniero)
             {
                 // Solo las solicitudes del ingeniero logueado
@@ -73,7 +75,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 cambiosQuery = cambiosQuery.Where(c => c.Factura.Comentario.ToLower().Contains(comentario.ToLower()));
 
             if (fecha.HasValue)
-                cambiosQuery = cambiosQuery.Where(c => c.Factura.Fecha.Date == fecha.Value.Date);
+                cambiosQuery = cambiosQuery.Where(c => c.Factura.Fecha?.Date == fecha.Value.Date);
 
             if (!string.IsNullOrWhiteSpace(estado))
                 cambiosQuery = cambiosQuery.Where(c => c.Estado.ToLower() == estado.ToLower());
@@ -104,7 +106,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
         [Authorize] // Asegura que solo usuarios logueados puedan crear solicitudes
         public IActionResult Create(int IdFactura,string Comentario)
         {
-            // 🔹 Obtener el usuario actual (Identity)
+            // Obtener el usuario actual (Identity)
             var userId = _userManager.GetUserId(User);
 
             if (string.IsNullOrEmpty(userId))
@@ -113,7 +115,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            // 🔹 Crear la solicitud
+            // Crear la solicitud
             Cambio nuevaSolicitud = new Cambio
             {
                 IdFactura = IdFactura,
@@ -131,7 +133,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             var factura = _unitOfWork.Factura.GetID(f => f.IdFactura == IdFactura);
             if (factura != null)
             {
-                factura.EstadoFactura = 2; // Pendiente
+                factura.EstadoFactura = 2; // Pendiente de aprobacion
                 _unitOfWork.Factura.Update(factura);
             }
             _unitOfWork.Save();
@@ -163,7 +165,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 includeProperties: "Producto"
             ).ToList();
 
-            // 🔹 Construir una lista de objetos para mostrar los datos combinados
+            // Construir una lista de objetos para mostrar los datos combinados
             var detalleVM = productos.Select(p =>
             {
                 // Buscar existencias actuales en RecintoProducto
@@ -213,7 +215,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 includeProperties: "Producto"
             ).ToList();
 
-            // 🔹 Lista para registrar los detalles del cambio
+            // Lista para registrar los detalles del cambio
             List<CambioDetalle> detallesExcedidos = new();
 
             foreach (var p in productos)
@@ -229,7 +231,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
 
                 if (excedePresupuesto)
                 {
-                    // ✅ Guardar detalle del producto excedido
+                    // Guardar detalle del producto excedido
                     var detalle = new CambioDetalle
                     {
                         IdCambio = IdCambio,
@@ -260,7 +262,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 }
             }
 
-            // 🔹 Guardar todos los detalles de productos excedidos
+            // Guardar todos los detalles de productos excedidos
             if (detallesExcedidos.Any())
             {
                 foreach (var d in detallesExcedidos)
@@ -269,7 +271,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 }
             }
 
-            // ✅ Cambiar estado y guardar comentario
+            // Cambiar estado de la factura y guardar comentario
             var factura = _unitOfWork.Factura.GetID(f => f.IdFactura == idFactura);
             if (factura != null)
             {
@@ -307,7 +309,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             var factura = _unitOfWork.Factura.GetID(f => f.IdFactura == cambio.IdFactura);
             if (factura != null)
             {
-                factura.EstadoFactura = 3;
+                factura.EstadoFactura = 3; // no se efectuan cambios y la factura se muestra en estado rechazada
                 _unitOfWork.Factura.Update(factura);
             }
 
@@ -327,7 +329,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            // 🔹 Cargar los cambios aprobados del proyecto activo
+            // Cargar los cambios aprobados del proyecto activo
             var cambios = _unitOfWork.Cambio.GetAllBYID(
                 c => c.Estado == "Aprobado" && c.Factura.IdProyecto == idProyecto,
                 includeProperties: "Factura,Factura.Recinto,Factura.Proyecto,Factura.Recinto.Aposento.Nivel"
@@ -337,7 +339,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 includeProperties: "Producto"
             ).ToList();
 
-            // 🔹 Construir el resultado uniendo los datos necesarios
+            // Construir el resultado uniendo los datos necesarios
             var resultado = (from c in cambios
                              join d in detalles on c.IdCambio equals d.IdCambio
                              let rec = c.Factura.Recinto
@@ -354,7 +356,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                                  Comentario = c.Comentario
                              }).ToList();
 
-            // 🔹 Aplicar filtros dinámicos
+            // Aplicar filtros dinámicos
             if (!string.IsNullOrWhiteSpace(nivel))
                 resultado = resultado.Where(x => x.Nivel.Contains(nivel, StringComparison.OrdinalIgnoreCase)).ToList();
 
@@ -406,7 +408,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                                  Comentario = c.Comentario
                              }).ToList();
 
-            // 🔹 Aplicar filtros igual que en el action principal
+            // Aplicar filtros igual que en el action principal
             if (!string.IsNullOrWhiteSpace(nivel))
                 resultado = resultado.Where(x => x.Nivel.Contains(nivel, StringComparison.OrdinalIgnoreCase)).ToList();
             if (!string.IsNullOrWhiteSpace(aposento))

@@ -34,13 +34,13 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            // 🔹 Obtiene los aposentos del proyecto actual
+            // Obtiene los aposentos del proyecto actual
             var aposentos = _unitOfWork.Aposento.GetAllBYID(
                 a => a.Nivel.IdProyecto == idProyecto,
                 includeProperties: "Nivel,Nivel.Proyecto"
             );
 
-            // 🔍 Filtros (insensibles a mayúsculas/minúsculas)
+            // Filtros (insensibles a mayúsculas/minúsculas)
             if (!string.IsNullOrEmpty(searchAposento))
             {
                 var aposentoLower = searchAposento.ToLower();
@@ -53,7 +53,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 aposentos = aposentos.Where(a => a.Nivel.NombreNivel.ToLower().Contains(nivelLower));
             }
 
-            // 📊 Total y paginación
+            //Total y paginación
             var totalAposentos = aposentos.Count();
             var aposentosPaginados = aposentos
                 .OrderBy(a => a.IdAposento)
@@ -61,7 +61,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 .Take(pageSize)
                 .ToList();
 
-            // 📦 Datos auxiliares para la vista
+            //Datos auxiliares para la vista
             ViewBag.Page = page;
             ViewBag.PageSize = pageSize;
             ViewBag.TotalAposentos = totalAposentos;
@@ -76,17 +76,16 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
 
         {
 
-            // 🔹 Obtener el IdProyecto actual (desde Session o donde lo tengas guardado)
+            //Obtener el IdProyecto actual
             int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
 
             if (idProyecto == null)
-            {
-                // Opcional: puedes redirigir o lanzar un error si no hay proyecto seleccionado
+            {      
                 TempData["Error"] = "Debe seleccionar un proyecto antes de agregar un aposento.";
                 return RedirectToAction("Index", "Proyecto");
             }
 
-            // 🔹 Filtrar los niveles solo del proyecto actual
+            //Filtrar los niveles solo del proyecto actual
             IEnumerable<SelectListItem> NivelList = _unitOfWork.Nivel
                 .GetAllBYID(n => n.IdProyecto == idProyecto)
                 .Select(u => new SelectListItem
@@ -95,21 +94,21 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                     Value = u.IdNivel.ToString()
                 });
 
-            // 🔹 Crear el ViewModel
+            // Crear el ViewModel
             AposentoVM AposentoVM = new()
             {
                 NivelList = NivelList,
                 Aposento = new Aposento()
             };
 
-            // 🔹 Si es nuevo registro
+            // Si es nuevo registro
             if (IdAposento == null || IdAposento == 0)
             {
                 return View(AposentoVM);
             }
             else
             {
-                // 🔹 Si es edición, cargar el Aposento existente
+                //Si es edición, cargar el Aposento existente
                 AposentoVM.Aposento = _unitOfWork.Aposento.GetID(u => u.IdAposento == IdAposento);
                 return View(AposentoVM);
             }
@@ -119,16 +118,18 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
         [HttpPost]
         public IActionResult Upsert(AposentoVM AposentoVM, IFormFile? file)
         {
+            // se asegura que el modelo sea valido
             if (ModelState.IsValid)
             {
 
-
                 if (AposentoVM.Aposento.IdAposento == 0)
                 {
+                    // agrega un nuevo aposento
                     _unitOfWork.Aposento.Add(AposentoVM.Aposento);
                 }
                 else
                 {
+                    //modifica un aposento existente
                     _unitOfWork.Aposento.Update(AposentoVM.Aposento);
                 }
 
@@ -138,35 +139,21 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             }
             else
             {
-                AposentoVM.NivelList = _unitOfWork.Nivel.GetAll().Select(u => new SelectListItem
-                {
-                    Text = u.NombreNivel,
-                    Value = u.IdNivel.ToString()
-                });
+                int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
+                // si el modelo no es valido, se devuelve a la lista
+                AposentoVM.NivelList = _unitOfWork.Nivel
+            .GetAllBYID(n => n.IdProyecto == idProyecto)
+            .Select(n => new SelectListItem
+            {
+                Text = n.NombreNivel,
+                Value = n.IdNivel.ToString()
+            });
+
 
                 return View(AposentoVM);
             }
 
-
-
         }
-        /*
-        public IActionResult Editar(int? IdAposento)
-        {
-            if (IdAposento == null || IdAposento == 0)
-            {
-                return NotFound();
-            }
-
-            Aposento? Aposento = _unitOfWork.Aposento.GetID(u => u.IdAposento == IdAposento);
-            if (Aposento == null)
-            {
-                return NotFound();
-            }
-            return View(Aposento);
-        }
-        */
-
 
         public IActionResult Borrar(int? IdAposento)
         {
@@ -183,9 +170,11 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             return View(Aposento);
         }
 
+
         [HttpPost, ActionName("Borrar")]
         public IActionResult BorrarPOST(int? IdAposento)
         {
+            // carga el aposento a borrar
             Aposento? obj = _unitOfWork.Aposento.GetID(u => u.IdAposento == IdAposento);
             if (obj == null)
             {

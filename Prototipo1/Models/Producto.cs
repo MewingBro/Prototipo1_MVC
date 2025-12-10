@@ -16,15 +16,15 @@ namespace Prototipo1.Models
     {
         [Key]
         public int IdProducto { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Debe indicar el código del producto")]
 
         [Display(Name = "Codigo del producto")]
         public string CodigoProducto { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Debe indicar el nombre del producto")]
         [Display(Name = "Nombre del producto")]
         public string NombreProducto { get; set; }
         public string Descripcion { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Debe indicar la cantidad de días deseados para el posterior cálculo de esta medida")]
         public int MediaAritmetica { get; set; }
 
         public int IdFamilia { get; set; }

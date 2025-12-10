@@ -15,7 +15,7 @@
         </div>
     </div>
 
-    <!-- 🔍 Filtro -->
+    <!--  Filtro -->
     <form method="get" asp-action="Index" class="row g-2 align-items-end mb-4">
         <div class="col-md-4">
             <label class="form-label fw-bold">Buscar</label>
@@ -32,7 +32,7 @@
         </div>
     </form>
 
-    <!-- 📋 Tabla -->
+    <!--  Tabla -->
     <div class="table-responsive shadow-sm rounded">
         <table class="table table-bordered table-hover align-middle text-center">
             <thead class="table-primary">
@@ -75,7 +75,7 @@
         </table>
     </div>
 
-    <!-- 📄 Paginación -->
+    <!--  Paginación -->
     @{
         int page = ViewBag.Page;
         int pageSize = ViewBag.PageSize;

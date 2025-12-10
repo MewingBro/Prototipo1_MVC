@@ -49,7 +49,7 @@
                 return;
             }
 
-            // 👇 Enviamos también el IdFactura para que el backend filtre por recinto
+            // Se envia también el IdFactura para que el backend filtre por recinto
             fetch(`/Ingeniero/Producto/BuscarProductos?filtro=${encodeURIComponent(filtro)}&idFactura=${encodeURIComponent(facturaId)}`)
                 .then(res => res.json())
                 .then(data => {

@@ -14,11 +14,12 @@ namespace Prototipo1.Models
     {
         [Key]
         public int IdRecinto { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Debe indicar el nombre del recinto")]
         [Display(Name = "Nombre del Recinto")]
         public string NombreRecinto { get; set; }
 
-        public int IdAposento { get; set; }
+        [Required(ErrorMessage = "Debe indicar el aposento")]
+        public int? IdAposento { get; set; }
         [ForeignKey("IdAposento")]
         [ValidateNever]
         public Aposento Aposento { get; set; }

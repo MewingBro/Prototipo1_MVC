@@ -75,7 +75,7 @@
             <tbody>
                 @foreach (var item in Model)
                 {
-                    double Suma = (@item.CantidadDisminuida - @item.Presupuesto);
+                    double? Suma = (@item.CantidadDisminuida - @item.Presupuesto);
                     <tr>
                         <td>@item.IdFactura</td>
                         <td>@item.CodigoProducto</td>

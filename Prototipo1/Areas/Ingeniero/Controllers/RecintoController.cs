@@ -39,7 +39,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 includeProperties: "Aposento,Aposento.Nivel.Proyecto"
             ).AsQueryable();
 
-            // 🔍 Filtros (case-insensitive)
+            // Filtros (case-insensitive)
             if (!string.IsNullOrEmpty(searchRecinto))
             {
                 var recintoLower = searchRecinto.ToLower();
@@ -58,7 +58,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 recintos = recintos.Where(r => r.Aposento.Nivel.NombreNivel.ToLower().Contains(nivelLower));
             }
 
-            // 📄 Paginación
+            // Paginación
             var total = recintos.Count();
             var recintosPaginados = recintos
                 .OrderBy(r => r.IdRecinto)
@@ -81,7 +81,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
 
         {
 
-            // 🔹 Obtener el IdProyecto actual (desde Session o donde lo tengas guardado)
+            // Obtener el IdProyecto actual (desde Session o donde lo tengas guardado)
             int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
 
             if (idProyecto == null)
@@ -91,7 +91,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 return RedirectToAction("Index", "Proyecto");
             }
 
-            // 🔹 Filtrar los niveles solo del proyecto actual
+            // Filtrar los niveles solo del proyecto actual
             IEnumerable<SelectListItem> AposentoList = _unitOfWork.Aposento
                 .GetAllBYID(n => n.Nivel.IdProyecto == idProyecto)
                 .Select(u => new SelectListItem
@@ -100,21 +100,21 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                     Value = u.IdAposento.ToString()
                 });
 
-            // 🔹 Crear el ViewModel
+            // Crear el ViewModel
             RecintoVM RecintoVM = new()
             {
                 AposentoList = AposentoList,
                 Recinto = new Recinto()
             };
 
-            // 🔹 Si es nuevo registro
+            // Si es nuevo registro
             if (IdRecinto == null || IdRecinto == 0)
             {
                 return View(RecintoVM);
             }
             else
             {
-                // 🔹 Si es edición, cargar el Recinto existente
+                // Si es edición, cargar el Recinto existente
                 RecintoVM.Recinto = _unitOfWork.Recinto.GetID(u => u.IdRecinto == IdRecinto);
                 return View(RecintoVM);
             }
@@ -148,6 +148,15 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                     Text = u.NombreAposento,
                     Value = u.IdAposento.ToString()
                 });
+                // si el modelo no es valido, se devuelve a la lista
+                int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
+                RecintoVM.AposentoList = _unitOfWork.Aposento
+            .GetAllBYID(n => n.Nivel.IdProyecto == idProyecto)
+            .Select(n => new SelectListItem
+            {
+                Text = n.NombreAposento,
+                Value = n.IdAposento.ToString()
+            });
 
                 return View(RecintoVM);
             }
@@ -155,23 +164,6 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
 
 
         }
-        /*
-        public IActionResult Editar(int? IdRecinto)
-        {
-            if (IdRecinto == null || IdRecinto == 0)
-            {
-                return NotFound();
-            }
-
-            Recinto? Recinto = _unitOfWork.Recinto.GetID(u => u.IdRecinto == IdRecinto);
-            if (Recinto == null)
-            {
-                return NotFound();
-            }
-            return View(Recinto);
-        }
-        */
-
 
         public IActionResult Borrar(int? IdRecinto)
         {
