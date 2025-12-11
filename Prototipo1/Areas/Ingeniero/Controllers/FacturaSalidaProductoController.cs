@@ -255,7 +255,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
 
                     if (recintoProducto != null)
                     {
-                        double existencias = recintoProducto.ExistenciasActuales;
+                        double? existencias = recintoProducto.ExistenciasActuales;
 
                         if (totalDisminuido > existencias)
                         {

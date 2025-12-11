@@ -27,6 +27,8 @@ namespace Prototipo1.Areas.Identity.Pages.Account
         {
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
+            // elimina el proyecto seleccionado cuando se cierra sesion
+            HttpContext.Session.SetInt32("IdProyecto", 0);
             if (returnUrl != null)
             {
                 return LocalRedirect(returnUrl);

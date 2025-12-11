@@ -84,12 +84,10 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 query = query.Where(f => f.Recinto != null &&
                                          f.Recinto.Aposento.Nivel.NombreNivel.ToLower().Contains(Nivel.ToLower()));
 
-            if (Tipo.Equals("Salida", StringComparison.OrdinalIgnoreCase))
-            {
                 if (!string.IsNullOrWhiteSpace(Recinto))
                     query = query.Where(f => f.Recinto != null &&
                                              f.Recinto.NombreRecinto.ToLower().Contains(Recinto.ToLower()));
-            }
+            
 
 
             // Filtro por estado
@@ -310,12 +308,23 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
                 return Json(new { success = false, message = "Error al borrar" });
             }
 
+            int TipoFactura = obj.IdTipoFactura;
+            string Tipo = "";
 
-            _unitOfWork.Factura.Delete(obj);
+            if (TipoFactura == 1) {
+                Tipo = "Entrada";
+                    } 
+            else if (TipoFactura == 2) {
+                Tipo = "Salida"; 
+            }
+
+
+
+                _unitOfWork.Factura.Delete(obj);
             _unitOfWork.Save();
             TempData["success"] = "Factura borrada exitosamente";
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { Tipo = Tipo });
 
         }
 

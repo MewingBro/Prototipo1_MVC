@@ -32,7 +32,7 @@ namespace Prototipo1.Models
         [Required(ErrorMessage = "Debe indicar el desperdicio")]
         public double? Desperdicio { get; set; }
         [ValidateNever]
-        public double ExistenciasActuales { get; set; }
+        public double? ExistenciasActuales { get; set; }
 
 
     }

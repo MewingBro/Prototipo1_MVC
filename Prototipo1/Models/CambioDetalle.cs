@@ -29,7 +29,7 @@ namespace Prototipo1.Models {
 
         public double? Presupuesto { get; set; }
 
-        public double ExistenciasActuales { get; set; }
+        public double? ExistenciasActuales { get; set; }
 
         public double CantidadDisminuida { get; set; }
     }
