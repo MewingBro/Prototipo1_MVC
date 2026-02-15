@@ -127,10 +127,11 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             return View(objFacturaLista);
         }
 
-        public IActionResult Upsert(int? IdFactura, string? Tipo)
+        public IActionResult Upsert(int? IdFactura, string? Tipo, int? EstadoFactura)
         {
             ViewBag.Tipo = Tipo;
             ViewBag.IdFactura = IdFactura;
+            ViewBag.Estado = EstadoFactura;
 
 
             // Lista de tipos de factura
@@ -284,8 +285,9 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
         }
 
 
-        public IActionResult Borrar(int? IdFactura)
+        public IActionResult Borrar(int? IdFactura, string? Tipo)
         {
+
             if (IdFactura == null || IdFactura == 0)
             {
                 return NotFound();
@@ -296,6 +298,9 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             {
                 return NotFound();
             }
+
+            ViewBag.TipoFactura = Tipo;
+
             return View(Factura);
         }
 
@@ -390,7 +395,7 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             if (idProyecto == null)
             {
                 TempData["Error"] = "Debe seleccionar un proyecto antes de generar el reporte Kardex.";
-                return RedirectToAction("Index", "Proyecto");
+                return RedirectToAction("Index", "Home");
             }
 
             // cargar lista de recintos del proyecto actual

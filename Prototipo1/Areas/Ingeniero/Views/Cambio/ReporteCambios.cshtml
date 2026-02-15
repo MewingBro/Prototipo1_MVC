@@ -15,42 +15,62 @@
         <div class="card-body px-4 py-4">
             <!--Filtros -->
             <form method="get" asp-action="ReporteCambios" class="row g-3 mb-3">
+
+                <!-- Filtros -->
                 <div class="col-md-2">
-                    <input type="text" name="nivel" class="form-control" placeholder="Nivel" value="@Context.Request.Query["nivel"]" />
+                    <input type="text" name="nivel" class="form-control" placeholder="Nivel"
+                           value="@Context.Request.Query["nivel"]" />
                 </div>
+
                 <div class="col-md-2">
-                    <input type="text" name="aposento" class="form-control" placeholder="Aposento" value="@Context.Request.Query["aposento"]" />
+                    <input type="text" name="aposento" class="form-control" placeholder="Aposento"
+                           value="@Context.Request.Query["aposento"]" />
                 </div>
+
                 <div class="col-md-2">
-                    <input type="text" name="recinto" class="form-control" placeholder="Recinto" value="@Context.Request.Query["recinto"]" />
+                    <input type="text" name="recinto" class="form-control" placeholder="Recinto"
+                           value="@Context.Request.Query["recinto"]" />
                 </div>
-                <div class="col-md-2">
-                    <input type="text" name="codigo" class="form-control" placeholder="Código Producto" value="@Context.Request.Query["codigo"]" />
+
+                <div class="col-md-3">
+                    <input type="text" name="codigo" class="form-control" placeholder="Código Producto"
+                           value="@Context.Request.Query["codigo"]" />
                 </div>
-                <div class="col-md-2">
-                    <input type="text" name="nombre" class="form-control" placeholder="Nombre Producto" value="@Context.Request.Query["nombre"]" />
+
+                <div class="col-md-3">
+                    <input type="text" name="nombre" class="form-control" placeholder="Nombre Producto"
+                           value="@Context.Request.Query["nombre"]" />
                 </div>
-                <div class="col-md-2 d-flex justify-content-end">
-                    <div class="btn-group w-100" role="group">
-                        <button type="submit" class="btn btn-warning">
-                            <i class="bi bi-search"></i> Filtrar
-                        </button>
-                        <a asp-action="ReporteCambios" class="btn btn-outline-warning">
-                            <i class="bi bi-x-circle"></i> Limpiar
-                        </a>
-                        <a asp-action="ImprimirReporteCambios"
-                           asp-route-nivel="@Context.Request.Query["nivel"]"
-                           asp-route-aposento="@Context.Request.Query["aposento"]"
-                           asp-route-recinto="@Context.Request.Query["recinto"]"
-                           asp-route-codigo="@Context.Request.Query["codigo"]"
-                           asp-route-nombre="@Context.Request.Query["nombre"]"
-                           target="_blank"
-                           class="btn btn-primary">
-                            <i class="bi bi-printer"></i> Imprimir
-                        </a>
+
+                <!-- Botones -->
+                <div class="col-12">
+                    <div class="d-flex justify-content-end">
+                        <div class="btn-group" role="group">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-search"></i> Filtrar
+                            </button>
+
+                            <a asp-action="ReporteCambios" class="btn btn-outline-warning">
+                                <i class="bi bi-x-circle"></i> Limpiar
+                            </a>
+
+                            <a asp-action="ImprimirReporteCambios"
+                               asp-route-nivel="@Context.Request.Query["nivel"]"
+                               asp-route-aposento="@Context.Request.Query["aposento"]"
+                               asp-route-recinto="@Context.Request.Query["recinto"]"
+                               asp-route-codigo="@Context.Request.Query["codigo"]"
+                               asp-route-nombre="@Context.Request.Query["nombre"]"
+                               target="_blank"
+                               class="btn btn-primary">
+                                <i class="bi bi-printer"></i> Imprimir
+                            </a>
+                        </div>
                     </div>
                 </div>
+
             </form>
+       
+
 
             <!--Tabla -->
             <div class="table-responsive">

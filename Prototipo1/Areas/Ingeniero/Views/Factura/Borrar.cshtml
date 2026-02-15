@@ -2,6 +2,7 @@
 
 <form method="post" class="container mt-5">
     <input asp-for="IdFactura" hidden />
+    <input asp-for="TipoFactura" hidden value="@ViewBag.TipoFactura" />
 
     <div class="card shadow-lg border-0 rounded-3">
         <div class="card-header bg-danger text-white text-center py-3 rounded-top">
@@ -37,7 +38,7 @@
                     </button>
                 </div>
                 <div class="col-6 col-md-3">
-                    <a asp-controller="Factura" asp-action="Index" class="btn btn-outline-secondary w-100 shadow-sm">
+                    <a asp-controller="Factura" asp-action="Index" asp-route-Tipo="@ViewBag.TipoFactura" class="btn btn-outline-secondary w-100 shadow-sm">
                         <i class="bi bi-arrow-left-circle"></i> Volver
                     </a>
                 </div>

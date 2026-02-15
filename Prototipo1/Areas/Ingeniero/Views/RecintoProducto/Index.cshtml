@@ -7,7 +7,7 @@
             <h2 class="text-primary">Presupuesto del Recinto</h2>
         </div>
         <div class="col-12 col-md-6 text-end">
-            @if (ViewBag.Completado == "0")
+            @if (ViewBag.Completado != "1")
             {
                 <a asp-controller="RecintoProducto" asp-action="Upsert" asp-route-IdRecinto="@ViewBag.IdRecinto" class="btn btn-primary">
                     <i class="bi bi-plus-circle"></i> Agregar Producto
@@ -57,7 +57,7 @@
                 <th>Desperdicio</th>
                 <th>Existencias Actuales</th>
                 
-                @if (ViewBag.Completado == "0")
+                @if (ViewBag.Completado != "1")
                 {
                     <th>Acciones</th>
                 }
@@ -83,10 +83,10 @@
                         <td>@obj.Desperdicio</td>
                         <td>@obj.ExistenciasActuales</td>
 
-                        
 
-                        
-                            @if (ViewBag.Completado == "0")
+
+
+                        @if (ViewBag.Completado != "1")
         {
                             <td>
                                 <div class="btn-group w-100" role="group">
@@ -144,7 +144,7 @@
 
     <!--  BOTÓN CONFIRMAR -->
     <div class="col-12 mt-3">
-        @if (ViewBag.Completado == "0")
+        @if (ViewBag.Completado != "1")
         {
             <form asp-controller="RecintoProducto" asp-action="ConfirmarPresupuesto" asp-route-IdRecinto="@ViewBag.IdRecinto" method="post">
                 <button type="submit" class="btn btn-primary">

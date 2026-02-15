@@ -243,6 +243,11 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
             );
 
             int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
+            if (!idProyecto.HasValue)
+            {
+                TempData["Error"] = "Debe seleccionar un proyecto antes de continuar.";
+                return RedirectToAction("Index", "Home");
+            }
 
             query = query.Where(n => n.Recinto.Aposento.Nivel.IdProyecto == idProyecto);
 
@@ -356,9 +361,16 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
     string nombreRecinto,
     int page = 1)
         {
-            int pageSize = 10;
-
+            
+            //asegurarse que haya un proyecto seleccionado
             int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
+            if (!idProyecto.HasValue)
+            {
+                TempData["Error"] = "Debe seleccionar un proyecto antes de continuar.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            int pageSize = 10;
 
             var query = _unitOfWork.RecintoProducto.GetAll(
                 includeProperties: "Recinto,Recinto.Aposento.Nivel,Producto"

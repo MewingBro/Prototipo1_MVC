@@ -174,8 +174,9 @@
                                             <a asp-controller="Factura" asp-action="Upsert"
                                                asp-route-IdFactura="@obj.IdFactura"
                                                asp-route-Tipo="@ViewBag.Tipo"
+                                               asp-route-EstadoFactura="@obj.EstadoFactura"
                                                class="btn btn-primary btn-sm">Editar</a>
-                                            <a asp-controller="Factura" asp-action="Borrar" asp-route-IdFactura="@obj.IdFactura"
+                                            <a asp-controller="Factura" asp-action="Borrar" asp-route-IdFactura="@obj.IdFactura" asp-route-Tipo="@ViewBag.Tipo"
                                                class="btn btn-danger btn-sm">Borrar</a>
                                         </div>
                                     }

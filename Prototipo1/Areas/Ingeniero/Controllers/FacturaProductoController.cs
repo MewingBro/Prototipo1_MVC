@@ -79,6 +79,16 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
         .GetAllBYID(f => f.IdFactura == IdFactura, includeProperties: "Factura,Producto")
         .ToList();
 
+            if (objFacturaProductoLista == null || !objFacturaProductoLista.Any())
+            {
+                TempData["Error"] = "Esta factura no tiene productos asociados, no se puede cerrar";
+
+                return RedirectToAction("Index", new
+                {
+                    idFactura = IdFactura
+                });
+            }
+
             int? idProyecto = HttpContext.Session.GetInt32("IdProyecto");
 
             foreach (var x in objFacturaProductoLista)

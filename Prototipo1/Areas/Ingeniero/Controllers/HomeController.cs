@@ -26,7 +26,8 @@ namespace Prototipo1.Areas.Ingeniero.Controllers
 
 public IActionResult Index(string searchString, int page = 1)
     {
-        if (!User.Identity.IsAuthenticated)
+        
+            if (!User.Identity.IsAuthenticated)
         {
             return RedirectToAction("Login", "Account", new { area = "Identity" });
         }
